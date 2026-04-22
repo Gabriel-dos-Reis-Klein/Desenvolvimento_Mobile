@@ -13,6 +13,7 @@
 |RF06|Filtragem de pedidos|O sistema deve permitir filtrar pedidos por tipo|
 |RF07|Anexar modelos|O sistema deve permitir ao usuário anexar modelos enviados pelo cliente|
 |RF08|Validação de entrada de dados|O sistema deve validar dados fornecido pelo usuário|
+|RF09|Enviar código de confirmação|O sistema deve enviar um código de verificação para validar a identidade do usuário antes de permitir a alteração de sua senha, caso ele ainda não esteja autenticado. O código deve ser enviado via e-mail ou número de telefone cadastrado|
 
 <!-- Observações
 - Para excluir/desativar uma entidade é necessário também excluir/desativar as demais entidades que dependem dela.
