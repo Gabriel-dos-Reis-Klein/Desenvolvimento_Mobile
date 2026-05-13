@@ -1,14 +1,13 @@
 {
   "expo": {
-    "name": "Desenvolvimento_Mobile",
-    "slug": "Desenvolvimento_Mobile",
+    "name": "front-end-",
+    "slug": "snack-6a258e85-8392-4cad-8d59-9b788812e029",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./src/assets/icon.png",
+    "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
-    "newArchEnabled": true,
     "splash": {
-      "image": "./src/assets/splash-icon.png",
+      "image": "./assets/splash-icon.png",
       "resizeMode": "contain",
       "backgroundColor": "#ffffff"
     },
@@ -18,17 +17,13 @@
     "android": {
       "adaptiveIcon": {
         "backgroundColor": "#E6F4FE",
-        "foregroundImage": "./src/assets/android-icon-foreground.png",
-        "backgroundImage": "./src/assets/android-icon-background.png",
-        "monochromeImage": "./src/assets/android-icon-monochrome.png"
-      },
-      "edgeToEdgeEnabled": true
+        "foregroundImage": "./assets/android-icon-foreground.png",
+        "backgroundImage": "./assets/android-icon-background.png",
+        "monochromeImage": "./assets/android-icon-monochrome.png"
+      }
     },
     "web": {
-      "favicon": "./src/assets/favicon.png"
-    },
-    "plugins": [
-      "expo-font"
-    ]
+      "favicon": "./assets/favicon.png"
+    }
   }
 }
