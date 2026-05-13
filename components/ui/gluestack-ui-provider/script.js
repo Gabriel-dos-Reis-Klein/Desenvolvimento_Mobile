@@ -1,4 +1,4 @@
-export const script = (mode: string) => {
+export const script = (mode) => {
   const documentElement = document.documentElement;
 
   function getSystemColorMode() {
