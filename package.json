@@ -17,6 +17,7 @@
     "@marceloterreiro/flash-calendar": "^2.0.0",
     "babel-preset-expo": "~54.0.10",
     "expo": "~54.0.33",
+    "expo-media-library": "~18.2.1",
     "expo-status-bar": "~3.0.9",
     "nativewind": "^4.1.23",
     "react": "19.1.0",
