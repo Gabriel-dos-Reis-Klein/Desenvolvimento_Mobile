@@ -7,7 +7,7 @@
 |-|-|-|
 |RF01|Gerenciar pedidos|O sistema deve permitir gerenciar pedidos, contendo: título do pedido, cliente do pedido, tipo de pedido, status de pedido, quantidade de peças, descrição, modelo (anexo fornecido pelo cliente), data de prova, data de entrega, orçamento, pagamento antecipado, saldo e tipo de pagamento|
 |RF02|Alternar status do pedido|O sistema deve permitir alterar o status dos pedidos entre: em produção, pronto e entregue|
-|RF03|Gerenciar clientes|O sistema deve permitir gerenciar clientes, contendo: nome, telefone, e-mail e outro (forma de contato genérica)|
+|RF03|Gerenciar clientes|O sistema deve permitir gerenciar clientes, contendo: nome, telefone|
 |RF04|Agenda de pedidos|O sistema deve exibir uma agenda com as datas de início, prova e entrega dos pedidos|
 |RF05|Gerenciar usuários|O sistema deve permitir gerenciar os usuários do sistema, contendo: nome, telefone, e-mail, senha e senha de exclusão|
 |RF06|Filtragem de pedidos|O sistema deve permitir filtrar pedidos por tipo|
