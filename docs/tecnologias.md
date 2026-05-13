@@ -7,3 +7,4 @@
 - **gluestack**
 - **expo-router**
 - **AsyncStorage**
+- **zod**
