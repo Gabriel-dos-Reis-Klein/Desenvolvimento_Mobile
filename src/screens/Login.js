@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, StyleSheet, TouchableOpacity, Text } from 'react-native';
+import { View, StyleSheet, TouchableOpacity, Text, ScrollView } from 'react-native';
 import { TextInput, Button } from 'react-native-paper';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
@@ -11,12 +11,16 @@ export default function Login() {
   const [secureText, setSecureText] = useState(true);
 
   return (
+    <ScrollView contentContainerStyle={styles.scrollContent}>
       <View style={styles.card}>
         {/* Ícone de Tesoura */}
-        <View style={styles.logoContainer}>
+
+        <View style={styles.headerContainer}>
+          <View style={styles.line} />        
           <View style={styles.iconCircle}>
             <MaterialCommunityIcons name="content-cut" size={30} color="white" />
           </View>
+          <View style={styles.line} />
         </View>
 
         <Text style={styles.title}>Comece agora</Text>
@@ -75,19 +79,35 @@ export default function Login() {
           Entrar
         </Button>
       </View>
+    </ScrollView>
   );
 }
 
 const styles = StyleSheet.create({
+  scrollContent: {
+    flexGrow: 1,
+    justifyContent: 'center',
+    padding: 20,
+  },
   card: {
     backgroundColor: 'white',
     borderRadius: 10,
     padding: 20,
     alignItems: 'stretch',
+    elevation: 5,
   },
-  logoContainer: {
+   headerContainer: {
+    flexDirection: 'row',
     alignItems: 'center',
+    justifyContent: 'center',
     marginBottom: 20,
+  },
+  line: {
+    flex: 1,
+    height: 1,
+    backgroundColor: '#333',
+    marginHorizontal: 10,
+    borderStyle: 'dashed', // Para simular os traços da imagem
   },
   iconCircle: {
     backgroundColor: '#FF0050',
