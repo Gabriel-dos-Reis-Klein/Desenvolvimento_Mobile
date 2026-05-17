@@ -31,6 +31,7 @@
 |-|-|-|
 |RNF01|Critérios de senha|A senha deve ter no mínimo 8 caracteres, devendo conter: letra maiúscula, minúscula, caracter especial e número|
 |RNF02|Confirmação de exclusão|A exclusão de entidades deve exigir a senha do usuário para confirmação|
+|RNF03|Unicidade de e-mail|Um e-mail apenas pode estar vinculado a um usuário|
 
 > [!NOTE]
 > Se o sistema tiver apenas um tipo de usuário, vale trocar o "O sistema deve permitir gerenciar usuários" por "O sistema deve permitir visualizar e editar os dados do usuário".
