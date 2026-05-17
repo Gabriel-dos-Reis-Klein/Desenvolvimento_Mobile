@@ -4,7 +4,7 @@
 - **Flash Calendar:** Biblioteca para exibição e manipulação de calendários e datas no aplicativo.
 - **expo-media-library:** API para acessar e gerenciar fotos e vídeos armazenados no dispositivo.
 - **react-native-paper:** Biblioteca de componentes visuais baseada em Material Design para criação de interfaces.
-- **gluestack**
-- **expo-router**
+- **react-navigator**
 - **AsyncStorage**
 - **zod**
+- **panva/jose** (tokens JWT)
