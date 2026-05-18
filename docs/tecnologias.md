@@ -3,8 +3,8 @@
 - [x] **react-native-safe-area-context:** Biblioteca que garante que o layout respeite áreas seguras da tela (notch, barras do sistema).
 - [x] **Flash Calendar:** Biblioteca para exibição e manipulação de calendários e datas no aplicativo.
 - [x] **expo-media-library:** API para acessar e gerenciar fotos e vídeos armazenados no dispositivo.
-- [ ] **react-native-paper:** Biblioteca de componentes visuais baseada em Material Design para criação de interfaces.
-- [ ] **react-navigator**
+- [x] **react-native-paper:** Biblioteca de componentes visuais baseada em Material Design para criação de interfaces.
+- [x] **react-navigator**
 - [x] **AsyncStorage**
 - [x] **zod**
 - [ ] **panva/jose** (tokens JWT)
