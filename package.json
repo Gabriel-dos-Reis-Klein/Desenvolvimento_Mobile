@@ -16,6 +16,7 @@
     "expo": "~54.0.33",
     "expo-media-library": "~18.2.1",
     "expo-status-bar": "~3.0.9",
+    "jose": "^6.2.3",
     "react": "19.1.0",
     "react-native": "0.81.5",
     "react-native-paper": "^5.15.2",

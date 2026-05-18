@@ -7,4 +7,4 @@
 - [x] **react-navigator**
 - [x] **AsyncStorage**
 - [x] **zod**
-- [ ] **panva/jose** (tokens JWT)
+- [x] **panva/jose** (tokens JWT)
