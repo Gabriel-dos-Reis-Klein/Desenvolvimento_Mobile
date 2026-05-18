@@ -1,7 +1,21 @@
-- **React Native:** Framework para desenvolver aplicativos móveis nativos usando JavaScript ou TypeScript.
-- **Expo:** Plataforma que simplifica o desenvolvimento com React Native, oferecendo ferramentas e APIs prontas.
-- **Expo SQLite:** Módulo para armazenamento local de dados utilizando banco SQLite no dispositivo.
-- **react-native-safe-area-context:** Biblioteca que garante que o layout respeite áreas seguras da tela (notch, barras do sistema).
-- **Flash Calendar:** Biblioteca para exibição e manipulação de calendários e datas no aplicativo.
-- **expo-media-library:** API para acessar e gerenciar fotos e vídeos armazenados no dispositivo.
-- **react-native-paper:** Biblioteca de componentes visuais baseada em Material Design para criação de interfaces.
+# Resumo das Tecnologias do Projeto
+
+## Desenvolvimento e Infraestrutura
+* **React Native:** Framework para criar aplicativos móveis nativos (Android e iOS) usando JavaScript ou TypeScript.
+* **Expo:** Conjunto de ferramentas que simplifica a criação, testes e build do aplicativo React Native.
+
+## Layout e Interface Visual (UI)
+* **react-native-paper:** Biblioteca de componentes de interface prontos baseados no Material Design.
+* **react-native-safe-area-context:** Garante que o conteúdo não seja cortado por entalhes (notches) ou barras do sistema.
+
+## Navegação e Dados
+* **react-navigator:** Gerencia a transição de telas e as rotas de navegação dentro do aplicativo.
+* **AsyncStorage:** Sistema de armazenamento local simples para salvar dados direto no dispositivo.
+
+## Validação e Segurança
+* **zod:** Biblioteca para criar esquemas de validação de dados e tipagem estática.
+* **panva/jose:** Biblioteca usada para criar, assinar e verificar tokens JWT (autenticação).
+
+## Recursos Nativos e Funcionalidades
+* **Flash Calendar:** Componente otimizado para exibição, controle e manipulação de calendários e datas.
+* **expo-media-library:** Permite que o aplicativo acesse, leia e salve fotos ou vídeos na galeria do celular.

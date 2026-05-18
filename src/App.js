@@ -5,11 +5,11 @@ import { createStackNavigator } from '@react-navigation/stack';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { Provider as PaperProvider } from 'react-native-paper';
 
-import Login from './src/screens/Login';
-import Home from './src/screens/Home';
-import Details from './src/screens/Details';
-import Register from './src/screens/Register';
-import Clientes from './src/screens/Clientes'
+import Login from './screens/Login';
+import Home from './screens/Home';
+import Details from './screens/Details';
+import Register from './screens/Register';
+import Clientes from './screens/Clientes'
 
 const Stack = createStackNavigator();
 const Tab = createBottomTabNavigator();
