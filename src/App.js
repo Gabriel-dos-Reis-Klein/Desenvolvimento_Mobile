@@ -15,15 +15,6 @@ const Stack = createStackNavigator();
 const Tab = createBottomTabNavigator();
 const PedidosStack = createStackNavigator();
 
-/*function PedidosStackScreen() {
-  return (
-    <PedidosStack.Navigator>
-      <PedidosStack.Screen name="ListaPedidos" component={OrdersScreen} options={{ headerShown: false }} />
-      <PedidosStack.Screen name="DetalhesPedido" component={DetailsScreen} />
-    </PedidosStack.Navigator>
-  );
-}*/
-
 function MainTabs() {
   return (
     <Tab.Navigator screenOptions={{ headerShown: false }}>
@@ -42,12 +33,7 @@ export default function App() {
     <PaperProvider>
       <NavigationContainer>
         <Stack.Navigator screenOptions={{ headerShown: false }}>
-
-
-
           <Stack.Screen name="MainHome" component={MainTabs} />
-
-          <Stack.Screen name="Detalhes" component={Details} />
         </Stack.Navigator>
       </NavigationContainer>
     </PaperProvider>
