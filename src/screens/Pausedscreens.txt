@@ -1,3 +1,0 @@
-          <Stack.Screen name="Login" component={Login}/>
-
-          <Stack.Screen name="Registro" component={Register} />
