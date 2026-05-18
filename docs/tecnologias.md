@@ -1,10 +1,10 @@
-- **React Native:** Framework para desenvolver aplicativos móveis nativos usando JavaScript ou TypeScript.
-- **Expo:** Plataforma que simplifica o desenvolvimento com React Native, oferecendo ferramentas e APIs prontas.
-- **react-native-safe-area-context:** Biblioteca que garante que o layout respeite áreas seguras da tela (notch, barras do sistema).
-- **Flash Calendar:** Biblioteca para exibição e manipulação de calendários e datas no aplicativo.
-- **expo-media-library:** API para acessar e gerenciar fotos e vídeos armazenados no dispositivo.
-- **react-native-paper:** Biblioteca de componentes visuais baseada em Material Design para criação de interfaces.
-- **react-navigator**
-- **AsyncStorage**
-- **zod**
-- **panva/jose** (tokens JWT)
+- [x] **React Native:** Framework para desenvolver aplicativos móveis nativos usando JavaScript ou TypeScript.
+- [x] **Expo:** Plataforma que simplifica o desenvolvimento com React Native, oferecendo ferramentas e APIs prontas.
+- [x] **react-native-safe-area-context:** Biblioteca que garante que o layout respeite áreas seguras da tela (notch, barras do sistema).
+- [x] **Flash Calendar:** Biblioteca para exibição e manipulação de calendários e datas no aplicativo.
+- [x] **expo-media-library:** API para acessar e gerenciar fotos e vídeos armazenados no dispositivo.
+- [ ] **react-native-paper:** Biblioteca de componentes visuais baseada em Material Design para criação de interfaces.
+- [ ] **react-navigator**
+- [x] **AsyncStorage**
+- [x] **zod**
+- [ ] **panva/jose** (tokens JWT)
