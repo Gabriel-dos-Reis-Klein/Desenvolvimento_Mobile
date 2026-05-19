@@ -35,15 +35,14 @@ export default function OrderCard({
 
       <View style={styles.contentContainer}>
         <Text
-          numberOfLines={1}
+          numberOfLines={2}
           style={styles.title}
         >
           {order.descricaoPeca}
         </Text>
 
         <Text style={styles.subtitle}>
-          {order.tipoServico} •{' '}
-          {order.status}
+          {`${order.tipoServico} • ${order.status}`}
         </Text>
       </View>
     </TouchableOpacity>
