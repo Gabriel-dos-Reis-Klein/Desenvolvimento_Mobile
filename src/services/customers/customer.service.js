@@ -1,9 +1,10 @@
-import BaseService from "./BaseService";
+import BaseService from "../api/base.service";
+import { ENDPOINTS } from "../api/endpoints"
 
 // TODO: Adicionar métodos exclusivos da classe conforme avanço no desenvolvimento do backend
 class CustomerService extends BaseService{
     constructor(){
-        super('/clientes');
+        super(ENDPOINTS.CUSTOMERS);
     }
 }
 
