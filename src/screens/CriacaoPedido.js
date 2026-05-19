@@ -1,18 +1,30 @@
-import { View, Text, StyleSheet, FlatList, TouchableOpacity, ActivityIndicator, Image, ScrollView, Alert, Platform } from "react-native";
-import { TextInput, Button, Menu } from 'react-native-paper';
+import {
+  View,
+  Text,
+  StyleSheet,
+  FlatList,
+  TouchableOpacity,
+  ActivityIndicator,
+  Image,
+  ScrollView,
+  Alert,
+  Platform,
+} from "react-native";
+import { TextInput, Button, Menu } from "react-native-paper";
 import React, { useState, useEffect, useCallback } from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import * as ImagePicker from 'expo-image-picker';
-import * as MediaLibrary from 'expo-media-library';
+import * as ImagePicker from "expo-image-picker";
+import * as MediaLibrary from "expo-media-library";
 import { Picker } from "@react-native-picker/picker";
+import DateTimePicker from "@react-native-community/datetimepicker";
 
-const IconeVoltar = require('../assets/return.png');
+const IconeVoltar = require("../assets/return.png");
 
-export default function PedidoCriacao({navigation}){
+export default function CriacaoPedido({ navigation }) {
   const [buscaCliente, setBuscaCliente] = useState("");
-  const [clienteSelecionado, setClienteSelecionado] = useState(null); // objeto { id, nome, telefone } ou null
+  const [clienteSelecionado, setClienteSelecionado] = useState(null); 
   const [clientesFiltrados, setClientesFiltrados] = useState([]);
-  const [tipoServico, setTipoServico] = useState("confecção"); // valor padrão
+  const [tipoServico, setTipoServico] = useState("confecção"); 
   const [descricaoPeca, setDescricaoPeca] = useState("");
   const [valorTotal, setValorTotal] = useState("");
   const [dataAgendamento, setDataAgendamento] = useState(new Date());
@@ -20,16 +32,17 @@ export default function PedidoCriacao({navigation}){
   const [image, setImage] = useState(null);
   const [loading, setLoading] = useState(false);
   const [carregandoClientes, setCarregandoClientes] = useState(false);
+
   const [todosClientes, setTodosClientes] = useState([]);
 
-    useEffect(() => {
+  useEffect(() => {
     carregarClientes();
   }, []);
 
   const carregarClientes = async () => {
     setCarregandoClientes(true);
     try {
-      const response = await fetch("https://ponto-gestor.onrender.com/api/clientes"); // substitua pela URL real
+      const response = await fetch("https://ponto-gestor.onrender.com/api/clientes"); 
       const data = await response.json();
       setTodosClientes(data);
     } catch (error) {
@@ -40,7 +53,6 @@ export default function PedidoCriacao({navigation}){
     }
   };
 
-  // Filtragem local conforme o usuário digita
   const filtrarClientes = (texto) => {
     setBuscaCliente(texto);
     if (!texto || texto.length < 2) {
@@ -56,16 +68,13 @@ export default function PedidoCriacao({navigation}){
     setClientesFiltrados(filtrados);
   };
 
-  // Seleciona um cliente da lista e fecha a sugestão
   const selecionarCliente = (cliente) => {
     setClienteSelecionado(cliente);
-    setBuscaCliente(cliente.nome); // exibe o nome no campo
+    setBuscaCliente(cliente.nome); 
     setClientesFiltrados([]);
   };
 
-  // Limpa a seleção quando o campo for alterado manualmente
   const handleMudancaBusca = (texto) => {
-    // Se o usuário está apagando o nome, removemos a seleção
     if (clienteSelecionado && texto !== clienteSelecionado.nome) {
       setClienteSelecionado(null);
     }
@@ -73,15 +82,18 @@ export default function PedidoCriacao({navigation}){
   };
 
   const selecionarFoto = async () => {
-    const cameraRollStatus = await ImagePicker.requestMediaLibraryPermissionsAsync();
+    const cameraRollStatus =
+      await ImagePicker.requestMediaLibraryPermissionsAsync();
     const mediaLibStatus = await MediaLibrary.requestPermissionsAsync();
 
-    if (cameraRollStatus.status !== 'granted' || mediaLibStatus.status !== 'granted') {
+    if (
+      cameraRollStatus.status !== "granted" ||
+      mediaLibStatus.status !== "granted"
+    ) {
       alert("Precisamos de permissão para acessar suas fotos!");
       return;
     }
 
-    // 2. Abrir a galeria para o usuário escolher
     let result = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ImagePicker.Images,
       allowsEditing: true,
@@ -91,11 +103,10 @@ export default function PedidoCriacao({navigation}){
     if (!result.canceled) {
       const uriOriginal = result.assets[0].uri;
       setImage(uriOriginal);
-    }  
+    }
   };
-  
+
   const onChangeDate = (event, selectedDate) => {
-    // Esconder o picker em Android (no iOS é modal)
     if (Platform.OS === "android") {
       setMostrarDatePicker(false);
     }
@@ -108,9 +119,7 @@ export default function PedidoCriacao({navigation}){
     setMostrarDatePicker(true);
   };
 
-  // Função de POST para criar pedido
   const criarPedido = async () => {
-    // Validações
     if (!clienteSelecionado) {
       Alert.alert("Erro", "Selecione um cliente válido.");
       return;
@@ -131,7 +140,7 @@ export default function PedidoCriacao({navigation}){
       formData.append("tipo_servico", tipoServico);
       formData.append("descricao_peca", descricaoPeca.trim());
       formData.append("valor_total", parseFloat(valorTotal));
-      formData.append("status", "pendente"); // valor padrão na criação
+      formData.append("status", "pendente"); 
       formData.append(
         "agendamento",
         dataAgendamento.toISOString()
@@ -147,7 +156,6 @@ export default function PedidoCriacao({navigation}){
       const response = await fetch("https://ponto-gestor.onrender.com/api/pedidos", {
         method: "POST",
         body: formData,
-        // Não defina Content-Type, o fetch coloca o boundary automaticamente
       });
 
       if (response.ok) {
@@ -168,16 +176,22 @@ export default function PedidoCriacao({navigation}){
     }
   };
 
-  return(
-  <ScrollView contentContainerStyle={styles.scrollContent}>  
-    <View style={styles.container}>
+  return (
+    <ScrollView contentContainerStyle={styles.scrollContent}>
+      <View style={styles.container}>
         <View style={styles.headerButtons}>
           <TouchableOpacity onPress={() => navigation.goBack()}>
-            <Image source={IconeVoltar} style={styles.customIcon} resizeMode="contain" />
+            <Image
+              source={IconeVoltar}
+              style={styles.customIcon}
+              resizeMode="contain"
+            />
           </TouchableOpacity>
         </View>
-      <Text style={styles.title}>Criar Pedido</Text>
-      <TextInput
+        <Text style={styles.title}>Criar Pedido</Text>
+
+        <Text style={styles.label}>Cliente *</Text>
+        <TextInput
           placeholder="Digite nome ou telefone para buscar"
           value={buscaCliente}
           onChangeText={handleMudancaBusca}
@@ -201,7 +215,6 @@ export default function PedidoCriacao({navigation}){
             style={{ marginBottom: 10 }}
           />
         )}
-        {/* Lista de sugestões */}
         {clientesFiltrados.length > 0 && !clienteSelecionado && (
           <View style={styles.sugestoesContainer}>
             <FlatList
@@ -224,7 +237,6 @@ export default function PedidoCriacao({navigation}){
           </View>
         )}
 
-        {/* Tipo de serviço */}
         <Text style={styles.label}>Tipo de Serviço *</Text>
         <View style={styles.pickerWrapper}>
           <Picker
@@ -239,13 +251,13 @@ export default function PedidoCriacao({navigation}){
           </Picker>
         </View>
 
-        {/* Descrição da peça */}
         <TextInput
           label="Descrição da peça"
           value={descricaoPeca}
           onChangeText={setDescricaoPeca}
           mode="outlined"
           multiline
+          numberOfLines={3}
           style={[styles.input, { height: 100 }]}
           theme={{
             colors: {
@@ -259,7 +271,6 @@ export default function PedidoCriacao({navigation}){
           activeOutlineColor="#FF0050"
         />
 
-        {/* Valor total */}
         <TextInput
           label="Valor do pedido (R$)"
           value={valorTotal}
@@ -279,7 +290,6 @@ export default function PedidoCriacao({navigation}){
           activeOutlineColor="#FF0050"
         />
 
-        {/* Agendamento */}
         <Text style={styles.label}>Agendamento *</Text>
         <TouchableOpacity
           style={styles.dateButton}
@@ -290,12 +300,14 @@ export default function PedidoCriacao({navigation}){
               day: "2-digit",
               month: "2-digit",
               year: "numeric",
+              hour: "2-digit",
+              minute: "2-digit",
             })}
           </Text>
           <Text style={styles.dateIcon}>📅</Text>
         </TouchableOpacity>
         {mostrarDatePicker && (
-          <Picker
+          <DateTimePicker
             value={dataAgendamento}
             mode="datetime"
             display={Platform.OS === "ios" ? "spinner" : "default"}
@@ -304,7 +316,6 @@ export default function PedidoCriacao({navigation}){
           />
         )}
 
-        {/* Anexar foto */}
         <Text style={styles.label}>Foto (opcional)</Text>
         <TouchableOpacity
           style={styles.fotoButton}
@@ -316,7 +327,6 @@ export default function PedidoCriacao({navigation}){
           <Image source={{ uri: image }} style={styles.previewImage} />
         )}
 
-        {/* Botão de envio */}
         <Button
           mode="contained"
           loading={loading}
@@ -327,9 +337,9 @@ export default function PedidoCriacao({navigation}){
         >
           Criar Pedido
         </Button>
-    </View>
-  </ScrollView>
-  )
+      </View>
+    </ScrollView>
+  );
 }
 
 const styles = StyleSheet.create({

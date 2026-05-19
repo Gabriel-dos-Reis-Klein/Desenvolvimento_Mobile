@@ -1,12 +1,14 @@
-import { View, Text, Button, StyleSheet, FlatList, TouchableOpacity, ActivityIndicator } from "react-native";
+import { View, Text, Button, StyleSheet, FlatList, TouchableOpacity, ActivityIndicator, Image  } from "react-native";
 import { IconButton, FAB } from 'react-native-paper';
 import React, { useState, useEffect } from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { MaterialCommunityIcons } from '@expo/vector-icons';
 
+const IconeOrdenar = require('../assets/ordem.png');
+const IconeFiltrar = require('../assets/filtragem.png');
+const IconePesquisa = require('../assets/pesquisa.png');
+const IconeConfiguracao = require('../assets/configuracao.png');
 
 const ClienteCard = ({ pessoa }) => {
-  // Cores dinâmicas baseadas no status que vem da sua API
 
   return (
     <TouchableOpacity style={styles.card}>
@@ -25,7 +27,7 @@ const ClienteCard = ({ pessoa }) => {
   );
 };
 
-export default function Home({navigation}){
+export default function Clientes({navigation}){
     
 const [clientes, setClientes] = useState([]);
 const [loading, setLoading] = useState(true);
@@ -33,7 +35,6 @@ const [loading, setLoading] = useState(true);
 const fetchClientes = async () => {
     try {
       setLoading(true);
-      // Substitua pela URL da sua API (ex: http://192.168.1.10:3000/pedidos)
       const response = await fetch('https://ponto-gestor.onrender.com/api/clientes');
       const data = await response.json();
       setClientes(data);
@@ -50,8 +51,8 @@ useEffect(() =>{
     return(
         <View style={styles.container}>
           <View style={styles.headerButtons}>
-            <IconButton icon="cog-outline" size={26} />
-            <IconButton icon="magnify" size={26} />
+            <Image source={IconeConfiguracao} style={styles.customIcon} resizeMode="contain" />
+            <Image source={IconePesquisa} style={styles.customIcon} resizeMode="contain" />
           </View>
           <View style={styles.titleArea}>
             <Text style={styles.headerTitle}>Clientes</Text>
@@ -59,10 +60,10 @@ useEffect(() =>{
           </View>
           <View style={styles.filterRow}>
            <TouchableOpacity style={styles.filterBox} onPress={fetchClientes}>
-              <MaterialCommunityIcons name="sort-variant" size={24} color="#333" />
+              <Image source={IconeOrdenar} style={styles.customIcon} resizeMode="contain" />
             </TouchableOpacity>
             <TouchableOpacity style={styles.filterBox}>
-              <MaterialCommunityIcons name="filter-variant" size={24} color="#333" />
+              <Image source={IconeFiltrar} style={styles.customIcon} resizeMode="contain" />
             </TouchableOpacity>
           </View> 
           {loading ? (
@@ -81,7 +82,7 @@ useEffect(() =>{
               style={styles.fab}
               icon="plus"
               color="white"
-              onPress={() => console.log('Novo Cliente')}
+              onPress={() => navigation.navigate('Criacao', { screen: 'ClienteCriacao' })}
               />         
         </View>
         
@@ -103,7 +104,12 @@ const styles = StyleSheet.create({
     borderWidth: 1, 
     borderColor: '#E0E0E0', 
     justifyContent: 'center', 
-    alignItems: 'center' 
+    alignItems: 'center',
+    backgroundColor: '#FFF',
+  },
+    customIcon: {
+    width: 26, 
+    height: 26,
   },
   listPadding: { paddingHorizontal: 20, paddingBottom: 100 },
   card: { flexDirection: 'row', alignItems: 'center', marginBottom: 20 },
@@ -115,16 +121,6 @@ const styles = StyleSheet.create({
     borderRadius: 15, 
     justifyContent: 'center', 
     alignItems: 'center' 
-  },
-  statusBadge: { 
-    position: 'absolute', 
-    bottom: -2, 
-    right: -2, 
-    width: 16, 
-    height: 16, 
-    borderRadius: 8, 
-    borderWidth: 2, 
-    borderColor: '#FFF' 
   },
   contentContainer: { flex: 1, marginLeft: 15 },
   pedidoTitle: { fontSize: 16, fontWeight: '700', color: '#333' },

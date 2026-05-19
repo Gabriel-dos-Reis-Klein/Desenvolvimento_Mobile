@@ -3,7 +3,16 @@ import { IconButton, FAB } from 'react-native-paper';
 import React, { useState, useEffect } from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { MaterialCommunityIcons } from '@expo/vector-icons';
-import Icon from '../components/Icon'
+import SortModal from '../components/SortModal'
+import FilterModal from '../components/FilterModal'
+
+const IconeOrdenar = require('../assets/ordem.png');
+const IconeFiltrar = require('../assets/filtragem.png');
+const IconeConfeccao = require('../assets/tipo_confeccao.png')
+const IconeReparo = require('../assets/tipo_reparo.png')
+const IconeModificacao = require('../assets/tipo_modificacao.png')
+const IconePesquisa = require('../assets/pesquisa.png');
+const IconeConfiguracao = require('../assets/configuracao.png');
 
 const PedidoCard = ({ item }) => {
   // Cores dinâmicas baseadas no status que vem da sua API
@@ -17,9 +26,9 @@ const PedidoCard = ({ item }) => {
 
   const getIcon = (tipo) => {
     const t = tipo?.toLowerCase();
-    if (t?.includes('confecção')) return Icon.confeccao;
-    if (t?.includes('modificação')) return Icon.modificacao;
-    if (t?.includes('reparo')) return Icon.reparo;
+    if (t?.includes('confecção')) return IconeConfeccao;
+    if (t?.includes('modificação')) return IconeModificacao;
+    if (t?.includes('reparo')) return IconeReparo;
     return 'dots-horizontal';
   };
 
@@ -35,7 +44,7 @@ const PedidoCard = ({ item }) => {
       <View style={styles.contentContainer}>
         <Text numberOfLines={1} style={styles.pedidoTitle}>{item.descricaoPeca}</Text>
         <Text style={styles.pedidoSubtitle}>
-          {item.tipo} • {item.status} • {item.data}
+          {item.tipo} • {item.status} • {item.tipoServico}
         </Text>
       </View>
     </TouchableOpacity>
@@ -46,6 +55,30 @@ export default function Home({navigation}){
     
 const [pedidos, setPedidos] = useState([]);
 const [loading, setLoading] = useState(true);
+const [isSortVisible, setIsSortVisible] = useState(false);
+const [sortOrder, setSortOrder] = useState('alfabetica');
+const [filterVisible, setFilterVisible] = useState(false);
+
+const handleSort = (tipo) => {
+  setSortOrder(tipo);
+  
+  let listaOrdenada = [...pedidos];
+
+  if (tipo === 'alfabetica') {
+    listaOrdenada.sort((a, b) => 
+      (a.descricaoPeca || "").localeCompare(b.descricaoPeca || "")
+    );
+  } else if (tipo === 'prazo') {
+    listaOrdenada.sort((a, b) => new Date(a.data) - new Date(b.data));
+  } else if (tipo === 'cliente') {
+    listaOrdenada.sort((a, b) => 
+      (a.nomeCliente || "").localeCompare(b.nomeCliente || "")
+    );
+  }
+
+  setPedidos(listaOrdenada);
+  setIsSortVisible(false);
+};
 
 const fetchPedidos = async () => {
     try {
@@ -69,8 +102,8 @@ useEffect(() =>{
     return (
     <View style={styles.container}>
       <View style={styles.headerButtons}>
-        <IconButton icon="cog-outline" size={26} />
-        <IconButton icon="magnify" size={26} />
+        <Image source={IconeConfiguracao} style={styles.customIcon} resizeMode="contain" />
+        <Image source={IconePesquisa} style={styles.customIcon} resizeMode="contain" />
       </View>
 
       <View style={styles.titleArea}>
@@ -79,11 +112,11 @@ useEffect(() =>{
       </View>
 
       <View style={styles.filterRow}>
-        <TouchableOpacity style={styles.filterBox} onPress={fetchPedidos}>
-          <MaterialCommunityIcons name="sort-variant" size={24} color="#333" />
+        <TouchableOpacity style={styles.filterBox} onPress={() => setIsSortVisible(true)}>
+          <Image source={IconeOrdenar} style={styles.customIcon} resizeMode="contain" />
         </TouchableOpacity>
-        <TouchableOpacity style={styles.filterBox}>
-          <MaterialCommunityIcons name="filter-variant" size={24} color="#333" />
+        <TouchableOpacity style={styles.filterBox} onPress={() => setFilterVisible(true)}>
+          <Image source={IconeFiltrar} style={styles.customIcon} resizeMode="contain" />
         </TouchableOpacity>
       </View>
 
@@ -103,7 +136,7 @@ useEffect(() =>{
         style={styles.fab}
         icon="plus"
         color="white"
-        onPress={() => console.log('Novo Pedido')}
+        onPress={() => navigation.navigate('Criacao', { screen: 'PedidoCriacao' })}
       />
     </View>
   );
@@ -124,7 +157,12 @@ const styles = StyleSheet.create({
     borderWidth: 1, 
     borderColor: '#E0E0E0', 
     justifyContent: 'center', 
-    alignItems: 'center' 
+    alignItems: 'center',
+    backgroundColor: '#FFF',
+  },
+  customIcon: {
+    width: 26, 
+    height: 26,
   },
   listPadding: { paddingHorizontal: 20, paddingBottom: 100 },
   card: { flexDirection: 'row', alignItems: 'center', marginBottom: 20 },
