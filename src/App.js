@@ -6,24 +6,24 @@ import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { Provider as PaperProvider } from 'react-native-paper';
 
 import Login from './screens/Login';
-import Home from './screens/Home';
-import Details from './screens/Details';
+import Order from './screens/Order';
 import Register from './screens/Register';
-import Clientes from './screens/Clientes'
+import Customer from './screens/Customer';
 
 const Stack = createStackNavigator();
 const Tab = createBottomTabNavigator();
-const PedidosStack = createStackNavigator();
 
 function MainTabs() {
   return (
     <Tab.Navigator screenOptions={{ headerShown: false }}>
       <Tab.Screen 
-        name="Home" 
-        component={Home} 
-        options={{ title: 'Pedidos' }} 
+        name="Pedidos" 
+        component={Order} 
       />
-      <Tab.Screen name="Clientes" component={Clientes} />
+      <Tab.Screen 
+        name="Clientes" 
+        component={Customer} 
+      />
     </Tab.Navigator>
   );
 }
