@@ -8,7 +8,7 @@ import {
 
 const api = axios.create({
   baseURL: 'https://ponto-gestor.onrender.com/api/',
-  timeout: 30000,
+  timeout: 60000,
 });
 
 api.interceptors.request.use(requestInterceptor, requestErrorInterceptor);
