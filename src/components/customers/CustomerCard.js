@@ -11,7 +11,8 @@ export default function CustomerCard({
   customer,
   onPress,
 }) {
-  const firstLetter = customer?.nome?.charAt(0)?.toUpperCase() || '?';
+  const firstLetter =
+    customer?.nome?.charAt(0)?.toUpperCase() || '?';
 
   return (
     <TouchableOpacity

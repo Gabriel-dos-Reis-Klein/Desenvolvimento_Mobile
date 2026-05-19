@@ -1,7 +1,6 @@
 import React, {
   useEffect,
   useState,
-  useCallback
 } from 'react';
 
 import {
@@ -43,21 +42,10 @@ export default function Customer({
   const [loading, setLoading] =
     useState(true);
 
-  const fetchCustomers = useCallback(
-    async () => {
-      try {
-        setLoading(true);
-        const data = await customerService.getAll();
-        setCustomers(data);
-      } catch (error) {
-        console.error(error);
-      } finally {
-        setLoading(false);
-      }
-    },
-
-    []
-  );
+      setLoading(true);
+      const data = await customerService.getAll();
+      setCustomers(data);
+      setLoading(false);
 
   useEffect(() => {
     fetchCustomers();

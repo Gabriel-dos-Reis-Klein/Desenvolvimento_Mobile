@@ -1,17 +1,14 @@
 import axios from 'axios';
-import { 
-  requestInterceptor, 
-  requestErrorInterceptor, 
-  responseInterceptor, 
-  responseErrorInterceptor 
-} from './interceptors';
+import { setupInterceptors } from './interceptors';
 
 const api = axios.create({
-  baseURL: 'https://ponto-gestor.onrender.com/api/',
-  timeout: 60000,
+    baseURL: 'https://ponto-gestor.onrender.com/api/',
+    timeout: 30000,
+    headers: {
+        'Content-Type': 'application/json'
+    },
 });
 
-api.interceptors.request.use(requestInterceptor, requestErrorInterceptor);
-api.interceptors.response.use(responseInterceptor, responseErrorInterceptor);
+setupInterceptors(api);
 
 export default api;
