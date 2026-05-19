@@ -1,27 +1,32 @@
 import api from "./api";
 
-export function setupInterceptors(api) {
+export async function requestInterceptor (config) {
     // TODO: Adicionar implementação de tokens
-    api.interceptors.request.use(
-        async (config) => {
-            // const token = await AsyncStorage.getItem('@token');
-            // if (token) config.headers.Authorization = `Bearer ${token}`;
-            return config;
-        },
-        (error) => Promise.reject(error)
-    );
+    /*
+    const token = await AsyncStorage.getItem('@App:token');
+  
+    if (token) {
+        config.headers.Authorization = `Bearer ${token}`;
+    }
+    */
+    return config;
+};
 
-    api.interceptors.response.use(
-        (response) => response,
-        (error) => {
-            console.error("Erro na API:", error.response || error.message);
-            return Promise.reject({
-                message:
-                    error.response?.data?.message ||
-                    'Erro inesperado',
+export function requestErrorInterceptor (error) {
+  return Promise.reject(error);
+};
 
-                status: error.response?.status,
-            });
-        }
-    );
-}
+export function responseInterceptor (response) {
+  return response;
+};
+
+export async function responseErrorInterceptor (error) {
+    console.error("Erro na API:", error.response || error.message);
+    return Promise.reject({
+        message:
+            error.response?.data?.message ||
+            'Erro inesperado',
+
+        status: error.response?.status,
+    });
+};
