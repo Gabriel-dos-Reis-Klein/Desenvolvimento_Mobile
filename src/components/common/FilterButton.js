@@ -1,3 +1,5 @@
+import React from 'react';
+
 import {
   TouchableOpacity,
   StyleSheet,
@@ -7,33 +9,19 @@ import {
   MaterialCommunityIcons,
 } from '@expo/vector-icons';
 
-import {
-  COLORS,
-  RADIUS,
-} from '../../theme';
-
 export default function FilterButton({
   icon,
   onPress,
-  iconSize = 24,
-  iconColor = COLORS.black70,
-  style,
-  ...props
 }) {
   return (
     <TouchableOpacity
-      style={[
-        styles.button,
-        style,
-      ]}
+      style={styles.button}
       onPress={onPress}
-      activeOpacity={0.7}
-      {...props}
     >
       <MaterialCommunityIcons
         name={icon}
-        size={iconSize}
-        color={iconColor}
+        size={24}
+        color="#333"
       />
     </TouchableOpacity>
   );
@@ -43,15 +31,10 @@ const styles = StyleSheet.create({
   button: {
     width: 55,
     height: 55,
-
-    borderRadius: RADIUS.md,
-
+    borderRadius: 12,
     borderWidth: 1,
-    borderColor: COLORS.border,
-
+    borderColor: '#E0E0E0',
     justifyContent: 'center',
     alignItems: 'center',
-
-    backgroundColor: COLORS.surface,
   },
 });

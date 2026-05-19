@@ -1,41 +1,25 @@
+import React from 'react';
+
 import {
   View,
+  Text,
   TouchableOpacity,
   StyleSheet,
 } from 'react-native';
 
-import Text
-  from '../common/Text';
-
-import OrderIcon
-  from './OrderIcon';
-
+import OrderIcon from './OrderIcon';
 import OrderStatusBadge
   from './OrderStatusBadge';
-
-import {
-  COLORS,
-  SPACING,
-  RADIUS,
-  TYPOGRAPHY,
-  FONT_FAMILY,
-} from '../../theme';
 
 export default function OrderCard({
   order,
   onPress,
-  style,
-  ...props
 }) {
   return (
     <TouchableOpacity
-      style={[
-        styles.card,
-        style,
-      ]}
+      style={styles.card}
       onPress={onPress}
       activeOpacity={0.8}
-      {...props}
     >
       <View style={styles.iconContainer}>
         <View style={styles.iconCircle}>
@@ -51,19 +35,15 @@ export default function OrderCard({
 
       <View style={styles.contentContainer}>
         <Text
-          variant="body"
           numberOfLines={1}
           style={styles.title}
         >
           {order.descricaoPeca}
         </Text>
 
-        <Text
-          variant="small"
-          color={COLORS.textSecondary}
-          style={styles.subtitle}
-        >
-          {`${order.tipoServico} • ${order.status}`}
+        <Text style={styles.subtitle}>
+          {order.tipoServico} •{' '}
+          {order.status}
         </Text>
       </View>
     </TouchableOpacity>
@@ -74,8 +54,7 @@ const styles = StyleSheet.create({
   card: {
     flexDirection: 'row',
     alignItems: 'center',
-
-    marginBottom: SPACING.lg,
+    marginBottom: 20,
   },
 
   iconContainer: {
@@ -85,29 +64,26 @@ const styles = StyleSheet.create({
   iconCircle: {
     width: 55,
     height: 55,
-
-    borderRadius: RADIUS.lg,
-
+    backgroundColor: '#F5F5F5',
+    borderRadius: 15,
     justifyContent: 'center',
     alignItems: 'center',
-
-    backgroundColor:
-      COLORS.surfaceSecondary,
   },
 
   contentContainer: {
     flex: 1,
-
-    marginLeft: SPACING.md,
+    marginLeft: 15,
   },
 
   title: {
-    ...TYPOGRAPHY.body,
-    fontFamily:FONT_FAMILY.robotoBold,
-    color: COLORS.text,
+    fontSize: 16,
+    fontWeight: '700',
+    color: '#333',
   },
 
   subtitle: {
-    marginTop: SPACING.xs,
+    fontSize: 13,
+    color: '#999',
+    marginTop: 3,
   },
 });

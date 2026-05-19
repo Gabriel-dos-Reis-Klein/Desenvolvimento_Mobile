@@ -1,22 +1,55 @@
-import {
-  Provider as PaperProvider,
-} from 'react-native-paper';
+import * as React from 'react';
+import {View, Text} from 'react-native';
+import { NavigationContainer } from '@react-navigation/native';
+import { createStackNavigator } from '@react-navigation/stack';
+import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
+import { Provider as PaperProvider } from 'react-native-paper';
 
-import AppNavigator
-  from './navigation';
+import Login from './screens/Login';
+import Home from './screens/Home';
+import Details from './screens/Details';
+import Register from './screens/Register';
+import Clientes from './screens/Clientes'
 
-import {
-  useAppFonts,
-} from './hooks/useAppFonts';
+const Stack = createStackNavigator();
+const Tab = createBottomTabNavigator();
+const PedidosStack = createStackNavigator();
 
-// TODO: criar contramedidas para caso a API esteja indisponível
+/*function PedidosStackScreen() {
+  return (
+    <PedidosStack.Navigator>
+      <PedidosStack.Screen name="ListaPedidos" component={OrdersScreen} options={{ headerShown: false }} />
+      <PedidosStack.Screen name="DetalhesPedido" component={DetailsScreen} />
+    </PedidosStack.Navigator>
+  );
+}*/
+
+function MainTabs() {
+  return (
+    <Tab.Navigator screenOptions={{ headerShown: false }}>
+      <Tab.Screen 
+        name="Home" 
+        component={Home} 
+        options={{ title: 'Pedidos' }} 
+      />
+      <Tab.Screen name="Clientes" component={Clientes} />
+    </Tab.Navigator>
+  );
+}
+
 export default function App() {
-
-  useAppFonts();
-
   return (
     <PaperProvider>
-      <AppNavigator />
+      <NavigationContainer>
+        <Stack.Navigator screenOptions={{ headerShown: false }}>
+
+
+
+          <Stack.Screen name="MainHome" component={MainTabs} />
+
+          <Stack.Screen name="Detalhes" component={Details} />
+        </Stack.Navigator>
+      </NavigationContainer>
     </PaperProvider>
   );
 }

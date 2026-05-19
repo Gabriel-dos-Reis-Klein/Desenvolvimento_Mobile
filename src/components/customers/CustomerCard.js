@@ -1,40 +1,24 @@
+import React from 'react';
+
 import {
   View,
+  Text,
   StyleSheet,
   TouchableOpacity,
 } from 'react-native';
 
-import Text
-  from '../common/Text';
-
-import {
-  COLORS,
-  SPACING,
-  RADIUS,
-  TYPOGRAPHY,
-  FONT_FAMILY,
-} from '../../theme';
-
 export default function CustomerCard({
   customer,
   onPress,
-  style,
-  ...props
 }) {
   const firstLetter =
-    customer?.nome
-      ?.charAt(0)
-      ?.toUpperCase() || '?';
+    customer?.nome?.charAt(0)?.toUpperCase() || '?';
 
   return (
     <TouchableOpacity
-      style={[
-        styles.card,
-        style,
-      ]}
+      style={styles.card}
       onPress={onPress}
       activeOpacity={0.8}
-      {...props}
     >
       <View style={styles.avatar}>
         <Text style={styles.avatarText}>
@@ -43,19 +27,11 @@ export default function CustomerCard({
       </View>
 
       <View style={styles.content}>
-        <Text
-          variant="body"
-          numberOfLines={1}
-          style={styles.name}
-        >
+        <Text style={styles.name}>
           {customer.nome}
         </Text>
 
-        <Text
-          variant="small"
-          color={COLORS.textSecondary}
-          style={styles.phone}
-        >
+        <Text style={styles.phone}>
           {customer.telefone}
         </Text>
       </View>
@@ -68,54 +44,47 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
 
-    paddingVertical: SPACING.sm,
+    padding: 16,
+    marginBottom: 16,
 
-    borderRadius: RADIUS.lg,
+    borderRadius: 18,
 
-    backgroundColor:
-      COLORS.surface,
-
-    marginBottom: SPACING.md,
+    backgroundColor: '#FFF',
   },
 
   avatar: {
     width: 55,
     height: 55,
 
-    borderRadius: 55 / 2,
+    borderRadius: 28,
+
+    backgroundColor: '#FFE5EE',
 
     justifyContent: 'center',
     alignItems: 'center',
-
-    backgroundColor:
-      COLORS.primary10,
   },
 
   avatarText: {
-    ...TYPOGRAPHY.body,
-
-    fontFamily:
-      FONT_FAMILY.poppinsBold,
-
-    color: COLORS.primary,
+    fontSize: 22,
+    fontWeight: '700',
+    color: '#FF0054',
   },
 
   content: {
+    marginLeft: 16,
     flex: 1,
-
-    marginLeft: SPACING.md,
   },
 
   name: {
-    ...TYPOGRAPHY.body,
-
-    fontFamily:
-      FONT_FAMILY.poppinsSemiBold,
-
-    color: COLORS.text,
+    fontSize: 16,
+    fontWeight: '700',
+    color: '#222',
   },
 
   phone: {
-    marginTop: SPACING.xs,
+    marginTop: 4,
+
+    fontSize: 13,
+    color: '#777',
   },
 });

@@ -1,63 +1,42 @@
+import React from 'react';
+
 import {
   View,
+  Text,
   StyleSheet,
 } from 'react-native';
 
-import Text
-  from './Text';
-
-import IconButton
-  from './IconButton';
-
-import {
-  COLORS,
-  FONT_FAMILY,
-  SPACING,
-} from '../../theme';
+import { IconButton }
+  from 'react-native-paper';
 
 export default function ListHeader({
   title,
   total,
-
-  onPressSettings,
-  onPressSearch,
-
-  style,
-  ...props
 }) {
   return (
-    <View
-      style={style}
-      {...props}
-    >
+    <>
       <View style={styles.headerButtons}>
         <IconButton
           icon="cog-outline"
-          onPress={onPressSettings}
+          size={26}
         />
 
         <IconButton
           icon="magnify"
-          onPress={onPressSearch}
+          size={26}
         />
       </View>
 
       <View style={styles.titleArea}>
-        <Text
-          variant="h1"
-          style={styles.title}
-        >
+        <Text style={styles.title}>
           {title}
         </Text>
 
-        <Text
-          variant="small"
-          color={COLORS.textSecondary}
-        >
+        <Text style={styles.subtitle}>
           {total} resultados
         </Text>
       </View>
-    </View>
+    </>
   );
 }
 
@@ -65,18 +44,21 @@ const styles = StyleSheet.create({
   headerButtons: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-
-    marginBottom: SPACING.sm,
+    paddingHorizontal: 10,
   },
 
   titleArea: {
     alignItems: 'center',
-
-    marginBottom: SPACING.lg,
+    marginBottom: 20,
   },
 
   title: {
-    fontFamily:
-      FONT_FAMILY.poppinsBold,
+    fontSize: 34,
+    fontWeight: 'bold',
+  },
+
+  subtitle: {
+    fontSize: 14,
+    color: '#888',
   },
 });
