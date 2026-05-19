@@ -3,7 +3,7 @@ import { setupInterceptors } from './interceptors';
 
 const api = axios.create({
     baseURL: 'https://ponto-gestor.onrender.com/api/',
-    timeout: 10000,
+    timeout: 30000,
     headers: {
         'Content-Type': 'application/json'
     },
