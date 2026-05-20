@@ -23,16 +23,16 @@ import {
 
 import {
   orderService,
-} from '../services';
+} from '../../services';
 
 import OrderCard
-  from '../components/orders/OrderCard';
+  from '../../components/orders/OrderCard';
 
 import Loading
-  from '../components/common/Loading';
+  from '../../components/common/Loading';
 
 import EmptyState
-  from '../components/common/EmptyState';
+  from '../../components/common/EmptyState';
 
 export default function OrdersScreen({
   navigation,

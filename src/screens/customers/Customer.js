@@ -11,25 +11,25 @@ import {
 
 import {
   customerService,
-} from '../services';
+} from '../../services';
 
 import CustomerCard
-  from '../components/customers/CustomerCard';
+  from '../../components/customers/CustomerCard';
 
 import Loading
-  from '../components/common/Loading';
+  from '../../components/common/Loading';
 
 import EmptyState
-  from '../components/common/EmptyState';
+  from '../../components/common/EmptyState';
 
 import ListHeader
-  from '../components/common/ListHeader';
+  from '../../components/common/ListHeader';
 
 import FilterButton
-  from '../components/common/FilterButton';
+  from '../../components/common/FilterButton';
 
 import AppFab
-  from '../components/common/AppFab';
+  from '../../components/common/AppFab';
 
 import { Text } from 'react-native-paper';
 
