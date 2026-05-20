@@ -1,22 +1,39 @@
-import { View, StyleSheet } from 'react-native';
+import {
+  View,
+  StyleSheet,
+} from 'react-native';
 
 import {
   STATUS_COLORS,
+  COLORS,
 } from '../../theme';
 
 export default function OrderStatusBadge({
   status,
+  size = 20,
+  style,
+  ...props
 }) {
   return (
     <View
       style={[
         styles.badge,
+
         {
+          width: size,
+          height: size,
+
+          borderRadius: size / 2,
+
           backgroundColor:
             STATUS_COLORS[status] ||
-            '#E0E0E0',
+            COLORS.black20,
         },
+
+        style,
       ]}
+
+      {...props}
     />
   );
 }
@@ -24,12 +41,11 @@ export default function OrderStatusBadge({
 const styles = StyleSheet.create({
   badge: {
     position: 'absolute',
+
     bottom: -2,
     right: -2,
-    width: 20,
-    height: 20,
-    borderRadius: 8,
+
     borderWidth: 2,
-    borderColor: '#FFF',
+    borderColor: COLORS.white,
   },
 });
