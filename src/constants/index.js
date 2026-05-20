@@ -1,2 +1,1 @@
-export * from './order-status';
-export * from './order-types';
+export * from './orders';
