@@ -1,19 +1,22 @@
-import { NavigationContainer } from '@react-navigation/native';
-import { createStackNavigator } from '@react-navigation/stack';
-import { Provider as PaperProvider } from 'react-native-paper';
+import {
+  Provider as PaperProvider,
+} from 'react-native-paper';
 
-import MainTab from "./components/common/MainTab"
+import AppNavigator
+  from './navigation';
 
-const Stack = createStackNavigator();
+import {
+  useAppFonts,
+} from './hooks/useAppFonts';
 
+// TODO: criar contramedidas para caso a API esteja indisponível
 export default function App() {
+
+  useAppFonts();
+
   return (
     <PaperProvider>
-      <NavigationContainer>
-        <Stack.Navigator screenOptions={{ headerShown: false }}>
-          <Stack.Screen name="MainHome" component={MainTab} />
-        </Stack.Navigator>
-      </NavigationContainer>
+      <AppNavigator />
     </PaperProvider>
   );
 }
