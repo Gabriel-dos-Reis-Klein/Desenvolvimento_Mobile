@@ -6,9 +6,10 @@ import {
   responseErrorInterceptor 
 } from './interceptors';
 
+// TODO: diminuir tempo de resposta da API
 const api = axios.create({
   baseURL: 'https://ponto-gestor.onrender.com/api/',
-  timeout: 60000,
+  timeout: 120000,
 });
 
 api.interceptors.request.use(requestInterceptor, requestErrorInterceptor);
