@@ -6,7 +6,7 @@ import Customer from '../../screens/Customer';
 
 const Tab = createBottomTabNavigator();
 
-function MainTabs() {
+function MainTab() {
   return (
     <Tab.Navigator screenOptions={{ headerShown: false }}>
       <Tab.Screen name="Pedidos" component={Order} />
@@ -15,4 +15,4 @@ function MainTabs() {
   );
 }
 
-export default MainTabs;
+export default MainTab;
