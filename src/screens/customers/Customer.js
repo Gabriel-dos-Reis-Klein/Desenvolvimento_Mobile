@@ -1,7 +1,7 @@
 import {
   useEffect,
   useState,
-  useCallback
+  useCallback,
 } from 'react';
 
 import {
@@ -29,10 +29,13 @@ import ListHeader
 import FilterButton
   from '../../components/common/FilterButton';
 
-import AppFab
-  from '../../components/common/AppFab';
+import Fab
+  from '../../components/common/Fab';
 
-import { Text } from 'react-native-paper';
+import {
+  COLORS,
+  SPACING,
+} from '../../theme';
 
 export default function Customer({
   navigation,
@@ -47,7 +50,10 @@ export default function Customer({
     async () => {
       try {
         setLoading(true);
-        const data = await customerService.getAll();
+
+        const data =
+          await customerService.getAll();
+
         setCustomers(data);
       } catch (error) {
         console.error(error);
@@ -91,8 +97,9 @@ export default function Customer({
         <FlatList
           data={customers}
           keyExtractor={(item) =>
-            item.id
+            item.id.toString()
           }
+
           renderItem={({ item }) => (
             <CustomerCard
               customer={item}
@@ -107,16 +114,18 @@ export default function Customer({
               }
             />
           )}
+
           contentContainerStyle={
             styles.listPadding
           }
+
           showsVerticalScrollIndicator={
             false
           }
         />
       )}
 
-      <AppFab
+      <Fab
         onPress={() =>
           navigation.navigate(
             'CreateCustomer'
@@ -130,18 +139,22 @@ export default function Customer({
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#FFF',
+    backgroundColor:
+      COLORS.background,
   },
 
   filterRow: {
     flexDirection: 'row',
     justifyContent: 'center',
-    gap: 15,
-    marginBottom: 25,
+    gap: SPACING.md,
+    marginBottom: SPACING.lg,
   },
 
   listPadding: {
-    paddingHorizontal: 20,
-    paddingBottom: 100,
+    paddingHorizontal:
+      SPACING.lg,
+
+    paddingBottom:
+      100,
   },
 });
