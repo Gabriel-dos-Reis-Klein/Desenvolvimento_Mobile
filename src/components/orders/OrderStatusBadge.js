@@ -1,8 +1,8 @@
 import { View, StyleSheet } from 'react-native';
 
 import {
-  ORDER_STATUS_COLORS,
-} from '../../constants/order-status';
+  STATUS_COLORS,
+} from '../../theme';
 
 export default function OrderStatusBadge({
   status,
@@ -13,7 +13,7 @@ export default function OrderStatusBadge({
         styles.badge,
         {
           backgroundColor:
-            ORDER_STATUS_COLORS[status] ||
+            STATUS_COLORS[status] ||
             '#E0E0E0',
         },
       ]}
