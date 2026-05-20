@@ -11,8 +11,7 @@ export default function CustomerCard({
   customer,
   onPress,
 }) {
-  const firstLetter =
-    customer?.nome?.charAt(0)?.toUpperCase() || '?';
+  const firstLetter = customer?.nome?.charAt(0)?.toUpperCase() || '?';
 
   return (
     <TouchableOpacity
@@ -43,23 +42,16 @@ const styles = StyleSheet.create({
   card: {
     flexDirection: 'row',
     alignItems: 'center',
-
-    padding: 16,
-    marginBottom: 16,
-
+    paddingVertical: 10,
     borderRadius: 18,
-
     backgroundColor: '#FFF',
   },
 
   avatar: {
     width: 55,
     height: 55,
-
     borderRadius: 28,
-
     backgroundColor: '#FFE5EE',
-
     justifyContent: 'center',
     alignItems: 'center',
   },
@@ -83,7 +75,6 @@ const styles = StyleSheet.create({
 
   phone: {
     marginTop: 4,
-
     fontSize: 13,
     color: '#777',
   },
