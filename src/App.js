@@ -5,6 +5,7 @@ import { createStackNavigator } from '@react-navigation/stack';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { Provider as PaperProvider } from 'react-native-paper'; 
 
+import MainTab from "./src/components/common/MainTab"
 import Login from './src/screens/Login';
 import Home from './src/screens/Home';
 import Details from './src/screens/Details';
@@ -66,11 +67,7 @@ export default function App() {
       <NavigationContainer>
         <Stack.Navigator screenOptions={{ headerShown: false }}>
 
-
-
           <Stack.Screen name="MainHome" component={MainTabs} />
-
-          <Stack.Screen name="Detalhes" component={Details} />
 
           <Stack.Screen name="Criacao" component={CriacaoStackScreen} />
         </Stack.Navigator>

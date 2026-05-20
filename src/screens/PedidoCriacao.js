@@ -1,10 +1,11 @@
-import { View, Text, StyleSheet, FlatList, TouchableOpacity, ActivityIndicator, Image, ScrollView, Alert, Platform } from "react-native";
+import { View, Text, StyleSheet, FlatList, TouchableOpacity, ActivityIndicator, Image, ScrollView, Alert, Platform, Modal } from "react-native";
 import { TextInput, Button, Menu } from 'react-native-paper';
 import React, { useState, useEffect, useCallback } from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import * as ImagePicker from 'expo-image-picker';
 import * as MediaLibrary from 'expo-media-library';
 import { Picker } from "@react-native-picker/picker";
+import CustomDateTimePicker from '../components/DateTime';
 
 const IconeVoltar = require('../assets/return.png');
 
@@ -21,6 +22,13 @@ export default function PedidoCriacao({navigation}){
   const [loading, setLoading] = useState(false);
   const [carregandoClientes, setCarregandoClientes] = useState(false);
   const [todosClientes, setTodosClientes] = useState([]);
+
+  const [agendamentos, setAgendamentos] = useState([]);
+
+  const [modalAgendamentoVisivel, setModalAgendamentoVisivel] = useState(false);
+  const [novoTipoAgendamento, setNovoTipoAgendamento] = useState("prova");
+  const [novaDataAgendamento, setNovaDataAgendamento] = useState(new Date());
+  const [mostrarCustomDatePicker, setMostrarCustomDatePicker] = useState(false);
 
     useEffect(() => {
     carregarClientes();
@@ -94,19 +102,52 @@ export default function PedidoCriacao({navigation}){
     }  
   };
   
-  const onChangeDate = (event, selectedDate) => {
-    // Esconder o picker em Android (no iOS é modal)
+
+
+  const abrirModalAgendamento = () => {
+    setNovoTipoAgendamento("prova");
+    setNovaDataAgendamento(new Date());
+    setModalAgendamentoVisivel(true);
+  };
+
+  const adicionarAgendamento = () => {
+    const novo = {
+      id: Date.now().toString(),
+      tipo: novoTipoAgendamento,
+      data: novaDataAgendamento.toISOString(),
+    };
+    setAgendamentos([...agendamentos, novo]);
+    setModalAgendamentoVisivel(false);
+  };
+
+  const removerAgendamento = (id) => {
+    setAgendamentos(agendamentos.filter((a) => a.id !== id));
+  };
+
+  const onChangeDateModal = (event, selectedDate) => {
     if (Platform.OS === "android") {
-      setMostrarDatePicker(false);
+      setMostrarDatePickerModal(false);
     }
     if (selectedDate) {
-      setDataAgendamento(selectedDate);
+      setNovaDataAgendamento(selectedDate);
     }
   };
 
-  const mostrarDatepicker = () => {
-    setMostrarDatePicker(true);
-  };
+  const uriToBase64 = async (uri) => {
+  const response = await fetch(uri);
+  const blob = await response.blob();
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      const base64 = reader.result; // "data:image/jpeg;base64,..."
+      // Se a API espera apenas a string sem o prefixo, remova:
+      const pureBase64 = base64.split(',')[1];
+      resolve(pureBase64); // ou resolve(base64) se precisar do prefixo completo
+    };
+    reader.onerror = reject;
+    reader.readAsDataURL(blob);
+  });
+};
 
   // Função de POST para criar pedido
   const criarPedido = async () => {
@@ -115,50 +156,47 @@ export default function PedidoCriacao({navigation}){
       Alert.alert("Erro", "Selecione um cliente válido.");
       return;
     }
-    if (!tipoServico) {
-      Alert.alert("Erro", "Escolha o tipo de serviço.");
-      return;
-    }
     if (!valorTotal || isNaN(parseFloat(valorTotal))) {
       Alert.alert("Erro", "Informe um valor válido.");
       return;
     }
 
+    let imagemBase64 = null;
+      if (image) {
+        imagemBase64 = await uriToBase64(image);
+      }
+
     setLoading(true);
     try {
-      const formData = new FormData();
-      formData.append("cliente_id", clienteSelecionado.id);
-      formData.append("tipo_servico", tipoServico);
-      formData.append("descricao_peca", descricaoPeca.trim());
-      formData.append("valor_total", parseFloat(valorTotal));
-      formData.append("status", "pendente"); // valor padrão na criação
-      formData.append(
-        "agendamento",
-        dataAgendamento.toISOString()
-      );
-      if (image) {
-        formData.append("imagem", {
-          uri: image,
-          type: "image/jpeg",
-          name: "foto_pedido.jpg",
-        });
-      }
+      const corpoJSON = {
+      cliente_id: clienteSelecionado.id,
+      tipo_servico: tipoServico,
+      descricao_peca: descricaoPeca.trim(),
+      valor_total: parseFloat(valorTotal),
+      status: "pendente",
+      agendamentos: agendamentos, // Array de objetos, agora diretamente no JSON
+      imagem: imagemBase64, // string base64 (ou null)
+    };
+        const headers = {
+      'Content-Type': 'application/json',
+    };
 
       const response = await fetch("https://ponto-gestor.onrender.com/api/pedidos", {
         method: "POST",
-        body: formData,
+        headers: headers,
+        body: JSON.stringify(corpoJSON)
         // Não defina Content-Type, o fetch coloca o boundary automaticamente
       });
+
+    console.log("Status:", response.status);
+    const respostaTexto = await response.text();
+    console.log("Resposta:", respostaTexto);
 
       if (response.ok) {
         Alert.alert("Sucesso", "Pedido criado com sucesso!");
         navigation.goBack();
       } else {
-        const erro = await response.json();
-        Alert.alert(
-          "Erro",
-          erro.message || "Erro ao criar pedido. Tente novamente."
-        );
+        Alert.alert("Erro", `Status ${response.status}: ${respostaTexto}`);
       }
     } catch (error) {
       console.error(error);
@@ -279,30 +317,32 @@ export default function PedidoCriacao({navigation}){
           activeOutlineColor="#FF0050"
         />
 
-        {/* Agendamento */}
-        <Text style={styles.label}>Agendamento *</Text>
+        <Text style={styles.label}>Agendamentos *</Text>
+        {agendamentos.map((item) => (
+          <View key={item.id} style={styles.agendamentoItem}>
+            <View style={{ flex: 1 }}>
+              <Text style={styles.agendamentoTipo}>
+                {item.tipo === "prova" ? "Prova" : "Entrega"}
+              </Text>
+              <Text style={styles.agendamentoData}>
+                {new Date(item.data).toLocaleDateString("pt-BR", {
+                  day: "2-digit",
+                  month: "2-digit",
+                  year: "numeric",
+                })}
+              </Text>
+            </View>
+            <TouchableOpacity onPress={() => removerAgendamento(item.id)}>
+              <Text style={styles.removerAgendamento}>✕</Text>
+            </TouchableOpacity>
+          </View>
+        ))}
         <TouchableOpacity
-          style={styles.dateButton}
-          onPress={mostrarDatepicker}
+          style={styles.adicionarAgendamentoButton}
+          onPress={abrirModalAgendamento}
         >
-          <Text style={styles.dateText}>
-            {dataAgendamento.toLocaleDateString("pt-BR", {
-              day: "2-digit",
-              month: "2-digit",
-              year: "numeric",
-            })}
-          </Text>
-          <Text style={styles.dateIcon}>📅</Text>
+          <Text style={styles.adicionarAgendamentoText}>+ Adicionar agendamento</Text>
         </TouchableOpacity>
-        {mostrarDatePicker && (
-          <Picker
-            value={dataAgendamento}
-            mode="datetime"
-            display={Platform.OS === "ios" ? "spinner" : "default"}
-            onChange={onChangeDate}
-            minimumDate={new Date()}
-          />
-        )}
 
         {/* Anexar foto */}
         <Text style={styles.label}>Foto (opcional)</Text>
@@ -328,6 +368,72 @@ export default function PedidoCriacao({navigation}){
           Criar Pedido
         </Button>
     </View>
+          <Modal
+        visible={modalAgendamentoVisivel}
+        transparent
+        animationType="slide"
+        onRequestClose={() => setModalAgendamentoVisivel(false)}
+      >
+        <View style={styles.modalOverlay}>
+          <View style={styles.modalContent}>
+            <Text style={styles.modalTitle}>Novo Agendamento</Text>
+
+            <Text style={styles.label}>Tipo:</Text>
+            <View style={styles.pickerWrapper}>
+              <Picker
+                selectedValue={novoTipoAgendamento}
+                onValueChange={(itemValue) => setNovoTipoAgendamento(itemValue)}
+                style={styles.picker}
+              >
+                <Picker.Item label="Prova" value="prova" />
+                <Picker.Item label="Entrega" value="entrega" />
+              </Picker>
+            </View>
+
+            <Text style={styles.label}>Data e hora:</Text>
+            <TouchableOpacity
+              style={styles.dateButton}
+              onPress={() => setMostrarCustomDatePicker(true)}
+            >
+              <Text style={styles.dateText}>
+                {novaDataAgendamento.toLocaleDateString("pt-BR", {
+                  day: "2-digit",
+                  month: "2-digit",
+                  year: "numeric",
+                })}
+              </Text>
+              <Text style={styles.dateIcon}>📅</Text>
+            </TouchableOpacity>
+
+            {/* Substituído o DateTimePicker pelo nosso componente customizado */}
+            {mostrarCustomDatePicker && (
+              <CustomDateTimePicker
+                visible={mostrarCustomDatePicker}
+                currentDate={novaDataAgendamento}
+                onConfirm={confirmarDataAgendamento}
+                onCancel={() => setMostrarCustomDatePicker(false)}
+              />
+            )}
+
+            <View style={styles.modalBotoes}>
+              <Button
+                mode="outlined"
+                onPress={() => setModalAgendamentoVisivel(false)}
+                style={{ flex: 1, marginRight: 10 }}
+              >
+                Cancelar
+              </Button>
+              <Button
+                mode="contained"
+                onPress={adicionarAgendamento}
+                style={{ flex: 1, backgroundColor: "#FF0050" }}
+              >
+                Adicionar
+              </Button>
+            </View>
+          </View>
+        </View>
+      </Modal>
   </ScrollView>
   )
 }
@@ -445,5 +551,64 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     marginBottom: 12,
     alignSelf: "center",
+  },
+  // Estilos para agendamentos
+  agendamentoItem: {
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: "#f9f9f9",
+    padding: 12,
+    borderRadius: 5,
+    marginBottom: 8,
+    borderWidth: 1,
+    borderColor: "#E0E0E0",
+  },
+  agendamentoTipo: {
+    fontSize: 14,
+    fontWeight: "bold",
+    color: "#FF0050",
+  },
+  agendamentoData: {
+    fontSize: 13,
+    color: "#555",
+  },
+  removerAgendamento: {
+    fontSize: 18,
+    color: "#999",
+    padding: 5,
+  },
+  adicionarAgendamentoButton: {
+    borderWidth: 1,
+    borderColor: "#FF0050",
+    borderRadius: 5,
+    padding: 10,
+    alignItems: "center",
+    marginBottom: 12,
+  },
+  adicionarAgendamentoText: {
+    color: "#FF0050",
+    fontWeight: "bold",
+  },
+  // Modal
+  modalOverlay: {
+    flex: 1,
+    justifyContent: "center",
+    backgroundColor: "rgba(0,0,0,0.5)",
+    padding: 20,
+  },
+  modalContent: {
+    backgroundColor: "#fff",
+    borderRadius: 10,
+    padding: 20,
+  },
+  modalTitle: {
+    fontSize: 20,
+    fontWeight: "bold",
+    marginBottom: 15,
+    textAlign: "center",
+  },
+  modalBotoes: {
+    flexDirection: "row",
+    marginTop: 20,
   },
 });
