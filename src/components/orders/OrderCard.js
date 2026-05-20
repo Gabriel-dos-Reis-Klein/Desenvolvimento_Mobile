@@ -1,23 +1,41 @@
 import {
   View,
-  Text,
   TouchableOpacity,
   StyleSheet,
 } from 'react-native';
 
-import OrderIcon from './OrderIcon';
+import Text
+  from '../common/Text';
+
+import OrderIcon
+  from './OrderIcon';
+
 import OrderStatusBadge
   from './OrderStatusBadge';
+
+import {
+  COLORS,
+  SPACING,
+  RADIUS,
+  TYPOGRAPHY,
+  FONT_FAMILY,
+} from '../../theme';
 
 export default function OrderCard({
   order,
   onPress,
+  style,
+  ...props
 }) {
   return (
     <TouchableOpacity
-      style={styles.card}
+      style={[
+        styles.card,
+        style,
+      ]}
       onPress={onPress}
       activeOpacity={0.8}
+      {...props}
     >
       <View style={styles.iconContainer}>
         <View style={styles.iconCircle}>
@@ -33,13 +51,18 @@ export default function OrderCard({
 
       <View style={styles.contentContainer}>
         <Text
+          variant="body"
           numberOfLines={2}
           style={styles.title}
         >
           {order.descricaoPeca}
         </Text>
 
-        <Text style={styles.subtitle}>
+        <Text
+          variant="small"
+          color={COLORS.textSecondary}
+          style={styles.subtitle}
+        >
           {`${order.tipoServico} • ${order.status}`}
         </Text>
       </View>
@@ -51,7 +74,8 @@ const styles = StyleSheet.create({
   card: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: 20,
+
+    marginBottom: SPACING.lg,
   },
 
   iconContainer: {
@@ -61,26 +85,32 @@ const styles = StyleSheet.create({
   iconCircle: {
     width: 55,
     height: 55,
-    backgroundColor: '#F5F5F5',
-    borderRadius: 15,
+
+    borderRadius: RADIUS.lg,
+
     justifyContent: 'center',
     alignItems: 'center',
+
+    backgroundColor:
+      COLORS.surfaceSecondary,
   },
 
   contentContainer: {
     flex: 1,
-    marginLeft: 15,
+
+    marginLeft: SPACING.md,
   },
 
   title: {
-    fontSize: 16,
-    fontWeight: '700',
-    color: '#333',
+    ...TYPOGRAPHY.body,
+
+    fontFamily:
+      FONT_FAMILY.poppinsSemiBold,
+
+    color: COLORS.text,
   },
 
   subtitle: {
-    fontSize: 13,
-    color: '#999',
-    marginTop: 3,
+    marginTop: SPACING.xs,
   },
 });
