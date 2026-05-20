@@ -1,6 +1,7 @@
 import {
   useEffect,
   useState,
+  useCallback,
 } from 'react';
 
 import {
@@ -28,10 +29,13 @@ import ListHeader
 import FilterButton
   from '../../components/common/FilterButton';
 
-import AppFab
-  from '../../components/common/AppFab';
+import Fab
+  from '../../components/common/Fab';
 
-import { Text } from 'react-native-paper';
+import {
+  COLORS,
+  SPACING,
+} from '../../theme';
 
 export default function Customer({
   navigation,
@@ -42,6 +46,24 @@ export default function Customer({
   const [loading, setLoading] =
     useState(true);
 
+  const fetchCustomers = useCallback(
+    async () => {
+      try {
+        setLoading(true);
+
+        const data =
+          await customerService.getAll();
+
+        setCustomers(data);
+      } catch (error) {
+        console.error(error);
+      } finally {
+        setLoading(false);
+      }
+    },
+
+    []
+  );
       setLoading(true);
       const data = await customerService.getAll();
       setCustomers(data);
