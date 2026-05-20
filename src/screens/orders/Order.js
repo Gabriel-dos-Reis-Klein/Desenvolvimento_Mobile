@@ -6,20 +6,9 @@ import {
 
 import {
   View,
-  Text,
   FlatList,
   StyleSheet,
-  TouchableOpacity,
 } from 'react-native';
-
-import {
-  FAB,
-  IconButton,
-} from 'react-native-paper';
-
-import {
-  MaterialCommunityIcons,
-} from '@expo/vector-icons';
 
 import {
   orderService,
@@ -34,10 +23,26 @@ import Loading
 import EmptyState
   from '../../components/common/EmptyState';
 
+import ListHeader
+  from '../../components/common/ListHeader';
+
+import FilterButton
+  from '../../components/common/FilterButton';
+
+import Fab
+  from '../../components/common/Fab';
+
+import {
+  COLORS,
+  SPACING,
+} from '../../theme';
+
 export default function OrdersScreen({
   navigation,
 }) {
-  const [orders, setOrders] = useState([]);
+  const [orders, setOrders] =
+    useState([]);
+
   const [loading, setLoading] =
     useState(true);
 
@@ -66,48 +71,20 @@ export default function OrdersScreen({
 
   return (
     <View style={styles.container}>
-      <View style={styles.headerButtons}>
-        <IconButton
-          icon="cog-outline"
-          size={26}
-        />
-
-        <IconButton
-          icon="magnify"
-          size={26}
-        />
-      </View>
-
-      <View style={styles.titleArea}>
-        <Text style={styles.headerTitle}>
-          Pedidos
-        </Text>
-
-        <Text style={styles.subTitle}>
-          {orders.length} resultados
-        </Text>
-      </View>
+      <ListHeader
+        title="Pedidos"
+        total={orders.length}
+      />
 
       <View style={styles.filterRow}>
-        <TouchableOpacity
-          style={styles.filterBox}
-        >
-          <MaterialCommunityIcons
-            name="sort-variant"
-            size={24}
-            color="#333"
-          />
-        </TouchableOpacity>
+        <FilterButton
+          icon="sort-variant"
+          onPress={fetchOrders}
+        />
 
-        <TouchableOpacity
-          style={styles.filterBox}
-        >
-          <MaterialCommunityIcons
-            name="filter-variant"
-            size={24}
-            color="#333"
-          />
-        </TouchableOpacity>
+        <FilterButton
+          icon="filter-variant"
+        />
       </View>
 
       {loading ? (
@@ -120,8 +97,9 @@ export default function OrdersScreen({
         <FlatList
           data={orders}
           keyExtractor={(item) =>
-            item.id
+            item.id.toString()
           }
+
           renderItem={({ item }) => (
             <OrderCard
               order={item}
@@ -135,19 +113,18 @@ export default function OrdersScreen({
               }
             />
           )}
+
           contentContainerStyle={
             styles.listPadding
           }
+
           showsVerticalScrollIndicator={
             false
           }
         />
       )}
 
-      <FAB
-        icon="plus"
-        color="white"
-        style={styles.fab}
+      <Fab
         onPress={() =>
           navigation.navigate(
             'CreateOrder'
@@ -161,56 +138,25 @@ export default function OrdersScreen({
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#FFF',
-  },
 
-  headerButtons: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    paddingHorizontal: 10,
-  },
-
-  titleArea: {
-    alignItems: 'center',
-    marginBottom: 20,
-  },
-
-  headerTitle: {
-    fontSize: 34,
-    fontWeight: 'bold',
-  },
-
-  subTitle: {
-    fontSize: 14,
-    color: '#888',
+    backgroundColor:
+      COLORS.background,
   },
 
   filterRow: {
     flexDirection: 'row',
-    justifyContent: 'center',
-    gap: 15,
-    marginBottom: 25,
-  },
 
-  filterBox: {
-    width: 55,
-    height: 55,
-    borderRadius: 12,
-    borderWidth: 1,
-    borderColor: '#E0E0E0',
     justifyContent: 'center',
-    alignItems: 'center',
+
+    gap: SPACING.md,
+
+    marginBottom: SPACING.lg,
   },
 
   listPadding: {
-    paddingHorizontal: 20,
-    paddingBottom: 100,
-  },
+    paddingHorizontal:
+      SPACING.lg,
 
-  fab: {
-    position: 'absolute',
-    right: 20,
-    bottom: 20,
-    backgroundColor: '#FF3366',
+    paddingBottom: 100,
   },
 });
