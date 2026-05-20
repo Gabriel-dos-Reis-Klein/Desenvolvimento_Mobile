@@ -2,6 +2,7 @@ import {
   useEffect,
   useState,
   useCallback,
+  useMemo,
 } from 'react';
 
 import {
@@ -13,6 +14,10 @@ import {
 import {
   orderService,
 } from '../../services';
+
+import {
+  ORDER_STATUS,
+} from '../../constants';
 
 import OrderCard
   from '../../components/orders/OrderCard';
@@ -32,6 +37,12 @@ import FilterButton
 import Fab
   from '../../components/common/Fab';
 
+import OrderFilterModal
+  from '../../components/orders/OrderFilterModal';
+
+import OrderSortModal
+  from '../../components/orders/OrderSortModal';
+
 import {
   COLORS,
   SPACING,
@@ -45,6 +56,21 @@ export default function OrdersScreen({
 
   const [loading, setLoading] =
     useState(true);
+
+  const [filterVisible, setFilterVisible] =
+    useState(false);
+
+  const [sortVisible, setSortVisible] =
+    useState(false);
+
+  const [selectedType, setSelectedType] =
+    useState(null);
+
+  const [selectedStatus, setSelectedStatus] =
+    useState(null);
+
+  const [selectedSort, setSelectedSort] =
+    useState('alphabetical');
 
   const fetchOrders = useCallback(
     async () => {
@@ -69,33 +95,104 @@ export default function OrdersScreen({
     fetchOrders();
   }, []);
 
+  const filteredOrders = useMemo(() => {
+    let filtered =
+      [...orders];
+
+    if (selectedType) {
+      filtered =
+        filtered.filter(
+          (order) =>
+            order.tipoServico ===
+            selectedType
+        );
+    }
+
+    if (selectedStatus) {
+      filtered =
+        filtered.filter(
+          (order) =>
+            order.status ===
+            selectedStatus
+        );
+    }
+
+    switch (selectedSort) {
+
+      case 'alphabetical':
+        filtered.sort((a, b) =>
+          a.descricaoPeca.localeCompare(
+            b.descricaoPeca
+          )
+        );
+        break;
+
+      case 'deadline':
+        filtered.sort((a, b) =>
+          new Date(a.dataEntrega) -
+          new Date(b.dataEntrega)
+        );
+        break;
+
+      case 'status':
+        const orderPriority = {
+          [ORDER_STATUS.WAITING]: 1,
+          [ORDER_STATUS.PRODUCTION]: 2,
+          [ORDER_STATUS.DELIVERED]: 3,
+        };
+
+        filtered.sort((a, b) =>
+          orderPriority[a.status] -
+          orderPriority[b.status]
+        );
+
+        break;
+
+      default:
+        break;
+    }
+
+    return filtered;
+  }, [
+    orders,
+    selectedType,
+    selectedStatus,
+    selectedSort,
+  ]);
+
   return (
     <View style={styles.container}>
       <ListHeader
         title="Pedidos"
-        total={orders.length}
+        total={filteredOrders.length}
       />
 
       <View style={styles.filterRow}>
         <FilterButton
           icon="sort-variant"
-          onPress={fetchOrders}
+          onPress={() =>
+            setSortVisible(true)
+          }
         />
 
         <FilterButton
           icon="filter-variant"
+          onPress={() =>
+            setFilterVisible(true)
+          }
         />
       </View>
 
       {loading ? (
         <Loading />
-      ) : orders.length === 0 ? (
+      ) : filteredOrders.length === 0 ? (
         <EmptyState
           message="Nenhum pedido encontrado"
         />
       ) : (
         <FlatList
-          data={orders}
+          data={filteredOrders}
+
           keyExtractor={(item) =>
             item.id.toString()
           }
@@ -130,6 +227,31 @@ export default function OrdersScreen({
             'CreateOrder'
           )
         }
+      />
+
+      <OrderFilterModal
+        visible={filterVisible}
+
+        onClose={() =>
+          setFilterVisible(false)
+        }
+
+        selectedType={selectedType}
+        setSelectedType={setSelectedType}
+
+        selectedStatus={selectedStatus}
+        setSelectedStatus={setSelectedStatus}
+      />
+
+      <OrderSortModal
+        visible={sortVisible}
+
+        onClose={() =>
+          setSortVisible(false)
+        }
+
+        selectedSort={selectedSort}
+        setSelectedSort={setSelectedSort}
       />
     </View>
   );
