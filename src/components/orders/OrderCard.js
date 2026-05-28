@@ -52,7 +52,7 @@ export default function OrderCard({
       <View style={styles.contentContainer}>
         <Text
           variant="body"
-          numberOfLines={2}
+          numberOfLines={1}
           style={styles.title}
         >
           {order.descricaoPeca}
@@ -103,10 +103,7 @@ const styles = StyleSheet.create({
 
   title: {
     ...TYPOGRAPHY.body,
-
-    fontFamily:
-      FONT_FAMILY.poppinsSemiBold,
-
+    fontFamily:FONT_FAMILY.robotoBold,
     color: COLORS.text,
   },
 
