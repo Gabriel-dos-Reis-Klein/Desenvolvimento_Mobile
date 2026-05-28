@@ -93,11 +93,9 @@ const styles = StyleSheet.create({
 
   avatarText: {
     ...TYPOGRAPHY.body,
-
-    fontFamily:
-      FONT_FAMILY.poppinsBold,
-
+    fontFamily: FONT_FAMILY.robotoBold,
     color: COLORS.primary,
+    fontSize:20,
   },
 
   content: {
@@ -108,10 +106,7 @@ const styles = StyleSheet.create({
 
   name: {
     ...TYPOGRAPHY.body,
-
-    fontFamily:
-      FONT_FAMILY.poppinsSemiBold,
-
+    fontFamily: FONT_FAMILY.robotoBold,
     color: COLORS.text,
   },
 
