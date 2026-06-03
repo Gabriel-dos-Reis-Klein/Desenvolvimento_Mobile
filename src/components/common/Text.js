@@ -3,7 +3,7 @@ import { Text as NativeText } from 'react-native';
 import {
   TYPOGRAPHY,
   COLORS,
-} from '../../theme';
+} from '../../themes';
 
 export default function Text({
   children,

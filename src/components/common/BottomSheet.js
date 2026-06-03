@@ -9,7 +9,7 @@ import {
   COLORS,
   RADIUS,
   SPACING,
-} from '../../theme';
+} from '../../themes';
 
 export default function BottomSheet({
   visible,

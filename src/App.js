@@ -6,18 +6,17 @@ import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { Provider as PaperProvider } from 'react-native-paper'; 
 
 import MainTab from "./src/components/common/MainTab"
-import Login from './src/screens/Login';
-import Home from './src/screens/Home';
-import Details from './src/screens/Details';
-import Register from './src/screens/Register';
-import Clientes from './src/screens/Clientes'
-import ClienteCriacao from './src/screens/ClienteCriacao'
-import PedidoCriacao from './src/screens/PedidoCriacao'
-import CriacaoPedido from './src/screens/CriacaoPedido'
+import Login from './src/screens/auth/Login';
+import Home from './src/screens/orders/Home';
+import Register from './src/screens/auth/Register';
+import Clientes from './src/screens/customers/Clientes'
+import ClienteCriacao from './src/screens/customers/ClienteCriacao'
+import PedidoCriacao from './src/screens/orders/PedidoCriacao'
 const IconeHomeAtivo = require('./src/assets/pedidoAtivo.png');
 const IconeHomeInativo = require('./src/assets/pedidoInativo.png');
 const IconeContatoAtivo = require('./src/assets/contatoAtivo.png');
 const IconeContatoInativo = require('./src/assets/contatoInativo.png');
+import DetailsPedidos from './src/screens/orders/DetailsPedidos'
 
 const Stack = createStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -67,9 +66,11 @@ export default function App() {
       <NavigationContainer>
         <Stack.Navigator screenOptions={{ headerShown: false }}>
 
-          <Stack.Screen name="MainHome" component={MainTabs} />
+          <Stack.Screen name="MainHome" component={MainTab} />
 
           <Stack.Screen name="Criacao" component={CriacaoStackScreen} />
+
+          <Stack.Screen name="Details" component={DetailsPedidos}/>
         </Stack.Navigator>
       </NavigationContainer>
     </PaperProvider>

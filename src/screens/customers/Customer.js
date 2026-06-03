@@ -30,12 +30,12 @@ import FilterButton
   from '../../components/common/FilterButton';
 
 import Fab
-  from '../../components/common/Fab';
+  from '../../components/common/AppFab';
 
 import {
   COLORS,
   SPACING,
-} from '../../theme';
+} from '../../themes';
 
 export default function Customer({
   navigation,
@@ -64,10 +64,6 @@ export default function Customer({
 
     []
   );
-      setLoading(true);
-      const data = await customerService.getAll();
-      setCustomers(data);
-      setLoading(false);
 
   useEffect(() => {
     fetchCustomers();
@@ -101,8 +97,9 @@ export default function Customer({
         <FlatList
           data={customers}
           keyExtractor={(item) =>
-            item.id
+            item.id.toString()
           }
+
           renderItem={({ item }) => (
             <CustomerCard
               customer={item}
@@ -117,19 +114,21 @@ export default function Customer({
               }
             />
           )}
+
           contentContainerStyle={
             styles.listPadding
           }
+
           showsVerticalScrollIndicator={
             false
           }
         />
       )}
 
-      <AppFab
+      <Fab
         onPress={() =>
           navigation.navigate(
-            'CreateCustomer'
+            'Criacao', { screen: 'ClienteCriacao' }
           )
         }
       />
@@ -140,18 +139,22 @@ export default function Customer({
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#FFF',
+    backgroundColor:
+      COLORS.background,
   },
 
   filterRow: {
     flexDirection: 'row',
     justifyContent: 'center',
-    gap: 15,
-    marginBottom: 25,
+    gap: SPACING.md,
+    marginBottom: SPACING.lg,
   },
 
   listPadding: {
-    paddingHorizontal: 20,
-    paddingBottom: 100,
+    paddingHorizontal:
+      SPACING.lg,
+
+    paddingBottom:
+      100,
   },
 });

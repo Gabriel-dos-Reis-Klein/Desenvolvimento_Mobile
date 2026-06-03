@@ -35,7 +35,7 @@ import FilterButton
   from '../../components/common/FilterButton';
 
 import Fab
-  from '../../components/common/Fab';
+  from '../../components/common/AppFab';
 
 import OrderFilterModal
   from '../../components/orders/OrderFilterModal';
@@ -46,7 +46,7 @@ import OrderSortModal
 import {
   COLORS,
   SPACING,
-} from '../../theme';
+} from '../../themes';
 
 export default function OrdersScreen({
   navigation,
@@ -201,7 +201,7 @@ export default function OrdersScreen({
               order={item}
               onPress={() =>
                 navigation.navigate(
-                  'OrderDetails',
+                  'DetailsPedidos',
                   {
                     orderId: item.id,
                   }
@@ -223,7 +223,7 @@ export default function OrdersScreen({
       <Fab
         onPress={() =>
           navigation.navigate(
-            'CreateOrder'
+            'Criacao', { screen: 'PedidoCriacao' }
           )
         }
       />
