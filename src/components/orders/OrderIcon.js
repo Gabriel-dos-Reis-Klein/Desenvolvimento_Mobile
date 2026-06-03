@@ -8,7 +8,7 @@ import {
 
 import {
   COLORS,
-} from '../../themes';
+} from '../../theme';
 
 export default function OrderIcon({
   type,

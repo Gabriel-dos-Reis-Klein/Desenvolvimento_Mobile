@@ -13,7 +13,7 @@ import {
   COLORS,
   FONT_FAMILY,
   SPACING,
-} from '../../themes';
+} from '../../theme';
 
 export default function ListHeader({
   title,

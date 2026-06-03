@@ -13,7 +13,7 @@ import {
   RADIUS,
   TYPOGRAPHY,
   FONT_FAMILY,
-} from '../../themes';
+} from '../../theme';
 
 export default function CustomerCard({
   customer,
@@ -93,9 +93,11 @@ const styles = StyleSheet.create({
 
   avatarText: {
     ...TYPOGRAPHY.body,
-    fontFamily: FONT_FAMILY.robotoBold,
+
+    fontFamily:
+      FONT_FAMILY.poppinsBold,
+
     color: COLORS.primary,
-    fontSize:20,
   },
 
   content: {
@@ -106,7 +108,10 @@ const styles = StyleSheet.create({
 
   name: {
     ...TYPOGRAPHY.body,
-    fontFamily: FONT_FAMILY.robotoBold,
+
+    fontFamily:
+      FONT_FAMILY.poppinsSemiBold,
+
     color: COLORS.text,
   },
 

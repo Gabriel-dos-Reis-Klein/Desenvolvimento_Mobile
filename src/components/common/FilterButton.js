@@ -10,7 +10,7 @@ import {
 import {
   COLORS,
   RADIUS,
-} from '../../themes';
+} from '../../theme';
 
 export default function FilterButton({
   icon,

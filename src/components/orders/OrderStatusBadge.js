@@ -6,7 +6,7 @@ import {
 import {
   STATUS_COLORS,
   COLORS,
-} from '../../themes';
+} from '../../theme';
 
 export default function OrderStatusBadge({
   status,

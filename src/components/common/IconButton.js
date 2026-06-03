@@ -4,7 +4,7 @@ import {
 
 import {
   COLORS,
-} from '../../themes';
+} from '../../theme';
 
 export default function IconButton({
   icon,

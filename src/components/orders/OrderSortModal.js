@@ -13,7 +13,7 @@ import Text
 import {
   COLORS,
   SPACING,
-} from '../../themes';
+} from '../../theme';
 
 const OPTIONS = [
   {

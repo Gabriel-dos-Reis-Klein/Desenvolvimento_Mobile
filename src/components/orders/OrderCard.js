@@ -19,7 +19,7 @@ import {
   RADIUS,
   TYPOGRAPHY,
   FONT_FAMILY,
-} from '../../themes';
+} from '../../theme';
 
 export default function OrderCard({
   order,
@@ -34,7 +34,7 @@ export default function OrderCard({
         styles.card,
         style,
       ]}
-      onPress={() => navigation.navigate('DetailsPedidos')}
+      onPress={() => navigation.navigate('Details')}
       activeOpacity={0.8}
       {...props}
     >
@@ -104,7 +104,10 @@ const styles = StyleSheet.create({
 
   title: {
     ...TYPOGRAPHY.body,
-    fontFamily:FONT_FAMILY.robotoBold,
+
+    fontFamily:
+      FONT_FAMILY.poppinsSemiBold,
+
     color: COLORS.text,
   },
 
