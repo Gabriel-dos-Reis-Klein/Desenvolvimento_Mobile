@@ -23,6 +23,7 @@ import {
 
 export default function OrderCard({
   order,
+  navigation,
   onPress,
   style,
   ...props
@@ -33,7 +34,7 @@ export default function OrderCard({
         styles.card,
         style,
       ]}
-      onPress={onPress}
+      onPress={() => navigation.navigate('Details')}
       activeOpacity={0.8}
       {...props}
     >
@@ -52,7 +53,7 @@ export default function OrderCard({
       <View style={styles.contentContainer}>
         <Text
           variant="body"
-          numberOfLines={2}
+          numberOfLines={1}
           style={styles.title}
         >
           {order.descricaoPeca}

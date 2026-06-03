@@ -30,12 +30,12 @@ import FilterButton
   from '../../components/common/FilterButton';
 
 import Fab
-  from '../../components/common/Fab';
+  from '../../components/common/AppFab';
 
 import {
   COLORS,
   SPACING,
-} from '../../theme';
+} from '../../themes';
 
 export default function Customer({
   navigation,
@@ -128,7 +128,7 @@ export default function Customer({
       <Fab
         onPress={() =>
           navigation.navigate(
-            'CreateCustomer'
+            'Criacao', { screen: 'ClienteCriacao' }
           )
         }
       />

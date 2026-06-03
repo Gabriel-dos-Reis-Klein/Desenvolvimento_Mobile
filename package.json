@@ -1,7 +1,6 @@
 {
-  "name": "desenvolvimento_mobile",
-  "version": "1.0.0",
-  "main": "./src/index.js",
+  "license": "0BSD",
+  "main": "index.js",
   "scripts": {
     "start": "expo start",
     "android": "expo start --android",

@@ -1,5 +1,5 @@
 export { default as customerService } 
-    from './customers/customer.service';
+    from './customers/customers.service';
 
 export { default as orderService } 
-    from './orders/order.service';
+    from './orders/orders.service';

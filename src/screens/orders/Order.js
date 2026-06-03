@@ -35,7 +35,7 @@ import FilterButton
   from '../../components/common/FilterButton';
 
 import Fab
-  from '../../components/common/Fab';
+  from '../../components/common/AppFab';
 
 import OrderFilterModal
   from '../../components/orders/OrderFilterModal';
@@ -46,7 +46,7 @@ import OrderSortModal
 import {
   COLORS,
   SPACING,
-} from '../../theme';
+} from '../../themes';
 
 export default function OrdersScreen({
   navigation,
@@ -135,19 +135,17 @@ export default function OrdersScreen({
         );
         break;
 
-      case 'status':
-        const orderPriority = {
-          [ORDER_STATUS.WAITING]: 1,
-          [ORDER_STATUS.PRODUCTION]: 2,
-          [ORDER_STATUS.DELIVERED]: 3,
-        };
+      case 'client':
+      filtered.sort((a, b) => {
+        const nameA = a?.clienteNome ?? '';
+        const nameB = b?.clienteNome ?? '';
 
-        filtered.sort((a, b) =>
-          orderPriority[a.status] -
-          orderPriority[b.status]
-        );
+        if (nameA === '' && nameB !== '') return 1;
+        if (nameA !== '' && nameB === '') return -1;
 
-        break;
+        return nameA.localeCompare(nameB, 'pt-BR');
+      });
+      break;
 
       default:
         break;
@@ -203,7 +201,7 @@ export default function OrdersScreen({
               order={item}
               onPress={() =>
                 navigation.navigate(
-                  'OrderDetails',
+                  'DetailsPedidos',
                   {
                     orderId: item.id,
                   }
@@ -225,7 +223,7 @@ export default function OrdersScreen({
       <Fab
         onPress={() =>
           navigation.navigate(
-            'CreateOrder'
+            'Criacao', { screen: 'PedidoCriacao' }
           )
         }
       />
