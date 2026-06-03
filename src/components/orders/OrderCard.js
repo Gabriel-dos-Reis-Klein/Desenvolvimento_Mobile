@@ -34,7 +34,7 @@ export default function OrderCard({
         styles.card,
         style,
       ]}
-      onPress={() => navigation.navigate('Details')}
+      onPress={onPress}
       activeOpacity={0.8}
       {...props}
     >
