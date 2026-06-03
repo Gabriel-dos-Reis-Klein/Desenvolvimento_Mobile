@@ -1,5 +1,3 @@
-import api from "./api";
-
 export async function requestInterceptor (config) {
     // TODO: Adicionar implementação de tokens
     /*
