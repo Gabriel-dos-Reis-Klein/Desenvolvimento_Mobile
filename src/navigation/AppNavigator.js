@@ -9,6 +9,9 @@ import {
 import MainTab
   from './MainTab';
 
+import DetailsPedidos
+  from '../screens/orders/DetailsPedidos'
+
 const Stack = createStackNavigator();
 
 export default function AppNavigator() {
@@ -23,6 +26,11 @@ export default function AppNavigator() {
         <Stack.Screen
           name="Main"
           component={MainTab}
+        />
+
+        <Stack.Screen
+          name="OrderDetails"
+          component={DetailsPedidos}
         />
       </Stack.Navigator>
     </NavigationContainer>

@@ -35,7 +35,7 @@ import Fab
 import {
   COLORS,
   SPACING,
-} from '../../themes';
+} from '../../theme';
 
 export default function Customer({
   navigation,

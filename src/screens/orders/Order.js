@@ -46,9 +46,9 @@ import OrderSortModal
 import {
   COLORS,
   SPACING,
-} from '../../themes';
+} from '../../theme';
 
-export default function OrdersScreen({
+export default function Order({
   navigation,
 }) {
   const [orders, setOrders] =
@@ -201,7 +201,7 @@ export default function OrdersScreen({
               order={item}
               onPress={() =>
                 navigation.navigate(
-                  'DetailsPedidos',
+                  'OrderDetails',
                   {
                     orderId: item.id,
                   }
