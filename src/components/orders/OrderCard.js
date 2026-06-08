@@ -23,6 +23,7 @@ import {
 
 export default function OrderCard({
   order,
+  navigation,
   onPress,
   style,
   ...props

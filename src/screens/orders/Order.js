@@ -201,7 +201,7 @@ export default function OrdersScreen({
               order={item}
               onPress={() =>
                 navigation.navigate(
-                  'OrderDetails',
+                  'DetailsPedidos',
                   {
                     orderId: item.id,
                   }
@@ -223,7 +223,7 @@ export default function OrdersScreen({
       <Fab
         onPress={() =>
           navigation.navigate(
-            'CreateOrder'
+            'Criacao', { screen: 'PedidoCriacao' }
           )
         }
       />
