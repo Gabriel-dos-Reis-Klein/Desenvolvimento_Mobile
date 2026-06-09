@@ -9,14 +9,20 @@ import {
   useAppFonts,
 } from './hooks/useAppFonts';
 
+import { SafeAreaView } 
+  from 'react-native-safe-area-context';
+
 // TODO: criar contramedidas para caso a API esteja indisponível
 export default function App() {
 
   useAppFonts();
 
   return (
-    <PaperProvider>
-      <AppNavigator />
-    </PaperProvider>
+    <SafeAreaView style={{flex:1}}>
+      <PaperProvider>
+        <AppNavigator />
+      </PaperProvider>
+    </SafeAreaView>
+    
   );
 }
