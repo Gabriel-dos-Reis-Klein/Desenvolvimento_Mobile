@@ -1,5 +1,4 @@
-import { ORDER_TYPES }
-  from './types';
+import { ORDER_TYPES } from './types';
 
 export const ORDER_TYPE_LABELS = {
   [ORDER_TYPES.MANUFACTURING]:

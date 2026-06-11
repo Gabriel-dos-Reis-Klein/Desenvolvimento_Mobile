@@ -3,7 +3,7 @@ export async function requestInterceptor (config) {
     /*
     const token = await AsyncStorage.getItem('@App:token');
     */
-    const token = "token"
+    const token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJwb250by1nZXN0YW8iLCJzdWIiOiJhMDQ5MWIxNS0xODZjLTRlNTAtYjVhZi1hM2RlMmVkZjEwNDIiLCJleHAiOjE3ODEyMjEyNTV9.4eiHkvRD7P2yfXPquH7gmqmHxWZdHG3HraU1gE7e4EQ"
   
     if (token) {
         config.headers.Authorization = `Bearer ${token}`;
