@@ -2,11 +2,13 @@ export async function requestInterceptor (config) {
     // TODO: Adicionar implementação de tokens
     /*
     const token = await AsyncStorage.getItem('@App:token');
+    */
+    const token = "token"
   
     if (token) {
         config.headers.Authorization = `Bearer ${token}`;
     }
-    */
+    
     return config;
 };
 
