@@ -79,7 +79,6 @@ export default function OrdersScreen({
 
         const data =
           await orderService.getAll();
-
         setOrders(data);
       } catch (error) {
         console.error(error);
@@ -193,7 +192,7 @@ export default function OrdersScreen({
           data={filteredOrders}
 
           keyExtractor={(item) =>
-            item.id.toString()
+            item.id
           }
 
           renderItem={({ item }) => (
