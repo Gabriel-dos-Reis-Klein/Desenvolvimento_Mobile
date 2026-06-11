@@ -7,7 +7,7 @@ class UserService extends BaseService{
     }
 
     async login(data, config = {}){
-        const response = await this.api.post(this.endpoint, data, config);
+        const response = await this.api.post(`${this.endpoint}/login`, data, config);
         return response.data;
     }
 }
