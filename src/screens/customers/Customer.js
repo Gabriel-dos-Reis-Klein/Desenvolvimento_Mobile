@@ -50,7 +50,6 @@ export default function Customer({
     async () => {
       try {
         setLoading(true);
-
         const data =
           await customerService.getAll();
 
@@ -97,7 +96,7 @@ export default function Customer({
         <FlatList
           data={customers}
           keyExtractor={(item) =>
-            item.id.toString()
+            item.id
           }
 
           renderItem={({ item }) => (
