@@ -35,7 +35,7 @@ import FilterButton
   from '../../components/common/FilterButton';
 
 import Fab
-  from '../../components/common/AppFab';
+  from '../../components/common/Fab';
 
 import OrderFilterModal
   from '../../components/orders/OrderFilterModal';
@@ -46,7 +46,8 @@ import OrderSortModal
 import {
   COLORS,
   SPACING,
-} from '../../themes';
+} from '../../theme';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 export default function OrdersScreen({
   navigation,
@@ -159,7 +160,7 @@ export default function OrdersScreen({
   ]);
 
   return (
-    <View style={styles.container}>
+    <SafeAreaView style={styles.container}>
       <ListHeader
         title="Pedidos"
         total={filteredOrders.length}
@@ -251,7 +252,7 @@ export default function OrdersScreen({
         selectedSort={selectedSort}
         setSelectedSort={setSelectedSort}
       />
-    </View>
+    </SafeAreaView>
   );
 }
 
