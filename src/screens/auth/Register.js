@@ -3,6 +3,7 @@ import { View, StyleSheet, TouchableOpacity, Text, ScrollView } from 'react-nati
 import { TextInput, Button } from 'react-native-paper';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 export default function RegisterScreen() {
   const navigation = useNavigation();
@@ -44,6 +45,7 @@ export default function RegisterScreen() {
 };
 
   return (
+    <SafeAreaView>
       <ScrollView contentContainerStyle={styles.scrollContent}>
         <View style={styles.card}>
           
@@ -147,6 +149,7 @@ export default function RegisterScreen() {
           </View>
         </View>
       </ScrollView>
+    </SafeAreaView>
   );
 }
 
