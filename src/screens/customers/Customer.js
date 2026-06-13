@@ -78,12 +78,12 @@ export default function Customer({
 
       <View style={styles.filterRow}>
         <FilterButton
-          icon="sort-variant"
+          icon="sort-alpha-down"
           onPress={fetchCustomers}
         />
 
         <FilterButton
-          icon="filter-variant"
+          icon="filter"
         />
       </View>
 
