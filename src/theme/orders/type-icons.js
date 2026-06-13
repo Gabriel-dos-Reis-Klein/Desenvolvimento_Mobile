@@ -1,5 +1,4 @@
-import { ORDER_TYPES }
-  from './types';
+import { ORDER_TYPES } from '../../constants/orders/types';
 
 export const ORDER_TYPE_ICONS = {
   [ORDER_TYPES.MANUFACTURING]:

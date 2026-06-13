@@ -19,7 +19,7 @@ export default function OrderIcon({
 }) {
   const icon =
     ORDER_TYPE_ICONS[
-      type?.toLowerCase()
+      type
     ] || 'dots-horizontal';
 
   return (

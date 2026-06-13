@@ -13,7 +13,7 @@ import {
   RADIUS,
   TYPOGRAPHY,
   FONT_FAMILY,
-} from '../../themes';
+} from '../../theme';
 import Text
   from '../../components/common/Text';
 import EmptyState
