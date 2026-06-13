@@ -1,5 +1,5 @@
 import {
-  MaterialCommunityIcons,
+  FontAwesome6
 } from '@expo/vector-icons';
 
 import {
@@ -23,7 +23,7 @@ export default function OrderIcon({
     ] || 'dots-horizontal';
 
   return (
-    <MaterialCommunityIcons
+    <FontAwesome6
       name={icon}
       size={size}
       color={color}
