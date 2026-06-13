@@ -16,7 +16,7 @@ import {
   SPACING,
   RADIUS,
   FONT_FAMILY,
-} from '../../themes';
+} from '../../theme';
 
 export default function FilterOption({
   label,

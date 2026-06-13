@@ -1,8 +1,11 @@
 import { createBottomTabNavigator } 
     from '@react-navigation/bottom-tabs';
 
-import Order from '../screens/orders/Order';
-import Customer from '../screens/customers/Customer';
+import Order 
+  from '../screens/orders/Order';
+
+import Customer
+  from '../screens/customers/Customer';
 
 const Tab = createBottomTabNavigator();
 

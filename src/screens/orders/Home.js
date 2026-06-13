@@ -3,8 +3,6 @@ import { IconButton, FAB } from 'react-native-paper';
 import React, { useState, useEffect } from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { MaterialCommunityIcons } from '@expo/vector-icons';
-import SortModal from '../../components/SortModal'
-import FilterModal from '../../components/FilterModal'
 
 const IconeOrdenar = require('../../assets/ordem.png');
 const IconeFiltrar = require('../../assets/filtragem.png');

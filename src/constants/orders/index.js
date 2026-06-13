@@ -3,4 +3,4 @@ export * from './status-labels';
 
 export * from './types';
 export * from './type-labels';
-export * from './type-icons';
+export * from '../../theme/orders/type-icons';

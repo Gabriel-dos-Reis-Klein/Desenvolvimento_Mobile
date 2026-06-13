@@ -20,6 +20,7 @@ import {
   TYPOGRAPHY,
   FONT_FAMILY,
 } from '../../theme';
+import { ORDER_STATUS_LABELS, ORDER_TYPE_LABELS } from '../../constants';
 
 export default function OrderCard({
   order,
@@ -41,12 +42,12 @@ export default function OrderCard({
       <View style={styles.iconContainer}>
         <View style={styles.iconCircle}>
           <OrderIcon
-            type={order.tipoServico}
+            type={order.tipoPedido}
           />
         </View>
 
         <OrderStatusBadge
-          status={order.status}
+          status={order.statusPedido}
         />
       </View>
 
@@ -56,7 +57,7 @@ export default function OrderCard({
           numberOfLines={1}
           style={styles.title}
         >
-          {order.descricaoPeca}
+          {order.titulo}
         </Text>
 
         <Text
@@ -64,7 +65,7 @@ export default function OrderCard({
           color={COLORS.textSecondary}
           style={styles.subtitle}
         >
-          {`${order.tipoServico} • ${order.status}`}
+          {`${ORDER_TYPE_LABELS[order.tipoPedido]} • ${ORDER_STATUS_LABELS[order.statusPedido]}`}
         </Text>
       </View>
     </TouchableOpacity>
@@ -104,10 +105,7 @@ const styles = StyleSheet.create({
 
   title: {
     ...TYPOGRAPHY.body,
-
-    fontFamily:
-      FONT_FAMILY.poppinsSemiBold,
-
+    fontFamily:FONT_FAMILY.robotoBold,
     color: COLORS.text,
   },
 

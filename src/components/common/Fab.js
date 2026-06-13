@@ -1,7 +1,7 @@
 import { FAB as PaperFAB}
   from 'react-native-paper';
 
-export default function Fab({
+export default function AppFab({
   icon = 'plus',
   onPress,
   style,

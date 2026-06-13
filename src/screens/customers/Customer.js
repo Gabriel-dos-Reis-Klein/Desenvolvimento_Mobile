@@ -30,12 +30,13 @@ import FilterButton
   from '../../components/common/FilterButton';
 
 import Fab
-  from '../../components/common/AppFab';
+  from '../../components/common/Fab';
 
 import {
   COLORS,
   SPACING,
 } from '../../theme';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 export default function Customer({
   navigation,
@@ -50,7 +51,6 @@ export default function Customer({
     async () => {
       try {
         setLoading(true);
-
         const data =
           await customerService.getAll();
 
@@ -70,7 +70,7 @@ export default function Customer({
   }, []);
 
   return (
-    <View style={styles.container}>
+    <SafeAreaView style={styles.container}>
       <ListHeader
         title="Clientes"
         total={customers.length}
@@ -97,19 +97,17 @@ export default function Customer({
         <FlatList
           data={customers}
           keyExtractor={(item) =>
-            item.id.toString()
+            item.id
           }
 
           renderItem={({ item }) => (
             <CustomerCard
               customer={item}
               onPress={() =>
-                navigation.navigate(
-                  'CustomerDetails',
-                  {
-                    customerId:
-                      item.id,
-                  }
+               navigation.navigate('Details', {
+              screen: 'ClientesDescricao',
+              params: { customersId: item.id },
+    }
                 )
               }
             />
@@ -132,7 +130,7 @@ export default function Customer({
           )
         }
       />
-    </View>
+    </SafeAreaView>
   );
 }
 

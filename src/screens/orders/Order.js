@@ -35,7 +35,7 @@ import FilterButton
   from '../../components/common/FilterButton';
 
 import Fab
-  from '../../components/common/AppFab';
+  from '../../components/common/Fab';
 
 import OrderFilterModal
   from '../../components/orders/OrderFilterModal';
@@ -48,7 +48,7 @@ import {
   SPACING,
 } from '../../theme';
 
-export default function Order({
+export default function OrdersScreen({
   navigation,
 }) {
   const [orders, setOrders] =
@@ -103,7 +103,7 @@ export default function Order({
       filtered =
         filtered.filter(
           (order) =>
-            order.tipoServico ===
+            order.tipoPedido ===
             selectedType
         );
     }
@@ -159,6 +159,8 @@ export default function Order({
     selectedSort,
   ]);
 
+  console.log(orders);
+
   return (
     <View style={styles.container}>
       <ListHeader
@@ -200,12 +202,10 @@ export default function Order({
             <OrderCard
               order={item}
               onPress={() =>
-                navigation.navigate(
-                  'OrderDetails',
-                  {
-                    orderId: item.id,
-                  }
-                )
+                navigation.navigate('Details', {
+                screen: 'PedidosDescricao',      // informa qual tela dentro da Stack
+                params: { orderId: item.id },    // parâmetros para a tela PedidosDescricao
+                })
               }
             />
           )}

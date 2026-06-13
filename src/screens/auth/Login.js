@@ -3,6 +3,7 @@ import { View, StyleSheet, TouchableOpacity, Text, ScrollView } from 'react-nati
 import { TextInput, Button } from 'react-native-paper';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 export default function Login() {
   const navigation = useNavigation();
@@ -11,75 +12,77 @@ export default function Login() {
   const [secureText, setSecureText] = useState(true);
 
   return (
-    <ScrollView contentContainerStyle={styles.scrollContent}>
-      <View style={styles.card}>
-        {/* Ícone de Tesoura */}
+    <SafeAreaView>
+      <ScrollView contentContainerStyle={styles.scrollContent}>
+        <View style={styles.card}>
+          {/* Ícone de Tesoura */}
 
-        <View style={styles.headerContainer}>
-          <View style={styles.line} />        
-          <View style={styles.iconCircle}>
-            <MaterialCommunityIcons name="content-cut" size={30} color="white" />
-          </View>
-          <View style={styles.line} />
-        </View>
-
-        <Text style={styles.title}>Comece agora</Text>
-
-        {/* Switch / Tab Selector Customizado */}
-        <View style={styles.switchContainer}>
-          <View style={styles.switchButtonOn}>
-              <Text style={styles.textOn}>Entrar</Text>
+          <View style={styles.headerContainer}>
+            <View style={styles.line} />        
+            <View style={styles.iconCircle}>
+              <MaterialCommunityIcons name="content-cut" size={30} color="white" />
             </View>
-            <TouchableOpacity
-              style={styles.switchButtonOff}
-              onPress={() => navigation.navigate('Registro')}
-            >
-              <Text style={styles.textOff}>Registrar-se</Text>
-            </TouchableOpacity>
+            <View style={styles.line} />
+          </View>
+
+          <Text style={styles.title}>Comece agora</Text>
+
+          {/* Switch / Tab Selector Customizado */}
+          <View style={styles.switchContainer}>
+            <View style={styles.switchButtonOn}>
+                <Text style={styles.textOn}>Entrar</Text>
+              </View>
+              <TouchableOpacity
+                style={styles.switchButtonOff}
+                onPress={() => navigation.navigate('Registro')}
+              >
+                <Text style={styles.textOff}>Registrar-se</Text>
+              </TouchableOpacity>
+          </View>
+
+          {/* Campos de Input */}
+          <TextInput
+            label="Usuário"
+            value={usuario}
+            onChangeText={setUsuario}
+            mode="outlined"
+            style={styles.input}
+            outlineColor="#E0E0E0"
+            activeOutlineColor="#FF0050"
+          />
+
+          <TextInput
+            label="Senha"
+            value={senha}
+            onChangeText={setSenha}
+            mode="outlined"
+            secureTextEntry={secureText}
+            style={styles.input}
+            outlineColor="#E0E0E0"
+            activeOutlineColor="#FF0050"
+            right={
+              <TextInput.Icon 
+                name={() => <MaterialCommunityIcons name={secureText ? "eye" : "eye-off"} size={20} />} 
+                onPress={() => setSecureText(!secureText)}
+              />
+            }
+          />
+
+          <View style={styles.footerLinks}>
+            <Text style={styles.forgotPass}>Recuperar senha</Text>
+          </View>
+
+          <Button 
+            mode="contained" 
+            onPress={() => navigation.navigate('MainHome')} 
+            style={styles.mainButton}
+            contentStyle={{ height: 50 }}
+          >
+            Entrar
+          </Button>
         </View>
-
-        {/* Campos de Input */}
-        <TextInput
-          label="Usuário"
-          value={usuario}
-          onChangeText={setUsuario}
-          mode="outlined"
-          style={styles.input}
-          outlineColor="#E0E0E0"
-          activeOutlineColor="#FF0050"
-        />
-
-        <TextInput
-          label="Senha"
-          value={senha}
-          onChangeText={setSenha}
-          mode="outlined"
-          secureTextEntry={secureText}
-          style={styles.input}
-          outlineColor="#E0E0E0"
-          activeOutlineColor="#FF0050"
-          right={
-            <TextInput.Icon 
-              name={() => <MaterialCommunityIcons name={secureText ? "eye" : "eye-off"} size={20} />} 
-              onPress={() => setSecureText(!secureText)}
-            />
-          }
-        />
-
-        <View style={styles.footerLinks}>
-           <Text style={styles.forgotPass}>Recuperar senha</Text>
-        </View>
-
-        <Button 
-          mode="contained" 
-          onPress={() => navigation.navigate('MainHome')} 
-          style={styles.mainButton}
-          contentStyle={{ height: 50 }}
-        >
-          Entrar
-        </Button>
-      </View>
-    </ScrollView>
+      </ScrollView>
+    </SafeAreaView>
   );
 }
 
