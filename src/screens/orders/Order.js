@@ -168,14 +168,14 @@ export default function OrdersScreen({
 
       <View style={styles.filterRow}>
         <FilterButton
-          icon="sort-variant"
+          icon="sort-alpha-down"
           onPress={() =>
             setSortVisible(true)
           }
         />
 
         <FilterButton
-          icon="filter-variant"
+          icon="filter"
           onPress={() =>
             setFilterVisible(true)
           }
