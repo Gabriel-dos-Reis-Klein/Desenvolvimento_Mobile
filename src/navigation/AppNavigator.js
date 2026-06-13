@@ -9,7 +9,7 @@ import {
 import Login
   from '../screens/auth/Login';
 
-import Login
+import Register
   from '../screens/auth/Register';
 
 import MainTab
@@ -22,7 +22,7 @@ export default function AppNavigator() {
   return (
     <NavigationContainer>
       <Stack.Navigator
-        initialRouteName="Login"
+        initialRouteName="Main"
         screenOptions={{
           headerShown: false,
         }}
