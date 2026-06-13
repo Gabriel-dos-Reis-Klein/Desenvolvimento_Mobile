@@ -8,7 +8,7 @@ import {
 
 // TODO: diminuir tempo de resposta da API
 const api = axios.create({
-  baseURL: 'http://10.20.0.18:8080',
+  baseURL: 'https://pontogestor.onrender.com',
   timeout: 120000,
 });
 
