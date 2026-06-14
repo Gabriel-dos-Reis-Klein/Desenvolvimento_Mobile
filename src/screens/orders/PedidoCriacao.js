@@ -1,10 +1,9 @@
-import { View, Text, StyleSheet, FlatList, TouchableOpacity, ActivityIndicator, Image, ScrollView, Alert, Platform, Modal } from "react-native";
-import { TextInput, Button, Menu } from 'react-native-paper';
-import React, { useState, useEffect, useCallback } from "react";
+import { View, Text, StyleSheet, FlatList, TouchableOpacity, ActivityIndicator, Image, ScrollView, Alert, Modal } from "react-native";
+import { TextInput, Button } from 'react-native-paper';
+import React, { useState, useEffect } from "react";
 import * as ImagePicker from 'expo-image-picker';
-import * as MediaLibrary from 'expo-media-library';
-import { Picker } from "@react-native-picker/picker";
 import CustomDateTimePicker from '../../components/DateTime';
+import { orderService } from '../../services';
 
 const IconeVoltar = require('../../assets/return.png');
 
@@ -12,10 +11,12 @@ export default function PedidoCriacao({navigation}){
   const [buscaCliente, setBuscaCliente] = useState("");
   const [clienteSelecionado, setClienteSelecionado] = useState(null); // objeto { id, nome, telefone } ou null
   const [clientesFiltrados, setClientesFiltrados] = useState([]);
-  const [tipoServico, setTipoServico] = useState("confecção"); // valor padrão
+  const [tipoServico, setTipoServico] = useState("CONFECCAO"); // valor padrão para API
+  const [tipoPagamento, setTipoPagamento] = useState("DINHEIRO");
   const [descricaoPeca, setDescricaoPeca] = useState("");
   const [valorTotal, setValorTotal] = useState("");
   const [image, setImage] = useState(null);
+  const [imageBase64, setImageBase64] = useState(null);
   const [loading, setLoading] = useState(false);
   const [carregandoClientes, setCarregandoClientes] = useState(false);
   const [todosClientes, setTodosClientes] = useState([]);
@@ -34,12 +35,34 @@ export default function PedidoCriacao({navigation}){
   const carregarClientes = async () => {
     setCarregandoClientes(true);
     try {
-      const response = await fetch("https://ponto-gestor.onrender.com/api/clientes"); // substitua pela URL real
+      const response = await fetch("https://pontogestor.onrender.com/clientes", {
+        headers: {
+          Authorization: "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJwb250by1nZXN0YW8iLCJzdWIiOiI0NTRhMDg5Yi0xM2M0LTQ5MWEtODI5MS1jY2I0NGQ4MDhiYTAifQ._7UIvHe8Xsn50NbvveUUh19vNvBti45fDAlZ1XKeSrk",
+        },
+      });
+
+      if (!response.ok) {
+        const errorText = await response.text();
+        throw new Error(`Erro HTTP: ${response.status} - ${errorText}`);
+      }
+
       const data = await response.json();
-      setTodosClientes(data);
+
+      // Garantir que data é um array
+      const clientesArray = Array.isArray(data) ? data : (data.clientes || []);
+      setTodosClientes(clientesArray);
     } catch (error) {
       console.error("Erro ao carregar clientes:", error);
-      Alert.alert("Erro", "Não foi possível carregar a lista de clientes.");
+
+      // Dados mock para teste enquanto a API não funciona
+      const clientesMock = [
+        { id: 1, nome: "João Silva", telefone: "11999999999" },
+        { id: 2, nome: "Maria Santos", telefone: "11988888888" },
+        { id: 3, nome: "Pedro Oliveira", telefone: "11977777777" },
+      ];
+      setTodosClientes(clientesMock);
+
+      Alert.alert("Aviso", "Usando dados de teste. Verifique a conexão com o servidor.");
     } finally {
       setCarregandoClientes(false);
     }
@@ -53,9 +76,12 @@ export default function PedidoCriacao({navigation}){
       return;
     }
     const termo = texto.toLowerCase();
-    const filtrados = todosClientes.filter(
+    
+    // Garantir que todosClientes é um array antes de filtrar
+    const clientes = Array.isArray(todosClientes) ? todosClientes : [];
+    const filtrados = clientes.filter(
       (c) =>
-        c.nome.toLowerCase().includes(termo) ||
+        (c.nome && c.nome.toLowerCase().includes(termo)) ||
         (c.telefone && c.telefone.includes(termo))
     );
     setClientesFiltrados(filtrados);
@@ -79,27 +105,25 @@ export default function PedidoCriacao({navigation}){
 
   const selecionarFoto = async () => {
     const cameraRollStatus = await ImagePicker.requestMediaLibraryPermissionsAsync();
-    const mediaLibStatus = await MediaLibrary.requestPermissionsAsync();
 
-    if (cameraRollStatus.status !== 'granted' || mediaLibStatus.status !== 'granted') {
+    if (cameraRollStatus.status !== 'granted') {
       alert("Precisamos de permissão para acessar suas fotos!");
       return;
     }
 
-    // 2. Abrir a galeria para o usuário escolher
-    let result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ImagePicker.Images,
+    const result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
       allowsEditing: true,
       quality: 0.8,
+      base64: true,
     });
 
     if (!result.canceled) {
-      const uriOriginal = result.assets[0].uri;
-      setImage(uriOriginal);
-    }  
+      const asset = result.assets[0];
+      setImage(asset.uri);
+      setImageBase64(asset.base64 || null);
+    }
   };
-  
-
 
   const abrirModalAgendamento = () => {
     setNovoTipoAgendamento("prova");
@@ -121,30 +145,10 @@ export default function PedidoCriacao({navigation}){
     setAgendamentos(agendamentos.filter((a) => a.id !== id));
   };
 
-  const onChangeDateModal = (event, selectedDate) => {
-    if (Platform.OS === "android") {
-      setMostrarDatePickerModal(false);
-    }
-    if (selectedDate) {
-      setNovaDataAgendamento(selectedDate);
-    }
+  const confirmarDataAgendamento = (selectedDate) => {
+    setNovaDataAgendamento(selectedDate);
+    setMostrarCustomDatePicker(false);
   };
-
-  const uriToBase64 = async (uri) => {
-  const response = await fetch(uri);
-  const blob = await response.blob();
-  return new Promise((resolve, reject) => {
-    const reader = new FileReader();
-    reader.onloadend = () => {
-      const base64 = reader.result; // "data:image/jpeg;base64,..."
-      // Se a API espera apenas a string sem o prefixo, remova:
-      const pureBase64 = base64.split(',')[1];
-      resolve(pureBase64); // ou resolve(base64) se precisar do prefixo completo
-    };
-    reader.onerror = reject;
-    reader.readAsDataURL(blob);
-  });
-};
 
   // Função de POST para criar pedido
   const criarPedido = async () => {
@@ -158,48 +162,85 @@ export default function PedidoCriacao({navigation}){
       return;
     }
 
-    let imagemBase64 = null;
-      if (image) {
-        imagemBase64 = await uriToBase64(image);
-      }
+    if (agendamentos.length === 0) {
+      Alert.alert("Erro", "Adicione pelo menos um agendamento.");
+      return;
+    }
+
+    const clienteId = clienteSelecionado.id || clienteSelecionado._id || clienteSelecionado.clienteId || clienteSelecionado.idCliente;
+
+    if (!clienteId) {
+      Alert.alert("Erro", "O cliente selecionado não é válido. Selecione novamente.");
+      return;
+    }
+
+    const tituloPedido = descricaoPeca.trim();
+    if (!tituloPedido) {
+      Alert.alert("Erro", "Informe um título de pedido válido.");
+      return;
+    }
+
+    // Encontrar data de prova e entrega a partir dos agendamentos
+    const agendamentoProva = agendamentos.find(a => a.tipo === 'prova');
+    const agendamentoEntrega = agendamentos.find(a => a.tipo === 'entrega');
+    const dataProva = agendamentoProva ? agendamentoProva.data : null;
+    const dataEntrega = agendamentoEntrega
+      ? agendamentoEntrega.data
+      : agendamentos.length > 0
+        ? new Date(Math.max(...agendamentos.map(a => new Date(a.data).getTime()))).toISOString()
+        : new Date().toISOString();
+    const dataPrazo = dataEntrega;
 
     setLoading(true);
     try {
+      // Simplificar agendamentos - remover 'id', enviar apenas tipo e data
+      const agendamentosSimplificados = agendamentos.map(a => ({
+        tipo: a.tipo,
+        data: a.data
+      }));
+
       const corpoJSON = {
-      "clienteId": clienteSelecionado.id,
-      "clienteNome": clienteSelecionado.nome,
-      "tipoServico": tipoServico,
-      "descricaoPeca": descricaoPeca.trim(),
-      "valorTotal": parseFloat(valorTotal),
-      "status": "Em andamento",
-      "agendamentos": agendamentos, // Array de objetos, agora diretamente no JSON
-      "imagem": imagemBase64, // string base64 (ou null)
-    };
-        const headers = {
-      'Content-Type': 'application/json',
-    };
+        titulo: tituloPedido,
+        descricao: descricaoPeca.trim(),
+        itens: [
+          {
+            titulo: tituloPedido,
+            descricao: descricaoPeca.trim(),
+            quantidade: 1,
+            valor: parseFloat(valorTotal),
+            valorUnitario: parseFloat(valorTotal),
+          },
+        ],
+        idCliente: clienteId,
+        tipoPedido: tipoServico,
+        dataProva: dataProva,
+        dataEntrega: dataEntrega,
+        dataPrazo: dataPrazo,
+        pagamentoAntecipado: 0.0,
+        tipoPagamento: tipoPagamento,
+      };
 
-      const response = await fetch("https://ponto-gestor.onrender.com/api/pedidos", {
-        method: "POST",
-        headers: headers,
-        body: JSON.stringify(corpoJSON)
-        // Não defina Content-Type, o fetch coloca o boundary automaticamente
-      });
+      console.log("Enviando pedido:", JSON.stringify(corpoJSON, null, 2));
 
-    console.log("Status:", response.status);
-    const respostaTexto = await response.text();
-    console.log("Resposta:", respostaTexto);
-    console.log(corpoJSON)
+      const data = await orderService.create(corpoJSON);
 
-      if (response.ok) {
-        Alert.alert("Sucesso", "Pedido criado com sucesso!");
-        navigation.goBack();
-      } else {
-        Alert.alert("Erro", `Status ${response.status}: ${respostaTexto}`);
-      }
+      console.log("Pedido criado com sucesso:", data);
+
+      Alert.alert("Sucesso", "Pedido criado com sucesso!");
+      navigation.goBack();
     } catch (error) {
-      console.error(error);
-      Alert.alert("Erro", "Não foi possível conectar ao servidor.");
+      console.error("Erro ao criar pedido:", error);
+      
+      // Extrair detalhes do erro
+      let errorMsg = "Não foi possível conectar ao servidor.";
+      if (error?.data) {
+        console.log("Dados do erro:", error.data);
+        errorMsg = error.message || "Erro na requisição";
+      } else if (error?.message) {
+        errorMsg = error.message;
+      }
+      
+      Alert.alert("Erro", errorMsg);
     } finally {
       setLoading(false);
     }
@@ -263,17 +304,60 @@ export default function PedidoCriacao({navigation}){
 
         {/* Tipo de serviço */}
         <Text style={styles.label}>Tipo de Serviço *</Text>
-        <View style={styles.pickerWrapper}>
-          <Picker
-            selectedValue={tipoServico}
-            onValueChange={(itemValue) => setTipoServico(itemValue)}
-            style={styles.picker}
-            dropdownIconColor="#FF0050"
-          >
-            <Picker.Item label="Confecção" value="confecção" />
-            <Picker.Item label="Modificação" value="modificação" />
-            <Picker.Item label="Reparo" value="reparo" />
-          </Picker>
+        <View style={styles.selectorRow}>
+          {[
+            { label: "Confecção", value: "CONFECCAO" },
+            { label: "Modificação", value: "MODIFICACAO" },
+            { label: "Reparo", value: "REPARO" },
+          ].map((item) => (
+            <TouchableOpacity
+              key={item.value}
+              style={[
+                styles.selectorOption,
+                tipoServico === item.value && styles.selectorOptionActive,
+              ]}
+              onPress={() => setTipoServico(item.value)}
+            >
+              <Text
+                style={
+                  tipoServico === item.value
+                    ? styles.selectorTextActive
+                    : styles.selectorText
+                }
+              >
+                {item.label}
+              </Text>
+            </TouchableOpacity>
+          ))}
+        </View>
+
+        {/* Tipo de pagamento */}
+        <Text style={styles.label}>Tipo de Pagamento *</Text>
+        <View style={styles.selectorRow}>
+          {[
+            { label: "Dinheiro", value: "DINHEIRO" },
+            { label: "Cartão", value: "CARTAO" },
+            { label: "Pix", value: "PIX" },
+          ].map((item) => (
+            <TouchableOpacity
+              key={item.value}
+              style={[
+                styles.selectorOption,
+                tipoPagamento === item.value && styles.selectorOptionActive,
+              ]}
+              onPress={() => setTipoPagamento(item.value)}
+            >
+              <Text
+                style={
+                  tipoPagamento === item.value
+                    ? styles.selectorTextActive
+                    : styles.selectorText
+                }
+              >
+                {item.label}
+              </Text>
+            </TouchableOpacity>
+          ))}
         </View>
 
         {/* Descrição da peça */}
@@ -378,15 +462,30 @@ export default function PedidoCriacao({navigation}){
             <Text style={styles.modalTitle}>Novo Agendamento</Text>
 
             <Text style={styles.label}>Tipo:</Text>
-            <View style={styles.pickerWrapper}>
-              <Picker
-                selectedValue={novoTipoAgendamento}
-                onValueChange={(itemValue) => setNovoTipoAgendamento(itemValue)}
-                style={styles.picker}
-              >
-                <Picker.Item label="Prova" value="prova" />
-                <Picker.Item label="Entrega" value="entrega" />
-              </Picker>
+            <View style={styles.selectorRow}>
+              {[
+                { label: "Prova", value: "prova" },
+                { label: "Entrega", value: "entrega" },
+              ].map((item) => (
+                <TouchableOpacity
+                  key={item.value}
+                  style={[
+                    styles.selectorOption,
+                    novoTipoAgendamento === item.value && styles.selectorOptionActive,
+                  ]}
+                  onPress={() => setNovoTipoAgendamento(item.value)}
+                >
+                  <Text
+                    style={
+                      novoTipoAgendamento === item.value
+                        ? styles.selectorTextActive
+                        : styles.selectorText
+                    }
+                  >
+                    {item.label}
+                  </Text>
+                </TouchableOpacity>
+              ))}
             </View>
 
             <Text style={styles.label}>Data e hora:</Text>
@@ -513,6 +612,34 @@ const styles = StyleSheet.create({
   picker: {
     height: 50,
     color: "#000",
+  },
+  selectorRow: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    marginBottom: 12,
+  },
+  selectorOption: {
+    flex: 1,
+    borderWidth: 1,
+    borderColor: "#E0E0E0",
+    borderRadius: 8,
+    paddingVertical: 12,
+    marginRight: 8,
+    backgroundColor: "#F7F7F7",
+    alignItems: "center",
+  },
+  selectorOptionActive: {
+    backgroundColor: "#FF0050",
+    borderColor: "#FF0050",
+  },
+  selectorText: {
+    color: "#333",
+    fontSize: 14,
+  },
+  selectorTextActive: {
+    color: "#fff",
+    fontSize: 14,
+    fontWeight: "bold",
   },
   dateButton: {
     flexDirection: "row",
