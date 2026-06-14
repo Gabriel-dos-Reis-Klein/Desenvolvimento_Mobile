@@ -106,7 +106,7 @@ export default function Register({
           <AuthTabs
             activeTab="register"
             onPressLogin={() =>
-              navigation.navigate(
+              navigation.replace(
                 'Login'
               )
             }
