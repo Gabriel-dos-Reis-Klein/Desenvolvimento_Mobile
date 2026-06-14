@@ -24,6 +24,8 @@ export default function AppNavigator() {
         initialRouteName="Login"
         screenOptions={{
           headerShown: false,
+          animationEnabled: true,
+          gestureEnabled: true,
         }}
       >
         <Stack.Screen

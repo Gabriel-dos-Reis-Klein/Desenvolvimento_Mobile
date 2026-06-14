@@ -80,7 +80,7 @@ export default function Login({
             activeTab="login"
             onPressLogin={() => {}}
             onPressRegister={() =>
-              navigation.navigate(
+              navigation.replace(
                 'Register'
               )
             }
