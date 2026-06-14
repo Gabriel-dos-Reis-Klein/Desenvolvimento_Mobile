@@ -21,12 +21,19 @@ export default function PedidoCriacao({navigation}){
   const [carregandoClientes, setCarregandoClientes] = useState(false);
   const [todosClientes, setTodosClientes] = useState([]);
 
+  const [itens, setItens] = useState([]);
+
   const [agendamentos, setAgendamentos] = useState([]);
 
   const [modalAgendamentoVisivel, setModalAgendamentoVisivel] = useState(false);
   const [novoTipoAgendamento, setNovoTipoAgendamento] = useState("prova");
   const [novaDataAgendamento, setNovaDataAgendamento] = useState(new Date());
   const [mostrarCustomDatePicker, setMostrarCustomDatePicker] = useState(false);
+
+  const [modalItemVisivel, setModalItemVisivel] = useState(false);
+  const [novoItemTipo, setNovoItemTipo] = useState("CONFECCAO");
+  const [novoItemDescricao, setNovoItemDescricao] = useState("");
+  const [novoItemValor, setNovoItemValor] = useState("");
 
     useEffect(() => {
     carregarClientes();
@@ -150,6 +157,37 @@ export default function PedidoCriacao({navigation}){
     setMostrarCustomDatePicker(false);
   };
 
+  const abrirModalItem = () => {
+    setNovoItemTipo("CONFECCAO");
+    setNovoItemDescricao("");
+    setNovoItemValor("");
+    setModalItemVisivel(true);
+  };
+
+  const adicionarItem = () => {
+    if (!novoItemDescricao.trim()) {
+      Alert.alert("Erro", "Informe a descrição do item.");
+      return;
+    }
+    if (!novoItemValor || isNaN(parseFloat(novoItemValor))) {
+      Alert.alert("Erro", "Informe um valor válido.");
+      return;
+    }
+
+    const novoItem = {
+      id: Date.now().toString(),
+      tipo: novoItemTipo,
+      descricao: novoItemDescricao.trim(),
+      valor: parseFloat(novoItemValor),
+    };
+    setItens([...itens, novoItem]);
+    setModalItemVisivel(false);
+  };
+
+  const removerItem = (id) => {
+    setItens(itens.filter((item) => item.id !== id));
+  };
+
   // Função de POST para criar pedido
   const criarPedido = async () => {
     // Validações
@@ -157,8 +195,9 @@ export default function PedidoCriacao({navigation}){
       Alert.alert("Erro", "Selecione um cliente válido.");
       return;
     }
-    if (!valorTotal || isNaN(parseFloat(valorTotal))) {
-      Alert.alert("Erro", "Informe um valor válido.");
+
+    if (itens.length === 0) {
+      Alert.alert("Erro", "Adicione pelo menos um item de serviço.");
       return;
     }
 
@@ -167,16 +206,15 @@ export default function PedidoCriacao({navigation}){
       return;
     }
 
+    if (!image || !imageBase64) {
+      Alert.alert("Erro", "Adicione uma foto da peça.");
+      return;
+    }
+
     const clienteId = clienteSelecionado.id || clienteSelecionado._id || clienteSelecionado.clienteId || clienteSelecionado.idCliente;
 
     if (!clienteId) {
       Alert.alert("Erro", "O cliente selecionado não é válido. Selecione novamente.");
-      return;
-    }
-
-    const tituloPedido = descricaoPeca.trim();
-    if (!tituloPedido) {
-      Alert.alert("Erro", "Informe um título de pedido válido.");
       return;
     }
 
@@ -193,26 +231,28 @@ export default function PedidoCriacao({navigation}){
 
     setLoading(true);
     try {
-      // Simplificar agendamentos - remover 'id', enviar apenas tipo e data
-      const agendamentosSimplificados = agendamentos.map(a => ({
-        tipo: a.tipo,
-        data: a.data
+      // Gerar título a partir do primeiro item
+      const primeiroItemDescricao = itens[0]?.descricao || "Pedido";
+      const tituloPedido = primeiroItemDescricao.substring(0, 50);
+
+      // Converter itens para o formato esperado pela API
+      const itensFormatados = itens.map((item) => ({
+        titulo: item.descricao.substring(0, 50),
+        descricao: item.descricao,
+        quantidade: 1,
+        valor: item.valor,
+        valorUnitario: item.valor,
       }));
+
+      // Calcular valor total
+      const valorTotalCalculado = itens.reduce((sum, item) => sum + item.valor, 0);
 
       const corpoJSON = {
         titulo: tituloPedido,
-        descricao: descricaoPeca.trim(),
-        itens: [
-          {
-            titulo: tituloPedido,
-            descricao: descricaoPeca.trim(),
-            quantidade: 1,
-            valor: parseFloat(valorTotal),
-            valorUnitario: parseFloat(valorTotal),
-          },
-        ],
+        descricao: itens.map(i => i.descricao).join("; "),
+        itens: itensFormatados,
         idCliente: clienteId,
-        tipoPedido: tipoServico,
+        tipoPedido: itens[0]?.tipo || "CONFECCAO",
         dataProva: dataProva,
         dataEntrega: dataEntrega,
         dataPrazo: dataPrazo,
@@ -302,35 +342,6 @@ export default function PedidoCriacao({navigation}){
           </View>
         )}
 
-        {/* Tipo de serviço */}
-        <Text style={styles.label}>Tipo de Serviço *</Text>
-        <View style={styles.selectorRow}>
-          {[
-            { label: "Confecção", value: "CONFECCAO" },
-            { label: "Modificação", value: "MODIFICACAO" },
-            { label: "Reparo", value: "REPARO" },
-          ].map((item) => (
-            <TouchableOpacity
-              key={item.value}
-              style={[
-                styles.selectorOption,
-                tipoServico === item.value && styles.selectorOptionActive,
-              ]}
-              onPress={() => setTipoServico(item.value)}
-            >
-              <Text
-                style={
-                  tipoServico === item.value
-                    ? styles.selectorTextActive
-                    : styles.selectorText
-                }
-              >
-                {item.label}
-              </Text>
-            </TouchableOpacity>
-          ))}
-        </View>
-
         {/* Tipo de pagamento */}
         <Text style={styles.label}>Tipo de Pagamento *</Text>
         <View style={styles.selectorRow}>
@@ -360,45 +371,28 @@ export default function PedidoCriacao({navigation}){
           ))}
         </View>
 
-        {/* Descrição da peça */}
-        <TextInput
-          label="Descrição da peça"
-          value={descricaoPeca}
-          onChangeText={setDescricaoPeca}
-          mode="outlined"
-          multiline
-          style={[styles.input, { height: 100 }]}
-          theme={{
-            colors: {
-              text: "#000000",
-              onSurface: "#000000",
-              primary: "#FF0050",
-              placeholder: "#666",
-            },
-          }}
-          outlineColor="#E0E0E0"
-          activeOutlineColor="#FF0050"
-        />
-
-        {/* Valor total */}
-        <TextInput
-          label="Valor do pedido (R$)"
-          value={valorTotal}
-          onChangeText={setValorTotal}
-          mode="outlined"
-          keyboardType="decimal-pad"
-          style={styles.input}
-          theme={{
-            colors: {
-              text: "#000000",
-              onSurface: "#000000",
-              primary: "#FF0050",
-              placeholder: "#666",
-            },
-          }}
-          outlineColor="#E0E0E0"
-          activeOutlineColor="#FF0050"
-        />
+        {/* Itens de serviço */}
+        <Text style={styles.label}>Itens de Serviço *</Text>
+        {itens.map((item) => (
+          <View key={item.id} style={styles.itemServico}>
+            <View style={{ flex: 1 }}>
+              <Text style={styles.itemTipo}>
+                {item.tipo === "CONFECCAO" ? "Confecção" : item.tipo === "MODIFICACAO" ? "Modificação" : "Reparo"}
+              </Text>
+              <Text style={styles.itemDescricao}>{item.descricao}</Text>
+              <Text style={styles.itemValor}>R$ {item.valor.toFixed(2)}</Text>
+            </View>
+            <TouchableOpacity onPress={() => removerItem(item.id)}>
+              <Text style={styles.removerItem}>✕</Text>
+            </TouchableOpacity>
+          </View>
+        ))}
+        <TouchableOpacity
+          style={styles.adicionarItemButton}
+          onPress={abrirModalItem}
+        >
+          <Text style={styles.adicionarItemText}>+ Adicionar item</Text>
+        </TouchableOpacity>
 
         <Text style={styles.label}>Agendamentos *</Text>
         {agendamentos.map((item) => (
@@ -532,7 +526,103 @@ export default function PedidoCriacao({navigation}){
           </View>
         </View>
       </Modal>
-  </ScrollView>
+
+      <Modal
+        visible={modalItemVisivel}
+        transparent
+        animationType="slide"
+        onRequestClose={() => setModalItemVisivel(false)}
+      >
+        <View style={styles.modalOverlay}>
+          <View style={styles.modalContent}>
+            <Text style={styles.modalTitle}>Novo Item de Serviço</Text>
+
+            <Text style={styles.label}>Tipo de Serviço:</Text>
+            <View style={styles.selectorRow}>
+              {[
+                { label: "Confecção", value: "CONFECCAO" },
+                { label: "Modificação", value: "MODIFICACAO" },
+                { label: "Reparo", value: "REPARO" },
+              ].map((item) => (
+                <TouchableOpacity
+                  key={item.value}
+                  style={[
+                    styles.selectorOption,
+                    novoItemTipo === item.value && styles.selectorOptionActive,
+                  ]}
+                  onPress={() => setNovoItemTipo(item.value)}
+                >
+                  <Text
+                    style={
+                      novoItemTipo === item.value
+                        ? styles.selectorTextActive
+                        : styles.selectorText
+                    }
+                  >
+                    {item.label}
+                  </Text>
+                </TouchableOpacity>
+              ))}
+            </View>
+
+            <TextInput
+              label="Descrição do item"
+              value={novoItemDescricao}
+              onChangeText={setNovoItemDescricao}
+              mode="outlined"
+              multiline
+              style={[styles.input, { height: 80 }]}
+              theme={{
+                colors: {
+                  text: "#000000",
+                  onSurface: "#000000",
+                  primary: "#FF0050",
+                  placeholder: "#666",
+                },
+              }}
+              outlineColor="#E0E0E0"
+              activeOutlineColor="#FF0050"
+            />
+
+            <TextInput
+              label="Valor (R$)"
+              value={novoItemValor}
+              onChangeText={setNovoItemValor}
+              mode="outlined"
+              keyboardType="decimal-pad"
+              style={styles.input}
+              theme={{
+                colors: {
+                  text: "#000000",
+                  onSurface: "#000000",
+                  primary: "#FF0050",
+                  placeholder: "#666",
+                },
+              }}
+              outlineColor="#E0E0E0"
+              activeOutlineColor="#FF0050"
+            />
+
+            <View style={styles.modalBotoes}>
+              <Button
+                mode="outlined"
+                onPress={() => setModalItemVisivel(false)}
+                style={{ flex: 1, marginRight: 10 }}
+              >
+                Cancelar
+              </Button>
+              <Button
+                mode="contained"
+                onPress={adicionarItem}
+                style={{ flex: 1, backgroundColor: "#FF0050" }}
+              >
+                Adicionar
+              </Button>
+            </View>
+          </View>
+        </View>
+      </Modal>
+    </ScrollView>
   )
 }
 
@@ -712,6 +802,49 @@ const styles = StyleSheet.create({
     marginBottom: 12,
   },
   adicionarAgendamentoText: {
+    color: "#FF0050",
+    fontWeight: "bold",
+  },
+  // Estilos para itens de serviço
+  itemServico: {
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: "#f9f9f9",
+    padding: 12,
+    borderRadius: 5,
+    marginBottom: 8,
+    borderWidth: 1,
+    borderColor: "#E0E0E0",
+  },
+  itemTipo: {
+    fontSize: 14,
+    fontWeight: "bold",
+    color: "#FF0050",
+  },
+  itemDescricao: {
+    fontSize: 13,
+    color: "#333",
+    marginVertical: 4,
+  },
+  itemValor: {
+    fontSize: 12,
+    color: "#555",
+    fontWeight: "600",
+  },
+  removerItem: {
+    fontSize: 18,
+    color: "#999",
+    padding: 5,
+  },
+  adicionarItemButton: {
+    borderWidth: 1,
+    borderColor: "#FF0050",
+    borderRadius: 5,
+    padding: 10,
+    alignItems: "center",
+    marginBottom: 12,
+  },
+  adicionarItemText: {
     color: "#FF0050",
     fontWeight: "bold",
   },
