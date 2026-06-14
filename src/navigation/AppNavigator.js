@@ -18,23 +18,22 @@ import MainTab
 const Stack = createStackNavigator();
 
 export default function AppNavigator() {
-
   return (
     <NavigationContainer>
       <Stack.Navigator
-        initialRouteName="Main"
+        initialRouteName="Login"
         screenOptions={{
           headerShown: false,
         }}
       >
-        <Stack.Screen 
-          name="Login" 
-          component={Login} 
+        <Stack.Screen
+          name="Login"
+          component={Login}
         />
 
-        <Stack.Screen 
-          name="Register" 
-          component={Register} 
+        <Stack.Screen
+          name="Register"
+          component={Register}
         />
 
         <Stack.Screen
