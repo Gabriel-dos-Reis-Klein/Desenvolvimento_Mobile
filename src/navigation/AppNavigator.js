@@ -1,12 +1,36 @@
-import { useContext } from 'react';
-import { NavigationContainer } from '@react-navigation/native';
-import { createStackNavigator } from '@react-navigation/stack';
+import { 
+  useContext 
+} from 'react';
 
-import Login from '../screens/auth/Login';
-import Register from '../screens/auth/Register';
-import MainTab from './MainTab';
+import { 
+  NavigationContainer 
+} from '@react-navigation/native';
 
-import { AuthContext } from '../contexts/AuthContext';
+import { 
+  createStackNavigator 
+} from '@react-navigation/stack';
+
+import Login 
+  from '../screens/auth/Login';
+
+import Register 
+  from '../screens/auth/Register';
+
+import MainTab 
+  from './MainTab';
+
+import CreateCustomer
+  from '../screens/customers/CreateCustomer';
+
+import PedidoCriacao
+  from '../screens/orders/PedidoCriacao';
+
+import DetailsPedidos
+  from '../screens/orders/DetailsPedidos';
+
+import { 
+  AuthContext 
+} from '../contexts/AuthContext';
 
 const Stack = createStackNavigator();
 
@@ -19,7 +43,27 @@ export default function AppNavigator() {
     <NavigationContainer>
       <Stack.Navigator screenOptions={{ headerShown: false }}>
         {signed ? (
-          <Stack.Screen name="Main" component={MainTab} />
+          <>
+            <Stack.Screen
+              name="Main"
+              component={MainTab}
+            />
+
+            <Stack.Screen
+              name="CreateCustomer"
+              component={CreateCustomer}
+            />
+
+            <Stack.Screen
+              name="PedidoCriacao"
+              component={PedidoCriacao}
+            />
+
+            <Stack.Screen
+              name="DetailsPedidos"
+              component={DetailsPedidos}
+            />
+          </>
         ) : (
           <>
             <Stack.Screen name="Login" component={Login} />
