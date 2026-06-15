@@ -45,6 +45,13 @@ import {
   showSuccess,
 } from '../../errors/showSuccess';
 
+import TextArea
+  from '../../components/form/TextArea';
+
+import { 
+  formatPhone 
+} from '../../utils/phoneMask';
+
 export default function CreateCustomer({
   navigation,
 }) {
@@ -133,41 +140,24 @@ export default function CreateCustomer({
 
           <Input
             label="Telefone"
-            value={
-              form.values.phone
-            }
+            value={form.values.phone}
             onChangeText={(text) =>
               form.setField(
                 'phone',
-                text
+                formatPhone(text)
               )
             }
-            error={
-              form.errors.phone
-            }
+            error={form.errors.phone}
             keyboardType="phone-pad"
           />
 
-          <Input
+          <TextArea
             label="Descrição"
-            value={
-              form.values.description
-            }
+            value={form.values.description}
             onChangeText={(text) =>
-              form.setField(
-                'description',
-                text
-              )
+              form.setField('description', text)
             }
-            error={
-              form.errors.description
-            }
-            multiline
-            numberOfLines={8}
-            textAlignVertical="top"
-            style={
-              styles.descriptionInput
-            }
+            error={form.errors.description}
           />
 
           <Button
@@ -196,9 +186,5 @@ const styles = StyleSheet.create({
       SPACING.xl,
     paddingVertical:
       SPACING.xl,
-  },
-
-  descriptionInput: {
-    height: 250,
   },
 });
