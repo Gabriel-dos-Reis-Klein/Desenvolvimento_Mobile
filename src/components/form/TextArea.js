@@ -5,7 +5,7 @@ import { TextInput, HelperText } from 'react-native-paper';
 
 import { COLORS, SPACING } from '../../theme';
 
-const MIN_HEIGHT = 80;
+const MIN_HEIGHT = 48;
 const MAX_HEIGHT = 250;
 
 export default function TextArea({
@@ -18,7 +18,6 @@ export default function TextArea({
 }) {
   const [height, setHeight] = useState(MIN_HEIGHT);
 
-  // volta ao tamanho inicial quando limpa
   useEffect(() => {
     if (!value?.trim()) {
       setHeight(MIN_HEIGHT);
