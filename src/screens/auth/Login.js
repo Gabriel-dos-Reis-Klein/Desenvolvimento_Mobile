@@ -1,7 +1,4 @@
-import {
-  useState,
-} from 'react';
-
+import { useState, useContext } from 'react';
 import {
   StyleSheet,
   KeyboardAvoidingView,
@@ -9,108 +6,91 @@ import {
   Platform,
 } from 'react-native';
 
-import {
-  SafeAreaView,
-} from 'react-native-safe-area-context';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
-import AuthHeader
-  from '../../components/auth/AuthHeader';
+import AuthHeader from '../../components/auth/AuthHeader';
+import AuthTabs from '../../components/auth/AuthTabs';
+import AuthInput from '../../components/auth/AuthInput';
+import AuthPasswordInput from '../../components/auth/AuthPasswordInput';
+import AuthButton from '../../components/auth/AuthButton';
 
-import AuthTabs
-  from '../../components/auth/AuthTabs';
+import { COLORS, SPACING } from '../../theme';
 
-import AuthInput
-  from '../../components/auth/AuthInput';
+import { useForm } from '../../hooks';
+import { loginSchema } from '../../validations/auth.validation';
 
-import AuthPasswordInput
-  from '../../components/auth/AuthPasswordInput';
+import { userService } from '../../services';
+import { showError } from '../../errors/showError';
 
-import AuthCheckbox
-  from '../../components/auth/AuthCheckbox';
+import { AuthContext } from '../../contexts/AuthContext';
 
-import AuthButton
-  from '../../components/auth/AuthButton';
+export default function Login({ navigation }) {
+  const form = useForm(loginSchema, {
+    email: '',
+    password: '',
+  });
 
-import {
-  COLORS,
-  SPACING,
-} from '../../theme';
+  const { signIn } = useContext(AuthContext);
 
-export default function Login({
-  navigation,
-}) {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [rememberMe, setRememberMe] = useState(false);
+  const [loading, setLoading] = useState(false);
 
   const handleLogin = async () => {
+    const data = form.validate();
+    if (!data) return;
+
     try {
-      navigation.navigate('Main');
+      setLoading(true);
+
+      const response = await userService.login({
+        email: data.email,
+        senha: data.password,
+      });
+
+      await signIn({
+        token: response.token,
+      });
+
     } catch (error) {
-      console.error(error);
+      showError(error);
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
-    <SafeAreaView
-      style={styles.container}
-    >
+    <SafeAreaView style={styles.container}>
       <KeyboardAvoidingView
         style={styles.container}
-        behavior={
-          Platform.OS === 'ios'
-            ? 'padding'
-            : 'height'
-        }
+        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
       >
         <ScrollView
           keyboardShouldPersistTaps="handled"
-          showsVerticalScrollIndicator={
-            false
-          }
-          contentContainerStyle={
-            styles.scrollContent
-          }
+          contentContainerStyle={styles.scrollContent}
         >
-          <AuthHeader
-            title="Comece Agora"
-          />
+          <AuthHeader title="Comece Agora" />
 
           <AuthTabs
             activeTab="login"
             onPressLogin={() => {}}
-            onPressRegister={() =>
-              navigation.replace(
-                'Register'
-              )
-            }
+            onPressRegister={() => navigation.replace('Register')}
           />
 
           <AuthInput
             label="E-mail"
-            value={email}
-            onChangeText={setEmail}
-            keyboardType="email-address"
-            autoCapitalize="none"
+            value={form.values.email}
+            onChangeText={(text) => form.setField('email', text)}
+            error={form.errors.email}
           />
 
           <AuthPasswordInput
-            value={password}
-            onChangeText={setPassword}
-          />
-
-          <AuthCheckbox
-            label="Lembrar-me"
-            checked={rememberMe}
-            onPress={() =>
-              setRememberMe(
-                !rememberMe
-              )
-            }
+            value={form.values.password}
+            onChangeText={(text) => form.setField('password', text)}
+            error={form.errors.password}
           />
 
           <AuthButton
             title="Entrar"
+            loading={loading}
             onPress={handleLogin}
           />
         </ScrollView>
@@ -124,7 +104,6 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: COLORS.background,
   },
-
   scrollContent: {
     flexGrow: 1,
     justifyContent: 'center',
