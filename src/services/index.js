@@ -3,3 +3,9 @@ export { default as customerService }
 
 export { default as orderService } 
     from './orders/order.service';
+
+export { default as userService }
+    from './users/user.service';
+
+export * as authStorage 
+    from './storage/auth.storage'

@@ -1,53 +1,30 @@
-import { createBottomTabNavigator } 
-    from '@react-navigation/bottom-tabs';
+import {
+  createBottomTabNavigator,
+} from '@react-navigation/bottom-tabs';
 
-import { createStackNavigator }
-    from '@react-navigation/stack';
+import Customer from '../screens/customers/Customer';
+import Order from '../screens/orders/Order';
 
-import Order 
-  from '../screens/orders/Order';
-
-import PedidoCriacao
-  from '../screens/orders/PedidoCriacao';
-
-import DetailsPedidos
-  from '../screens/orders/DetailsPedidos';
-
-import Customer
-  from '../screens/customers/Customer';
+import {
+  createScreenOptions,
+} from './config/tab.config';
 
 const Tab = createBottomTabNavigator();
-const Stack = createStackNavigator();
 
-function OrdersStack() {
+export default function MainTab() {
   return (
-    <Stack.Navigator screenOptions={{ headerShown: false }}>
-      <Stack.Screen 
-        name="OrderList" 
-        component={Order} 
+    <Tab.Navigator
+      screenOptions={createScreenOptions}
+    >
+      <Tab.Screen
+        name="Pedidos"
+        component={Order}
       />
-      <Stack.Screen 
-        name="PedidoCriacao" 
-        component={PedidoCriacao} 
-      />
-      <Stack.Screen 
-        name="DetailsPedidos" 
-        component={DetailsPedidos} 
-      />
-    </Stack.Navigator>
-  );
-}
 
-function MainTab() {
-  return (
-    <Tab.Navigator screenOptions={{ headerShown: false }}>
-      <Tab.Screen 
-        name="Pedidos" 
-        component={OrdersStack} 
+      <Tab.Screen
+        name="Clientes"
+        component={Customer}
       />
-      <Tab.Screen name="Clientes" component={Customer} />
     </Tab.Navigator>
   );
 }
-
-export default MainTab;

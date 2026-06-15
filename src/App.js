@@ -7,10 +7,13 @@ import AppNavigator
 
 import {
   useAppFonts,
-} from './hooks/useAppFonts';
+} from './hooks';
 
 import { SafeAreaProvider } 
   from 'react-native-safe-area-context';
+
+import { AuthProvider } 
+  from './contexts/AuthContext';
 
 // TODO: criar contramedidas para caso a API esteja indisponível
 export default function App() {
@@ -18,11 +21,12 @@ export default function App() {
   useAppFonts();
 
   return (
-    <SafeAreaProvider style={{flex:1}}>
+    <SafeAreaProvider style={{ flex: 1 }}>
       <PaperProvider>
-        <AppNavigator />
+        <AuthProvider>
+          <AppNavigator />
+        </AuthProvider>
       </PaperProvider>
     </SafeAreaProvider>
-    
   );
 }

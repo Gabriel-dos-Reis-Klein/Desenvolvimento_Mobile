@@ -1,46 +1,75 @@
-import {
-  NavigationContainer,
+import { 
+  useContext 
+} from 'react';
+
+import { 
+  NavigationContainer 
 } from '@react-navigation/native';
 
-import {
-  createStackNavigator,
+import { 
+  createStackNavigator 
 } from '@react-navigation/stack';
 
-import Login
+import Login 
   from '../screens/auth/Login';
 
-import Register
+import Register 
   from '../screens/auth/Register';
 
-import MainTab
+import MainTab 
   from './MainTab';
+
+import CreateCustomer
+  from '../screens/customers/CreateCustomer';
+
+import PedidoCriacao
+  from '../screens/orders/PedidoCriacao';
+
+import DetailsPedidos
+  from '../screens/orders/DetailsPedidos';
+
+import { 
+  AuthContext 
+} from '../contexts/AuthContext';
 
 const Stack = createStackNavigator();
 
 export default function AppNavigator() {
+  const { signed, loading } = useContext(AuthContext);
+
+  if (loading) return null;
 
   return (
     <NavigationContainer>
-      <Stack.Navigator
-        initialRouteName="Main"
-        screenOptions={{
-          headerShown: false,
-        }}
-      >
-        <Stack.Screen 
-          name="Login" 
-          component={Login} 
-        />
+      <Stack.Navigator screenOptions={{ headerShown: false }}>
+        {signed ? (
+          <>
+            <Stack.Screen
+              name="Main"
+              component={MainTab}
+            />
 
-        <Stack.Screen 
-          name="Register" 
-          component={Register} 
-        />
+            <Stack.Screen
+              name="CreateCustomer"
+              component={CreateCustomer}
+            />
 
-        <Stack.Screen
-          name="Main"
-          component={MainTab}
-        />
+            <Stack.Screen
+              name="PedidoCriacao"
+              component={PedidoCriacao}
+            />
+
+            <Stack.Screen
+              name="DetailsPedidos"
+              component={DetailsPedidos}
+            />
+          </>
+        ) : (
+          <>
+            <Stack.Screen name="Login" component={Login} />
+            <Stack.Screen name="Register" component={Register} />
+          </>
+        )}
       </Stack.Navigator>
     </NavigationContainer>
   );
