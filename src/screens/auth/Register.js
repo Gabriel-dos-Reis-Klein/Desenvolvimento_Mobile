@@ -10,9 +10,9 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 
 import AuthHeader from '../../components/auth/AuthHeader';
 import AuthTabs from '../../components/auth/AuthTabs';
-import AuthInput from '../../components/auth/AuthInput';
-import AuthPasswordInput from '../../components/auth/AuthPasswordInput';
-import AuthButton from '../../components/auth/AuthButton';
+import Input from '../../components/form/Input';
+import PasswordInput from '../../components/form/PasswordInput';
+import Button from '../../components/form/Button';
 
 import { COLORS, SPACING } from '../../theme';
 
@@ -86,28 +86,28 @@ export default function Register({ navigation }) {
             onPressRegister={() => {}}
           />
 
-          <AuthInput
+          <Input
             label="Nome"
             value={form.values.name}
             onChangeText={(text) => form.setField('name', text)}
             error={form.errors.name}
           />
 
-          <AuthInput
+          <Input
             label="E-mail"
             value={form.values.email}
             onChangeText={(text) => form.setField('email', text)}
             error={form.errors.email}
           />
 
-          <AuthPasswordInput
+          <PasswordInput
             label="Senha"
             value={form.values.password}
             onChangeText={(text) => form.setField('password', text)}
             error={form.errors.password}
           />
 
-          <AuthPasswordInput
+          <PasswordInput
             label="Confirmar senha"
             value={form.values.confirmPassword}
             onChangeText={(text) =>
@@ -116,7 +116,7 @@ export default function Register({ navigation }) {
             error={form.errors.confirmPassword}
           />
 
-          <AuthButton
+          <Button
             title="Cadastrar-se"
             loading={loading}
             onPress={handleRegister}

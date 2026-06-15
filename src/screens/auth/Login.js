@@ -10,9 +10,9 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 
 import AuthHeader from '../../components/auth/AuthHeader';
 import AuthTabs from '../../components/auth/AuthTabs';
-import AuthInput from '../../components/auth/AuthInput';
-import AuthPasswordInput from '../../components/auth/AuthPasswordInput';
-import AuthButton from '../../components/auth/AuthButton';
+import Input from '../../components/form/Input';
+import PasswordInput from '../../components/form/PasswordInput';
+import Button from '../../components/form/Button';
 
 import { COLORS, SPACING } from '../../theme';
 
@@ -75,20 +75,20 @@ export default function Login({ navigation }) {
             onPressRegister={() => navigation.replace('Register')}
           />
 
-          <AuthInput
+          <Input
             label="E-mail"
             value={form.values.email}
             onChangeText={(text) => form.setField('email', text)}
             error={form.errors.email}
           />
 
-          <AuthPasswordInput
+          <PasswordInput
             value={form.values.password}
             onChangeText={(text) => form.setField('password', text)}
             error={form.errors.password}
           />
 
-          <AuthButton
+          <Button
             title="Entrar"
             loading={loading}
             onPress={handleLogin}
