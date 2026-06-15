@@ -1,5 +1,5 @@
-import { Button } from 'react-native-paper';
 import { StyleSheet } from 'react-native';
+import { Button as PaperButton } from 'react-native-paper';
 
 import {
   COLORS,
@@ -8,14 +8,14 @@ import {
   SPACING,
 } from '../../theme';
 
-export default function AuthButton({
+export default function Button({
   title,
-  loading,
+  loading = false,
   style,
   ...props
 }) {
   return (
-    <Button
+    <PaperButton
       mode="contained"
       buttonColor={COLORS.primary}
       contentStyle={styles.content}
@@ -26,7 +26,7 @@ export default function AuthButton({
       {...props}
     >
       {title}
-    </Button>
+    </PaperButton>
   );
 }
 
