@@ -49,6 +49,9 @@ import {
 } from '../../theme';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
+// Importação para teste, vou remover depois
+import AsyncStorage from '@react-native-async-storage/async-storage';
+
 export default function OrdersScreen({
   navigation,
 }) {
@@ -164,6 +167,9 @@ export default function OrdersScreen({
       <ListHeader
         title="Pedidos"
         total={filteredOrders.length}
+        onPressSettings={() => {
+          AsyncStorage.clear()
+        }}
       />
 
       <View style={styles.filterRow}>

@@ -1,20 +1,16 @@
-import {
-  Button,
-} from 'react-native-paper';
+import { Button } from 'react-native-paper';
+import { StyleSheet } from 'react-native';
 
 import {
   COLORS,
   RADIUS,
   FONT_FAMILY,
-  SPACING
+  SPACING,
 } from '../../theme';
-
-import {
-  StyleSheet,
-} from 'react-native';
 
 export default function AuthButton({
   title,
+  loading,
   style,
   ...props
 }) {
@@ -24,10 +20,9 @@ export default function AuthButton({
       buttonColor={COLORS.primary}
       contentStyle={styles.content}
       labelStyle={styles.label}
-      style={[
-        styles.button,
-        style,
-      ]}
+      style={[styles.button, style]}
+      loading={loading}
+      disabled={loading}
       {...props}
     >
       {title}
