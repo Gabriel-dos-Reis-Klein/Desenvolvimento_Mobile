@@ -128,7 +128,7 @@ export default function Customer({
       <Fab
         onPress={() =>
           navigation.navigate(
-            'Criacao', { screen: 'ClienteCriacao' }
+            'CreateCustomer', { screen: 'CreateCustomer' }
           )
         }
       />
