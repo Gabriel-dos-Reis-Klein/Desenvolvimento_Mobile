@@ -5,11 +5,12 @@ import {
   SPACING,
 } from '../../theme';
 
-export default function AuthInput({
+export default function Input({
   label,
   value,
   onChangeText,
   error,
+  style,
   ...props
 }) {
   return (
@@ -22,15 +23,24 @@ export default function AuthInput({
         error={!!error}
         outlineColor={COLORS.border}
         activeOutlineColor={COLORS.primary40}
-        style={{
-          marginBottom: error ? 0 : SPACING.md,
-          backgroundColor: COLORS.surface,
-        }}
+        style={[
+          {
+            marginBottom: error
+              ? 0
+              : SPACING.md,
+            backgroundColor:
+              COLORS.surface,
+          },
+          style,
+        ]}
         {...props}
       />
 
       {!!error && (
-        <HelperText type="error" visible={true}>
+        <HelperText
+          type="error"
+          visible
+        >
           {error}
         </HelperText>
       )}
