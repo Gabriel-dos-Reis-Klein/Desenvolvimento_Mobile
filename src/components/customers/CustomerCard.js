@@ -1,11 +1,4 @@
-import {
-  View,
-  StyleSheet,
-  TouchableOpacity,
-} from 'react-native';
-
-import Text
-  from '../common/Text';
+import { View, StyleSheet, TouchableOpacity, Text } from 'react-native';
 
 import {
   COLORS,
@@ -18,45 +11,56 @@ import {
 export default function CustomerCard({
   customer,
   onPress,
+  highlightQuery = '',
   style,
   ...props
 }) {
   const firstLetter =
-    customer?.nome
-      ?.charAt(0)
-      ?.toUpperCase() || '?';
+    customer?.nome?.charAt(0)?.toUpperCase() || '?';
+
+  const normalize = (text = '') => text.toString();
+
+  const renderHighlighted = (text = '') => {
+    if (!highlightQuery.trim()) {
+      return <Text>{text}</Text>;
+    }
+
+    const regex = new RegExp(`(${highlightQuery})`, 'gi');
+    const parts = text.split(regex);
+
+    return parts.map((part, index) => {
+      const isMatch =
+        part.toLowerCase() === highlightQuery.toLowerCase();
+
+      return (
+        <Text
+          key={index}
+          style={isMatch ? styles.highlight : styles.normalText}
+        >
+          {part}
+        </Text>
+      );
+    });
+  };
 
   return (
     <TouchableOpacity
-      style={[
-        styles.card,
-        style,
-      ]}
+      style={[styles.card, style]}
       onPress={onPress}
       activeOpacity={0.8}
       {...props}
     >
       <View style={styles.avatar}>
-        <Text style={styles.avatarText}>
-          {firstLetter}
-        </Text>
+        <Text style={styles.avatarText}>{firstLetter}</Text>
       </View>
 
       <View style={styles.content}>
-        <Text
-          variant="body"
-          numberOfLines={1}
-          style={styles.name}
-        >
-          {customer.nome}
+        <Text style={styles.name} numberOfLines={1}>
+          {renderHighlighted(customer.nome)}
         </Text>
 
-        <Text
-          variant="small"
-          color={COLORS.textSecondary}
-          style={styles.phone}
-        >
-          {customer.telefone}
+        <Text style={styles.phone}>
+          {renderHighlighted(customer.telefone)}
         </Text>
       </View>
     </TouchableOpacity>
@@ -67,40 +71,30 @@ const styles = StyleSheet.create({
   card: {
     flexDirection: 'row',
     alignItems: 'center',
-
     paddingVertical: SPACING.sm,
-
     borderRadius: RADIUS.lg,
-
-    backgroundColor:
-      COLORS.surface,
-
+    backgroundColor: COLORS.surface,
     marginBottom: SPACING.md,
   },
 
   avatar: {
     width: 55,
     height: 55,
-
     borderRadius: 55 / 2,
-
     justifyContent: 'center',
     alignItems: 'center',
-
-    backgroundColor:
-      COLORS.primary10,
+    backgroundColor: COLORS.primary10,
   },
 
   avatarText: {
     ...TYPOGRAPHY.body,
     fontFamily: FONT_FAMILY.robotoBold,
     color: COLORS.primary,
-    fontSize:20,
+    fontSize: 20,
   },
 
   content: {
     flex: 1,
-
     marginLeft: SPACING.md,
   },
 
@@ -112,5 +106,17 @@ const styles = StyleSheet.create({
 
   phone: {
     marginTop: SPACING.xs,
+    color: COLORS.textSecondary,
+  },
+
+  normalText: {
+    color: COLORS.text,
+  },
+
+  highlight: {
+    color: COLORS.primary,
+    backgroundColor: COLORS.primary10,
+    fontWeight: '700',
+    borderRadius: 4,
   },
 });

@@ -3,11 +3,7 @@ import {
   StyleSheet,
 } from 'react-native';
 
-import Text
-  from './Text';
-
-import IconButton
-  from './IconButton';
+import Text from './Text';
 
 import {
   COLORS,
@@ -18,65 +14,50 @@ import {
 export default function ListHeader({
   title,
   total,
-
-  onPressSettings,
-  onPressSearch,
-
   style,
   ...props
 }) {
   return (
     <View
-      style={style}
+      style={[
+        styles.container,
+        style,
+      ]}
       {...props}
     >
-      <View style={styles.headerButtons}>
-        <IconButton
-          icon="cog-outline"
-          onPress={onPressSettings}
-        />
+      <Text
+        variant="h1"
+        style={styles.title}
+      >
+        {title}
+      </Text>
 
-        <IconButton
-          icon="magnify"
-          onPress={onPressSearch}
-        />
-      </View>
-
-      <View style={styles.titleArea}>
-        <Text
-          variant="h1"
-          style={styles.title}
-        >
-          {title}
-        </Text>
-
-        <Text
-          variant="small"
-          color={COLORS.textSecondary}
-        >
-          {total} resultados
-        </Text>
-      </View>
+      <Text
+        variant="small"
+        color={COLORS.textSecondary}
+        style={styles.subtitle}
+      >
+        {total} resultado
+        {total !== 1 ? 's' : ''}
+      </Text>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  headerButtons: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-
-    marginBottom: SPACING.sm,
-  },
-
-  titleArea: {
+  container: {
     alignItems: 'center',
 
-    marginBottom: SPACING.lg,
+    paddingTop: SPACING.xl,
+    marginBottom: SPACING.xl,
   },
 
   title: {
     fontFamily:
       FONT_FAMILY.poppinsBold,
+  },
+
+  subtitle: {
+    marginTop: SPACING.xs,
   },
 });
