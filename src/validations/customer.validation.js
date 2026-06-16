@@ -9,7 +9,10 @@ export const customerSchema = z.object({
   phone: z
     .string()
     .trim()
-    .min(10, 'Telefone inválido'),
+    .regex(
+      /^\(?\d{2}\)?\s?9\d{4}-?\d{4}$/,
+      'Telefone inválido'
+    ),
 
   description: z
     .string()

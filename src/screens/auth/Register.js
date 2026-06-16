@@ -10,9 +10,8 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 
 import AuthHeader from '../../components/auth/AuthHeader';
 import AuthTabs from '../../components/auth/AuthTabs';
-import Input from '../../components/form/Input';
-import PasswordInput from '../../components/form/PasswordInput';
-import Button from '../../components/form/Button';
+import Input from '../../components/common/Input';
+import Button from '../../components/common/Button';
 
 import { COLORS, SPACING } from '../../theme';
 
@@ -68,6 +67,7 @@ export default function Register({ navigation }) {
       setLoading(false);
     }
   };
+
   return (
     <SafeAreaView style={styles.container}>
       <KeyboardAvoidingView
@@ -89,25 +89,35 @@ export default function Register({ navigation }) {
           <Input
             label="Nome"
             value={form.values.name}
-            onChangeText={(text) => form.setField('name', text)}
+            onChangeText={(text) =>
+              form.setField('name', text)
+            }
             error={form.errors.name}
           />
 
           <Input
             label="E-mail"
             value={form.values.email}
-            onChangeText={(text) => form.setField('email', text)}
+            onChangeText={(text) =>
+              form.setField('email', text)
+            }
             error={form.errors.email}
+            keyboardType="email-address"
+            autoCapitalize="none"
           />
 
-          <PasswordInput
+          <Input
+            type="password"
             label="Senha"
             value={form.values.password}
-            onChangeText={(text) => form.setField('password', text)}
+            onChangeText={(text) =>
+              form.setField('password', text)
+            }
             error={form.errors.password}
           />
 
-          <PasswordInput
+          <Input
+            type="password"
             label="Confirmar senha"
             value={form.values.confirmPassword}
             onChangeText={(text) =>
@@ -132,6 +142,7 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: COLORS.background,
   },
+
   scrollContent: {
     flexGrow: 1,
     justifyContent: 'center',

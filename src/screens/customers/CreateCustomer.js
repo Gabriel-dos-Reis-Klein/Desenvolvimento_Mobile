@@ -7,175 +7,108 @@ import {
   Platform,
 } from 'react-native';
 
-import {
-  SafeAreaView,
-} from 'react-native-safe-area-context';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
-import {
-  COLORS,
-  SPACING,
-} from '../../theme';
+import { COLORS, SPACING } from '../../theme';
 
-import PageHeader
-  from '../../components/common/PageHeader';
+import PageHeader from '../../components/common/PageHeader';
+import Input from '../../components/common/Input';
+import Button from '../../components/common/Button';
 
-import Input
-  from '../../components/form/Input';
+import { useForm } from '../../hooks';
 
-import Button
-  from '../../components/form/Button';
+import { customerSchema } from '../../validations/customer.validation';
 
-import {
-  useForm,
-} from '../../hooks';
+import { customerService } from '../../services';
 
-import {
-  customerSchema,
-} from '../../validations/customer.validation';
+import { showError } from '../../errors/showError';
+import { showSuccess } from '../../errors/showSuccess';
 
-import {
-  customerService,
-} from '../../services';
+import { formatPhone } from '../../utils/phoneMask';
 
-import {
-  showError,
-} from '../../errors/showError';
+export default function CreateCustomer({ navigation }) {
+  const [loading, setLoading] = useState(false);
 
-import {
-  showSuccess,
-} from '../../errors/showSuccess';
+  const form = useForm(customerSchema, {
+    name: '',
+    phone: '',
+    description: '',
+  });
 
-export default function CreateCustomer({
-  navigation,
-}) {
-  const [loading, setLoading] =
-    useState(false);
+  const setField = (field) => (value) => {
+    form.setField(field, value);
+  };
 
-  const form = useForm(
-    customerSchema,
-    {
-      name: '',
-      phone: '',
-      description: '',
+  const handlePhoneChange = (text) => {
+    form.setField('phone', formatPhone(text));
+  };
+
+  const handleCreateCustomer = async () => {
+    const data = form.validate();
+    if (!data) return;
+
+    try {
+      setLoading(true);
+
+      await customerService.create({
+        nome: data.name,
+        telefone: data.phone,
+        descricao: data.description,
+      });
+
+      showSuccess(
+        'Cliente cadastrado com sucesso!',
+        () => navigation.goBack()
+      );
+    } catch (error) {
+      showError(error);
+    } finally {
+      setLoading(false);
     }
-  );
-
-  const handleCreateCustomer =
-    async () => {
-      const data =
-        form.validate();
-
-      if (!data) return;
-
-      try {
-        setLoading(true);
-
-        await customerService.create({
-          nome: data.name,
-          telefone: data.phone,
-          descricao:
-            data.description,
-        });
-
-        showSuccess(
-          'Cliente cadastrado com sucesso!',
-          () => navigation.goBack()
-        );
-
-      } catch (error) {
-        showError(error);
-
-      } finally {
-        setLoading(false);
-      }
-    };
+  };
 
   return (
-    <SafeAreaView
-      style={styles.container}
-    >
+    <SafeAreaView style={styles.container}>
       <KeyboardAvoidingView
         style={styles.container}
-        behavior={
-          Platform.OS === 'ios'
-            ? 'padding'
-            : 'height'
-        }
+        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
       >
         <ScrollView
           keyboardShouldPersistTaps="handled"
-          contentContainerStyle={
-            styles.scrollContent
-          }
+          contentContainerStyle={styles.scrollContent}
         >
           <PageHeader
             title="Criar Cliente"
-            onBack={() =>
-              navigation.goBack()
-            }
+            onBack={() => navigation.goBack()}
           />
 
           <Input
             label="Nome"
-            value={
-              form.values.name
-            }
-            onChangeText={(text) =>
-              form.setField(
-                'name',
-                text
-              )
-            }
-            error={
-              form.errors.name
-            }
+            value={form.values.name}
+            onChangeText={setField('name')}
+            error={form.errors.name}
           />
 
           <Input
             label="Telefone"
-            value={
-              form.values.phone
-            }
-            onChangeText={(text) =>
-              form.setField(
-                'phone',
-                text
-              )
-            }
-            error={
-              form.errors.phone
-            }
+            value={form.values.phone}
+            onChangeText={handlePhoneChange}
+            error={form.errors.phone}
             keyboardType="phone-pad"
           />
 
           <Input
             label="Descrição"
-            value={
-              form.values.description
-            }
-            onChangeText={(text) =>
-              form.setField(
-                'description',
-                text
-              )
-            }
-            error={
-              form.errors.description
-            }
-            multiline
-            numberOfLines={8}
-            textAlignVertical="top"
-            style={
-              styles.descriptionInput
-            }
+            type='textarea'
+            value={form.values.description}
+            onChangeText={setField('description')}
+            error={form.errors.description}
           />
 
           <Button
             title="Cadastrar Cliente"
             loading={loading}
-            onPress={
-              handleCreateCustomer
-            }
+            onPress={handleCreateCustomer}
           />
         </ScrollView>
       </KeyboardAvoidingView>
@@ -186,19 +119,12 @@ export default function CreateCustomer({
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor:
-      COLORS.background,
+    backgroundColor: COLORS.background,
   },
 
   scrollContent: {
     flexGrow: 1,
-    paddingHorizontal:
-      SPACING.xl,
-    paddingVertical:
-      SPACING.xl,
-  },
-
-  descriptionInput: {
-    height: 250,
+    paddingHorizontal: SPACING.xl,
+    paddingVertical: SPACING.xl,
   },
 });

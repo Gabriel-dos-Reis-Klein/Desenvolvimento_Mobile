@@ -10,9 +10,8 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 
 import AuthHeader from '../../components/auth/AuthHeader';
 import AuthTabs from '../../components/auth/AuthTabs';
-import Input from '../../components/form/Input';
-import PasswordInput from '../../components/form/PasswordInput';
-import Button from '../../components/form/Button';
+import Button from '../../components/common/Button';
+import Input from '../../components/common/Input';
 
 import { COLORS, SPACING } from '../../theme';
 
@@ -31,7 +30,6 @@ export default function Login({ navigation }) {
   });
 
   const { signIn } = useContext(AuthContext);
-
   const [loading, setLoading] = useState(false);
 
   const handleLogin = async () => {
@@ -72,19 +70,29 @@ export default function Login({ navigation }) {
           <AuthTabs
             activeTab="login"
             onPressLogin={() => {}}
-            onPressRegister={() => navigation.replace('Register')}
+            onPressRegister={() =>
+              navigation.replace('Register')
+            }
           />
 
           <Input
-            label="E-mail"
+            label="Email"
             value={form.values.email}
-            onChangeText={(text) => form.setField('email', text)}
+            onChangeText={(t) =>
+              form.setField('email', t)
+            }
+            keyboardType="email-address"
+            autoCapitalize="none"
             error={form.errors.email}
           />
 
-          <PasswordInput
+          <Input
+            type="password"
+            label="Senha"
             value={form.values.password}
-            onChangeText={(text) => form.setField('password', text)}
+            onChangeText={(t) =>
+              form.setField('password', t)
+            }
             error={form.errors.password}
           />
 
@@ -104,6 +112,7 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: COLORS.background,
   },
+
   scrollContent: {
     flexGrow: 1,
     justifyContent: 'center',

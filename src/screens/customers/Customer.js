@@ -1,73 +1,70 @@
-import {
-  useEffect,
-  useState,
-  useCallback,
-} from 'react';
+import { useState } from 'react';
 
 import {
-  View,
   FlatList,
   StyleSheet,
+  View,
 } from 'react-native';
 
 import {
-  customerService,
-} from '../../services';
+  SafeAreaView,
+} from 'react-native-safe-area-context';
 
-import CustomerCard
-  from '../../components/customers/CustomerCard';
-
-import Loading
-  from '../../components/common/Loading';
-
-import EmptyState
-  from '../../components/common/EmptyState';
-
-import ListHeader
-  from '../../components/common/ListHeader';
-
-import FilterButton
-  from '../../components/common/FilterButton';
-
-import Fab
-  from '../../components/common/Fab';
+import {
+  Menu,
+  Divider,
+  Chip,
+} from 'react-native-paper';
 
 import {
   COLORS,
   SPACING,
 } from '../../theme';
-import { SafeAreaView } from 'react-native-safe-area-context';
+
+import {
+  useCustomers,
+} from '../../hooks/useCustomers';
+
+import ListHeader
+  from '../../components/common/ListHeader';
+
+import SearchInput
+  from '../../components/common/SearchInput';
+
+import IconButton
+  from '../../components/common/IconButton';
+
+import EmptyState
+  from '../../components/common/EmptyState';
+
+import Fab
+  from '../../components/common/Fab';
+
+import CustomerCard
+  from '../../components/customers/CustomerCard';
+
+import CustomerSkeleton
+  from '../../components/customers/CustomerSkeleton';
 
 export default function Customer({
   navigation,
 }) {
-  const [customers, setCustomers] =
-    useState([]);
+  const {
+    customers,
+    loading,
+    refreshing,
 
-  const [loading, setLoading] =
-    useState(true);
+    searchText,
+    setSearchText,
 
-  const fetchCustomers = useCallback(
-    async () => {
-      try {
-        setLoading(true);
-        const data =
-          await customerService.getAll();
+    sortBy,
+    setSortBy,
 
-        setCustomers(data);
-      } catch (error) {
-        console.error(error);
-      } finally {
-        setLoading(false);
-      }
-    },
+    refresh,
+  } = useCustomers();
 
-    []
-  );
-
-  useEffect(() => {
-    fetchCustomers();
-  }, []);
+  const [menuVisible, setMenuVisible] =
+    useState(false);
 
   return (
     <SafeAreaView style={styles.container}>
@@ -76,19 +73,59 @@ export default function Customer({
         total={customers.length}
       />
 
-      <View style={styles.filterRow}>
-        <FilterButton
-          icon="sort-alpha-down"
-          onPress={fetchCustomers}
-        />
+      <SearchInput
+        value={searchText}
+        onChangeText={setSearchText}
+      />
 
-        <FilterButton
-          icon="filter"
-        />
+      <View style={styles.toolbar}>
+        <Chip
+          compact
+          icon="sort"
+        >
+          {sortBy === 'NOME'
+            ? 'A-Z'
+            : 'Recentes'}
+        </Chip>
+
+        <Menu
+          visible={menuVisible}
+          onDismiss={() =>
+            setMenuVisible(false)
+          }
+          anchor={
+            <IconButton
+              icon="tune"
+              onPress={() =>
+                setMenuVisible(true)
+              }
+            />
+          }
+        >
+          <Menu.Item
+            title="Mais recentes"
+            leadingIcon="clock-outline"
+            onPress={() => {
+              setSortBy('CRIACAO');
+              setMenuVisible(false);
+            }}
+          />
+
+          <Divider />
+
+          <Menu.Item
+            title="Ordem alfabética"
+            leadingIcon="sort-alphabetical-ascending"
+            onPress={() => {
+              setSortBy('NOME');
+              setMenuVisible(false);
+            }}
+          />
+        </Menu>
       </View>
 
       {loading ? (
-        <Loading />
+        <CustomerSkeleton />
       ) : customers.length === 0 ? (
         <EmptyState
           message="Nenhum cliente encontrado"
@@ -99,10 +136,12 @@ export default function Customer({
           keyExtractor={(item) =>
             item.id
           }
-
           renderItem={({ item }) => (
             <CustomerCard
               customer={item}
+              highlightQuery={
+                searchText
+              }
               onPress={() =>
                 navigation.navigate(
                   'CustomerDetails',
@@ -114,21 +153,21 @@ export default function Customer({
               }
             />
           )}
-
           contentContainerStyle={
             styles.listPadding
           }
-
           showsVerticalScrollIndicator={
             false
           }
+          refreshing={refreshing}
+          onRefresh={refresh}
         />
       )}
 
       <Fab
         onPress={() =>
           navigation.navigate(
-            'CreateCustomer', { screen: 'CreateCustomer' }
+            'CreateCustomer'
           )
         }
       />
@@ -136,25 +175,31 @@ export default function Customer({
   );
 }
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor:
-      COLORS.background,
-  },
+const styles =
+  StyleSheet.create({
+    container: {
+      flex: 1,
+      backgroundColor:
+        COLORS.background,
+    },
 
-  filterRow: {
-    flexDirection: 'row',
-    justifyContent: 'center',
-    gap: SPACING.md,
-    marginBottom: SPACING.lg,
-  },
+    toolbar: {
+      flexDirection: 'row',
+      justifyContent:
+        'space-between',
+      alignItems: 'center',
 
-  listPadding: {
-    paddingHorizontal:
-      SPACING.lg,
+      paddingHorizontal:
+        SPACING.lg,
 
-    paddingBottom:
-      100,
-  },
-});
+      marginBottom:
+        SPACING.md,
+    },
+
+    listPadding: {
+      paddingHorizontal:
+        SPACING.lg,
+
+      paddingBottom: 100,
+    },
+  });
