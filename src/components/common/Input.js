@@ -1,34 +1,34 @@
-import { useState, useEffect } from 'react';
-
-import { StyleSheet } from 'react-native';
+import { useState } from 'react';
 import { TextInput, HelperText } from 'react-native-paper';
+import { StyleSheet, View } from 'react-native';
 
 import { COLORS, SPACING } from '../../theme';
 
-const MIN_HEIGHT = 48;
+const MIN_HEIGHT = 80;
 const MAX_HEIGHT = 250;
 
-export default function TextArea({
+export default function Input({
   label,
   value,
+  type = 'text',
   onChangeText,
   error,
   style,
   ...props
 }) {
+  const [secure, setSecure] = useState(true);
   const [height, setHeight] = useState(MIN_HEIGHT);
 
-  useEffect(() => {
-    if (!value?.trim()) {
-      setHeight(MIN_HEIGHT);
-    }
-  }, [value]);
+  const isPassword = type === 'password';
+  const isTextArea = type === 'textarea';
 
   const handleContentSizeChange = (event) => {
+    if (!isTextArea) return;
+
     const contentHeight = event.nativeEvent.contentSize.height;
 
     const nextHeight = Math.min(
-      Math.max(MIN_HEIGHT, contentHeight),
+      Math.max(MIN_HEIGHT, contentHeight + 10),
       MAX_HEIGHT
     );
 
@@ -36,25 +36,30 @@ export default function TextArea({
   };
 
   return (
-    <>
+    <View style={styles.container}>
       <TextInput
         mode="outlined"
-        multiline
         label={label}
         value={value}
         onChangeText={onChangeText}
+        secureTextEntry={isPassword ? secure : false}
+        multiline={isTextArea}
         onContentSizeChange={handleContentSizeChange}
         error={!!error}
-        textAlignVertical="top"
+        textAlignVertical={isTextArea ? 'top' : 'center'}
         outlineColor={COLORS.border}
         activeOutlineColor={COLORS.primary40}
-        scrollEnabled={height >= MAX_HEIGHT}
-        contentStyle={{
-          paddingTop: 12,
-        }}
+        right={
+          isPassword ? (
+            <TextInput.Icon
+              icon={secure ? 'eye' : 'eye-off'}
+              onPress={() => setSecure(!secure)}
+            />
+          ) : null
+        }
         style={[
           styles.input,
-          { height },
+          isTextArea && { height },
           style,
         ]}
         {...props}
@@ -65,13 +70,16 @@ export default function TextArea({
           {error}
         </HelperText>
       )}
-    </>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
   input: {
     backgroundColor: COLORS.surface,
-    marginBottom: SPACING.md,
   },
+
+  container: {
+    marginBottom: SPACING.md,
+  }
 });
