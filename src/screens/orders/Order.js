@@ -231,7 +231,7 @@ export default function OrdersScreen({
           // Simple navigation call — React Navigation will resolve the correct
           // navigator if the route name exists. This avoids complex state
           // traversal which was failing to find the route.
-          navigation.navigate('PedidoCriacao');
+          navigation.navigate('CreateOrder');
         }}
       />
 
