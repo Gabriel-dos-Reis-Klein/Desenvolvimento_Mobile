@@ -1,8 +1,14 @@
+import {
+  View,
+  StyleSheet,
+} from 'react-native';
+
 import FontAwesome6 from 'react-native-vector-icons/FontAwesome6';
 
 import { COLORS } from '../../theme/colors';
 import { SPACING } from '../../theme/spacing';
 import { TYPOGRAPHY } from '../../theme/typography';
+import { FONT_FAMILY } from '../../theme';
 
 export const TAB_ICONS = {
   Pedidos: 'shirt',
@@ -10,26 +16,45 @@ export const TAB_ICONS = {
 };
 
 export const styleOptions = {
-  tabBarActiveTintColor: COLORS.primary,
+  tabBarActiveTintColor:
+    COLORS.primary,
 
   tabBarInactiveTintColor:
     COLORS.textSecondary,
 
   tabBarStyle: {
-    backgroundColor: COLORS.surface,
+    height: 72,
+
+    backgroundColor:
+      COLORS.surface,
+
     borderTopWidth: 1,
-    borderTopColor: COLORS.border,
+
+    borderTopColor:
+      COLORS.black05,
+
+    elevation: 8,
+
+    paddingTop: 6,
+    paddingBottom: 6,
   },
 
   tabBarItemStyle: {
-    paddingTop: SPACING.sm,
-    paddingBottom: SPACING.xs,
-    height: 60,
+    paddingVertical:
+      SPACING.xs,
   },
 
   tabBarLabelStyle: {
     ...TYPOGRAPHY.caption,
-    marginTop: SPACING.xs,
+
+    fontFamily:
+      FONT_FAMILY.robotoBold,
+
+    fontSize: 12,
+
+    letterSpacing: 1,
+
+    marginTop: 5,
   },
 };
 
@@ -44,14 +69,39 @@ export function createScreenOptions({
     tabBarIcon: ({
       focused,
       color,
-      size,
     }) => (
-      <FontAwesome6
-        name={TAB_ICONS[route.name]}
-        size={size}
-        color={color}
-        solid={focused}
-      />
+      <View
+        style={[
+          styles.iconContainer,
+
+          focused &&
+            styles.iconContainerActive,
+        ]}
+      >
+        <FontAwesome6
+          name={TAB_ICONS[route.name]}
+          size={18}
+          color={color}
+          solid={focused}
+        />
+      </View>
     ),
   };
 }
+
+const styles = StyleSheet.create({
+  iconContainer: {
+    width: 64,
+    height: 32,
+
+    borderRadius: 999,
+
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+
+  iconContainerActive: {
+    backgroundColor:
+      COLORS.primary20,
+  },
+});
