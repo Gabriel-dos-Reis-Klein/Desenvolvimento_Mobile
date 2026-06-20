@@ -1,5 +1,11 @@
-import { FAB as PaperFAB}
+import { FAB as PaperFAB }
   from 'react-native-paper';
+
+import {
+  COLORS,
+  SPACING,
+  RADIUS,
+} from '../../theme';
 
 export default function Fab({
   icon = 'plus',
@@ -10,18 +16,25 @@ export default function Fab({
   return (
     <PaperFAB
       icon={icon}
-      color="white"
-      style={[
-        {
-          position: 'absolute',
-          right: 20,
-          bottom: 20,
-          backgroundColor: '#FF3366',
-        },
-        style
-      ]}
+      mode="flat"
+      color='white'
       onPress={onPress}
+      style={[
+        styles.fab,
+        style,
+      ]}
       {...props}
     />
   );
 }
+
+const styles = {
+  fab: {
+    position: 'absolute',
+    right: SPACING.md,
+    bottom: SPACING.xl,
+    backgroundColor: COLORS.primary,
+    borderRadius: RADIUS.xl,
+    elevation: 6,
+  },
+};

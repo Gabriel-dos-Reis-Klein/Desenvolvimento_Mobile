@@ -1,7 +1,4 @@
-import {
-  useMemo,
-  useState,
-} from 'react';
+import { useMemo, useState } from 'react';
 
 import {
   KeyboardAvoidingView,
@@ -12,14 +9,10 @@ import {
   View,
 } from 'react-native';
 
-import {
-  SafeAreaView,
-} from 'react-native-safe-area-context';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import FontAwesome6 from 'react-native-vector-icons/FontAwesome6';
 
-import {
-  COLORS,
-  SPACING,
-} from '../../theme';
+import { COLORS, SPACING } from '../../theme';
 
 import PageHeader from '../../components/common/PageHeader';
 import Input from '../../components/common/Input';
@@ -28,293 +21,259 @@ import Text from '../../components/common/Text';
 
 import CustomerPicker from '../../components/orders/CustomerPicker';
 import OrderItemCard from '../../components/orders/OrderItemCard';
-import AddItemModal from '../../components/orders/AddItemModal';
 import PaymentSelector from '../../components/orders/PaymentSelector';
 import OrderSummaryCard from '../../components/orders/OrderSummaryCard';
 import OrderSection from '../../components/orders/OrderSection';
 
-import {
-  customerService,
-  orderService,
-} from '../../services';
+import { customerService, orderService } from '../../services';
+import { showError } from '../../errors/showError';
+import { showSuccess } from '../../errors/showSuccess';
 
-import {
-  showError,
-} from '../../errors/showError';
+export default function CreateOrder({ navigation }) {
+  const [title, setTitle] = useState('');
 
-import {
-  showSuccess,
-} from '../../errors/showSuccess';
+  const [customers, setCustomers] = useState([]);
+  const [selectedCustomer, setSelectedCustomer] = useState(null);
 
-export default function CreateOrder({
-  navigation,
-}) {
-  const [title, setTitle] =
-    useState('');
+  const [items, setItems] = useState([]);
 
-  const [customers, setCustomers] =
-    useState([]);
+  const [advance, setAdvance] = useState('');
+  const [paymentType, setPaymentType] = useState('');
 
-  const [
-    selectedCustomer,
-    setSelectedCustomer,
-  ] = useState(null);
+  const [loading, setLoading] = useState(false);
+  const [customerVisible, setCustomerVisible] = useState(false);
 
-  const [items, setItems] =
-    useState([]);
+  // -------------------------
+  // TOTAL
+  // -------------------------
+  const total = useMemo(() => {
+    return items.reduce((acc, item) => {
+      const value = Number(item.valor);
+      return acc + (isNaN(value) ? 0 : value);
+    }, 0);
+  }, [items]);
 
-  const [advance, setAdvance] =
-    useState('');
-
-  const [
-    paymentType,
-    setPaymentType,
-  ] = useState('');
-
-  const [loading, setLoading] =
-    useState(false);
-
-  const [
-    customerVisible,
-    setCustomerVisible,
-  ] = useState(false);
-
-  const [itemVisible, setItemVisible] =
-    useState(false);
-
-  const total = useMemo(
-    () =>
-      items.reduce(
-        (acc, item) =>
-          acc +
-          Number(item.valor || 0),
-        0
-      ),
-    [items]
-  );
-
-  const handleAddItem = (item) => {
-    setItems((prev) => [
-      ...prev,
-      item,
-    ]);
+  // -------------------------
+  // CUSTOMERS
+  // -------------------------
+  const loadCustomers = async () => {
+    try {
+      const data = await customerService.getAll();
+      setCustomers(data);
+    } catch (error) {
+      showError(error);
+    }
   };
 
-  const loadCustomers =
-    async () => {
-      try {
-        const data =
-          await customerService.getAll();
+  // -------------------------
+  // ADD / EDIT ITEM (NAVIGATION FLOW)
+  // -------------------------
+  const handleAddItem = () => {
+    navigation.navigate('ItemForm', {
+      mode: 'create',
+      onSave: (newItem) => {
+        setItems((prev) => [...prev, newItem]);
+      },
+    });
+  };
 
-        setCustomers(data);
-
-      } catch (error) {
-        showError(error);
-      }
-    };
-
-  const handleCreate =
-    async () => {
-      try {
-        if (!selectedCustomer) {
-          return showError(
-            'Selecione um cliente.'
-          );
-        }
-
-        if (items.length === 0) {
-          return showError(
-            'Adicione pelo menos um item.'
-          );
-        }
-
-        setLoading(true);
-
-        await orderService.create({
-          titulo: title,
-          itens: items,
-
-          idCliente:
-            selectedCustomer.id,
-
-          pagamentoAntecipado:
-            Number(advance || 0),
-
-          tipoPagamento:
-            paymentType,
-        });
-
-        showSuccess(
-          'Pedido criado com sucesso!',
-          () => navigation.goBack()
+  const handleEditItem = (item, index) => {
+    navigation.navigate('ItemForm', {
+      mode: 'edit',
+      item,
+      index,
+      onSave: (updatedItem) => {
+        setItems((prev) =>
+          prev.map((current, i) =>
+            i === index ? updatedItem : current
+          )
         );
+      },
+    });
+  };
 
-      } catch (error) {
-        showError(error);
+  const handleDeleteItem = (index) => {
+    setItems((prev) =>
+      prev.filter((_, i) => i !== index)
+    );
+  };
 
-      } finally {
-        setLoading(false);
+  // -------------------------
+  // CREATE ORDER
+  // -------------------------
+  const handleCreate = async () => {
+    try {
+      if (!selectedCustomer) {
+        return showError('Selecione um cliente.');
       }
-    };
 
-return (
-  <SafeAreaView style={styles.container}>
-    <View style={styles.headerContainer}>
-      <PageHeader
-        title="Criar Pedido"
-        onBack={() => navigation.goBack()}
-      />
-    </View>
-
-    <KeyboardAvoidingView
-      behavior={
-        Platform.OS === 'ios'
-          ? 'padding'
-          : 'height'
+      if (!paymentType) {
+        return showError('Selecione o tipo de pagamento.');
       }
-      style={styles.keyboardView}
-    >
-      <View style={styles.scrollContainer}>
-        <ScrollView
-          style={styles.scrollView}
-          showsVerticalScrollIndicator={false}
-          keyboardShouldPersistTaps="handled"
-          contentContainerStyle={
-            styles.content
-          }
+
+      if (items.length === 0) {
+        return showError('Adicione pelo menos um item.');
+      }
+
+      setLoading(true);
+
+      await orderService.create({
+        titulo: title,
+        itens: items,
+        idCliente: selectedCustomer.id,
+        pagamentoAntecipado: Number(advance || 0),
+        tipoPagamento: paymentType,
+      });
+
+      showSuccess('Pedido criado com sucesso!', () =>
+        navigation.goBack()
+      );
+    } catch (error) {
+      showError(error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // -------------------------
+  // UI
+  // -------------------------
+  return (
+    <SafeAreaView style={styles.container}>
+      
+      <View style={styles.headerContainer}>
+        <PageHeader
+          title="Criar Pedido"
+          onBack={() => navigation.goBack()}
+        />
+      </View>
+
+      <View style={styles.body}>
+        <KeyboardAvoidingView
+          behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+          style={styles.keyboardView}
         >
-          <TouchableOpacity
-            style={styles.selectorCard}
-            onPress={() => {
-              loadCustomers();
-              setCustomerVisible(true);
-            }}
+          <ScrollView
+            showsVerticalScrollIndicator={false}
+            keyboardShouldPersistTaps="handled"
+            style={styles.scroll}
+            contentContainerStyle={styles.content}
           >
-            <Text
-              variant="small"
-              color={COLORS.textSecondary}
-            >
-              Cliente
-            </Text>
-
-            <Text variant="body">
-              {selectedCustomer
-                ? selectedCustomer.nome
-                : 'Selecionar cliente'}
-            </Text>
-
-            {selectedCustomer && (
-              <Text
-                variant="small"
-                color={COLORS.textSecondary}
-              >
-                {selectedCustomer.telefone}
-              </Text>
-            )}
-          </TouchableOpacity>
-
-          <View style={styles.inputWrapper}>
-            <Input
-              label="Título do Pedido"
-              value={title}
-              onChangeText={setTitle}
-            />
-          </View>
-
-          <View style={styles.summaryContainer}>
-            <OrderSummaryCard
-              quantity={items.length}
-              total={total}
-              advance={Number(
-                advance || 0
-              )}
-            />
-          </View>
-
-          <OrderSection
-            title={`Itens (${items.length})`}
-          >
-            {items.map(
-              (item, index) => (
-                <OrderItemCard
-                  key={index}
-                  item={item}
-                />
-              )
-            )}
-
-            <Button
-              title="Adicionar Item"
-              variant="secondary"
-              onPress={() =>
-                setItemVisible(true)
-              }
-            />
-          </OrderSection>
-
-          <OrderSection title="Pagamento">
-          <View style={styles.paymentContainer}>
-            <View style={styles.paymentRow}>
-              <PaymentSelector
-                value={paymentType}
-                onChange={setPaymentType}
+            <View style={styles.inputWrapper}>
+              <Input
+                label="Título do Pedido"
+                value={title}
+                onChangeText={setTitle}
               />
             </View>
 
-            <Input
-              label="Entrada"
-              keyboardType="numeric"
-              value={advance}
-              onChangeText={setAdvance}
-            />
-          </View>
-        </OrderSection>
+            <TouchableOpacity
+              style={styles.selectorCard}
+              onPress={() => {
+                loadCustomers();
+                setCustomerVisible(true);
+              }}
+            >
+              <Text variant="small" color={COLORS.textSecondary}>
+                Cliente
+              </Text>
 
-          <View
-            style={styles.buttonContainer}
-          >
-            <Button
-              title="Criar Pedido"
-              loading={loading}
-              onPress={handleCreate}
+              <Text variant="body">
+                {selectedCustomer
+                  ? selectedCustomer.nome
+                  : 'Selecionar cliente'}
+              </Text>
+
+              {!!selectedCustomer && (
+                <Text variant="small" color={COLORS.textSecondary}>
+                  {selectedCustomer.telefone}
+                </Text>
+              )}
+            </TouchableOpacity>
+
+            <OrderSummaryCard
+              quantity={items.length}
+              total={total}
+              advance={Number(advance || 0)}
             />
-          </View>
-        </ScrollView>
+
+            <OrderSection title="Pagamento">
+              <View style={styles.paymentContainer}>
+                <PaymentSelector
+                  value={paymentType}
+                  onChange={setPaymentType}
+                />
+
+                <Input
+                  label="Entrada"
+                  keyboardType="numeric"
+                  value={advance}
+                  onChangeText={setAdvance}
+                />
+              </View>
+            </OrderSection>
+
+            <OrderSection title={`Itens (${items.length})`}>
+              {items.map((item, index) => (
+                <OrderItemCard
+                  key={index}
+                  item={item}
+                  onEdit={() => handleEditItem(item, index)}
+                  onDelete={() => handleDeleteItem(index)}
+                />
+              ))}
+
+              {/* Novo botão placeholder tracejado */}
+              <TouchableOpacity 
+                style={styles.dashedButton} 
+                onPress={handleAddItem}
+                activeOpacity={0.6}
+              >
+                <FontAwesome6 name="plus" size={14} color={COLORS.primary} />
+                <Text style={styles.dashedButtonText}>Adicionar Item</Text>
+              </TouchableOpacity>
+            </OrderSection>
+          </ScrollView>
+        </KeyboardAvoidingView>
       </View>
-    </KeyboardAvoidingView>
 
-    <CustomerPicker
-      visible={customerVisible}
-      customers={customers}
-      selectedCustomer={selectedCustomer}
-      onDismiss={() => setCustomerVisible(false)}
-      onSelect={setSelectedCustomer}
-    />
+      <View style={styles.footer}>
+        <Button
+          title="Criar Pedido"
+          loading={loading}
+          onPress={handleCreate}
+        />
+        <Button 
+          title="Cancelar" 
+          variant="secondary" 
+          onPress={() => navigation.goBack()} 
+        />
+      </View>
 
-    <AddItemModal
-      visible={itemVisible}
-      onDismiss={() =>
-        setItemVisible(false)
-      }
-      onAdd={handleAddItem}
-    />
-  </SafeAreaView>
-);
+      <CustomerPicker
+        visible={customerVisible}
+        customers={customers}
+        selectedCustomer={selectedCustomer}
+        onDismiss={() => setCustomerVisible(false)}
+        onSelect={setSelectedCustomer}
+      />
+    </SafeAreaView>
+  );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor:
-      COLORS.background,
-
+    backgroundColor: COLORS.background,
     ...Platform.select({
       web: {
-        height: '100vh',
         position: 'fixed',
-        width: '100%',
         top: 0,
         left: 0,
+        right: 0,
+        bottom: 0,
+        height: '100%',
+        width: '100%',
       },
     }),
   },
@@ -324,75 +283,44 @@ const styles = StyleSheet.create({
     paddingTop: SPACING.xl,
   },
 
-  keyboardView: {
+  body: {
     flex: 1,
-    width: '100%',
+    overflow: 'hidden',
   },
 
-  scrollContainer: {
+  keyboardView: {
     flex: 1,
-    height: '100%',
+  },
 
+  scroll: {
+    flex: 1,
     ...Platform.select({
       web: {
-        maxHeight:
-          'calc(100vh - 70px)',
+        overflowY: 'auto',
       },
     }),
   },
 
-  scrollView: {
-    flex: 1,
-  },
-
   content: {
-    paddingHorizontal:
-      SPACING.xl,
-
-    paddingVertical:
-      SPACING.xl,
-
-    paddingBottom:
-      SPACING.xl * 4,
-
+    paddingHorizontal: SPACING.xl,
+    paddingVertical: SPACING.xl,
+    paddingBottom: SPACING.xl,
     flexGrow: 1,
   },
 
+  footer: {
+    padding: SPACING.xl,
+    gap: SPACING.md,
+    backgroundColor: COLORS.background,
+  },
+
   selectorCard: {
-    backgroundColor:
-      COLORS.surface,
-
+    backgroundColor: COLORS.surface,
     borderWidth: 1,
-    borderColor:
-      COLORS.border,
-
+    borderColor: COLORS.border,
     borderRadius: 16,
-
     padding: SPACING.lg,
-
-    marginBottom:
-      SPACING.lg,
-  },
-
-  sectionCard: {
-    backgroundColor:
-      COLORS.surface,
-
-    borderWidth: 1,
-    borderColor:
-      COLORS.border,
-
-    borderRadius: 16,
-
-    padding: SPACING.lg,
-
-    marginBottom:
-      SPACING.lg,
-  },
-
-  summaryContainer: {
-    marginBottom:
-      SPACING.lg,
+    marginBottom: SPACING.lg,
   },
 
   inputWrapper: {
@@ -403,7 +331,23 @@ const styles = StyleSheet.create({
     gap: SPACING.md,
   },
 
-  paymentRow: {
-    alignItems: 'flex-start',
+  dashedButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 8,
+    backgroundColor: COLORS.surface,
+    borderWidth: 1.5,
+    borderStyle: 'dashed',
+    borderColor: COLORS.primary30 || 'rgba(255, 0, 84, 0.3)',
+    borderRadius: 12,
+    paddingVertical: 14,
+    marginTop: SPACING.sm,
+  },
+
+  dashedButtonText: {
+    fontSize: 15,
+    fontWeight: '600',
+    color: COLORS.primary,
   },
 });

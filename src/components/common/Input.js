@@ -1,8 +1,19 @@
 import { useState } from 'react';
-import { TextInput, HelperText } from 'react-native-paper';
-import { StyleSheet, View } from 'react-native';
+import {
+  Platform,
+  StyleSheet,
+  View,
+} from 'react-native';
 
-import { COLORS, SPACING } from '../../theme';
+import {
+  HelperText,
+  TextInput,
+} from 'react-native-paper';
+
+import {
+  COLORS,
+  SPACING,
+} from '../../theme';
 
 const MIN_HEIGHT = 80;
 const MAX_HEIGHT = 250;
@@ -12,23 +23,42 @@ export default function Input({
   value,
   type = 'text',
   onChangeText,
+  mode = 'flat',
   error,
   style,
   ...props
 }) {
-  const [secure, setSecure] = useState(true);
-  const [height, setHeight] = useState(MIN_HEIGHT);
+  const [secure, setSecure] =
+    useState(true);
 
-  const isPassword = type === 'password';
-  const isTextArea = type === 'textarea';
+  const [height, setHeight] =
+    useState(MIN_HEIGHT);
 
-  const handleContentSizeChange = (event) => {
+  const isPassword =
+    type === 'password';
+
+  const isTextArea =
+    type === 'textarea';
+
+  const handleContentSizeChange = (
+    event
+  ) => {
     if (!isTextArea) return;
 
-    const contentHeight = event.nativeEvent.contentSize.height;
+    const contentHeight =
+      event.nativeEvent.contentSize
+        .height;
+
+    if (!value?.trim()) {
+      setHeight(MIN_HEIGHT);
+      return;
+    }
 
     const nextHeight = Math.min(
-      Math.max(MIN_HEIGHT, contentHeight + 10),
+      Math.max(
+        MIN_HEIGHT,
+        contentHeight + 8
+      ),
       MAX_HEIGHT
     );
 
@@ -38,35 +68,72 @@ export default function Input({
   return (
     <View style={styles.container}>
       <TextInput
-        mode="outlined"
+        mode={mode}
         label={label}
         value={value}
         onChangeText={onChangeText}
-        secureTextEntry={isPassword ? secure : false}
+        secureTextEntry={
+          isPassword ? secure : false
+        }
         multiline={isTextArea}
-        onContentSizeChange={handleContentSizeChange}
+        numberOfLines={
+          isTextArea ? 3 : 1
+        }
+        onContentSizeChange={
+          handleContentSizeChange
+        }
         error={!!error}
-        textAlignVertical={isTextArea ? 'top' : 'center'}
+        textAlignVertical={
+          isTextArea
+            ? 'top'
+            : 'center'
+        }
+
+        underlineColor={COLORS.border}
+        activeUnderlineColor={COLORS.primary}
+        
         outlineColor={COLORS.border}
-        activeOutlineColor={COLORS.primary40}
+        activeOutlineColor={COLORS.primary}
+
         right={
           isPassword ? (
             <TextInput.Icon
-              icon={secure ? 'eye' : 'eye-off'}
-              onPress={() => setSecure(!secure)}
+              icon={
+                secure
+                  ? 'eye'
+                  : 'eye-off'
+              }
+              onPress={() =>
+                setSecure(
+                  (prev) => !prev
+                )
+              }
             />
           ) : null
         }
         style={[
           styles.input,
-          isTextArea && { height },
+
+          isTextArea && {
+            minHeight: MIN_HEIGHT,
+            maxHeight: MAX_HEIGHT,
+
+            ...(Platform.OS !==
+              'web' && {
+              height,
+            }),
+          },
+
           style,
         ]}
         {...props}
       />
 
       {!!error && (
-        <HelperText type="error" visible>
+        <HelperText
+          type="error"
+          visible
+        >
           {error}
         </HelperText>
       )}
@@ -74,12 +141,14 @@ export default function Input({
   );
 }
 
-const styles = StyleSheet.create({
-  input: {
-    backgroundColor: COLORS.surface,
-  },
+const styles =
+  StyleSheet.create({
+    container: {
+      marginBottom: SPACING.md,
+    },
 
-  container: {
-    marginBottom: SPACING.md,
-  }
-});
+    input: {
+      backgroundColor:
+        COLORS.surface,
+    },
+  });
