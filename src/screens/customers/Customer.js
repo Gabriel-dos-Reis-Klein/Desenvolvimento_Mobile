@@ -179,27 +179,21 @@ const styles =
   StyleSheet.create({
     container: {
       flex: 1,
-      backgroundColor:
-        COLORS.background,
+      backgroundColor: COLORS.background,
     },
 
     toolbar: {
       flexDirection: 'row',
-      justifyContent:
-        'space-between',
+      justifyContent: 'space-between',
       alignItems: 'center',
-
-      paddingHorizontal:
-        SPACING.lg,
-
-      marginBottom:
-        SPACING.md,
+      borderBottomWidth: 1,
+      borderBottomColor: COLORS.black05,
+      paddingHorizontal: SPACING.lg,
+      paddingBottom: SPACING.md,
     },
 
     listPadding: {
-      paddingHorizontal:
-        SPACING.lg,
-
+      paddingHorizontal: SPACING.lg,
       paddingBottom: 100,
     },
   });
