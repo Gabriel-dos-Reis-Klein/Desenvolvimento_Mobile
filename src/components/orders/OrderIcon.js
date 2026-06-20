@@ -8,6 +8,7 @@ import {
 
 import {
   COLORS,
+  ORDER_TYPE_STYLES,
 } from '../../theme';
 
 export default function OrderIcon({
@@ -18,7 +19,7 @@ export default function OrderIcon({
   ...props
 }) {
   const icon =
-    ORDER_TYPE_ICONS[
+    ORDER_TYPE_STYLES[
       type
     ] || 'dots-horizontal';
 

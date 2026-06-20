@@ -42,26 +42,14 @@ export default function OrderSummaryCard({
       </View>
 
       <View style={styles.row}>
-        <Text color={COLORS.textSecondary}>
-          Entrada
-        </Text>
-
-        <Text>
-          R$ {advance.toFixed(2)}
-        </Text>
-      </View>
-
-      <View style={styles.divider} />
-
-      <View style={styles.row}>
         <Text
-          style={styles.totalLabel}
+          color={COLORS.textSecondary}
         >
-          Total
+          Orçamento
         </Text>
 
         <Text
-          style={styles.total}
+          style={styles.balance}
         >
           R$ {total.toFixed(2)}
         </Text>
@@ -69,11 +57,27 @@ export default function OrderSummaryCard({
 
       <View style={styles.row}>
         <Text color={COLORS.textSecondary}>
+          Entrada
+        </Text>
+
+        <Text>
+          R$ { 
+            advance > 0 
+              ? "-" 
+              : ""
+          } {
+            advance.toFixed(2)
+          }
+        </Text>
+      </View>
+
+      <View style={styles.row}>
+        <Text style={styles.totalLabel}>
           Saldo
         </Text>
 
         <Text
-          style={styles.balance}
+          style={styles.total}
         >
           R$ {balance.toFixed(2)}
         </Text>
@@ -118,6 +122,9 @@ const styles =
 
       marginBottom:
         SPACING.sm,
+
+      alignItems:
+        'center',
     },
 
     divider: {
