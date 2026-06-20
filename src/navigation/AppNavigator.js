@@ -32,6 +32,9 @@ import {
   AuthContext 
 } from '../contexts/AuthContext';
 
+import ItemForm 
+  from '../screens/orders/ItemForm';
+
 const Stack = createStackNavigator();
 
 export default function AppNavigator() {
@@ -62,6 +65,11 @@ export default function AppNavigator() {
             <Stack.Screen
               name="DetailsPedidos"
               component={DetailsPedidos}
+            />
+
+            <Stack.Screen
+              name="ItemForm"
+              component={ItemForm}
             />
           </>
         ) : (

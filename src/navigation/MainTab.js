@@ -9,12 +9,15 @@ import {
   createScreenOptions,
 } from './config/tab.config';
 
-const Tab = createBottomTabNavigator();
+const Tab =
+  createBottomTabNavigator();
 
 export default function MainTab() {
   return (
     <Tab.Navigator
-      screenOptions={createScreenOptions}
+      screenOptions={
+        createScreenOptions
+      }
     >
       <Tab.Screen
         name="Pedidos"
