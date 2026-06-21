@@ -60,12 +60,13 @@ export default function OrderSummaryCard({
           Entrada
         </Text>
 
-        <Text>
-          R$ { 
+        <Text>{ 
             advance > 0 
-              ? "-" 
+              ? "- " 
               : ""
-          } {
+          }
+
+          R$ {
             advance.toFixed(2)
           }
         </Text>

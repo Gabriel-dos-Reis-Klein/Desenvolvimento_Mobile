@@ -8,18 +8,18 @@ import {
   SPACING,
 } from '../../theme';
 
-export default function PaymentSelector({ value, onChange }) {
+export default function ServiceTypeSelector({ value, onChange }) {
   
   useEffect(() => {
     if (!value) {
-      onChange('PIX');
+      onChange('CONFECCAO');
     }
   }, [value]);
 
   const OPTIONS = [
-    { id: 'PIX', label: 'PIX', icon: 'qrcode' },
-    { id: 'DINHEIRO', label: 'Dinheiro', icon: 'cash' },
-    { id: 'CARTAO', label: 'Cartão', icon: 'credit-card' },
+    { id: 'CONFECCAO', label: 'Confecção', icon: 'hanger' }, // ou 'needle' / 'hanger'
+    { id: 'REPARO', label: 'Reparo', icon: 'wrench' },
+    { id: 'MODIFICACAO', label: 'Modif.', icon: 'content-cut' },
   ];
 
   return (
