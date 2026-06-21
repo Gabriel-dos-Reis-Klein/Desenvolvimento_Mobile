@@ -1,10 +1,5 @@
-import {
-  View,
-  StyleSheet,
-} from 'react-native';
-
+import { View, StyleSheet } from 'react-native';
 import FontAwesome6 from 'react-native-vector-icons/FontAwesome6';
-
 import { COLORS } from '../../theme/colors';
 import { SPACING } from '../../theme/spacing';
 import { TYPOGRAPHY } from '../../theme/typography';
@@ -16,68 +11,36 @@ export const TAB_ICONS = {
 };
 
 export const styleOptions = {
-  tabBarActiveTintColor:
-    COLORS.primary,
-
-  tabBarInactiveTintColor:
-    COLORS.textSecondary,
-
-  tabBarStyle: {
-    height: 72,
-
-    backgroundColor:
-      COLORS.surface,
-
-    borderTopWidth: 1,
-
-    borderTopColor:
-      COLORS.black05,
-
-    elevation: 8,
-
-    paddingTop: 6,
-    paddingBottom: 6,
-  },
-
+  tabBarActiveTintColor: COLORS.primary,
+  tabBarInactiveTintColor: COLORS.textSecondary,
   tabBarItemStyle: {
-    paddingVertical:
-      SPACING.xs,
+    paddingVertical: SPACING.xs,
   },
-
   tabBarLabelStyle: {
     ...TYPOGRAPHY.caption,
-
-    fontFamily:
-      FONT_FAMILY.robotoBold,
-
+    fontFamily: FONT_FAMILY.robotoBold,
     fontSize: 12,
-
     letterSpacing: 1,
-
-    marginTop: 5,
+    marginTop: 8,
   },
 };
 
-export function createScreenOptions({
-  route,
-}) {
+export function createScreenOptions({ route }, insets) {
   return {
     headerShown: false,
-
     ...styleOptions,
 
-    tabBarIcon: ({
-      focused,
-      color,
-    }) => (
-      <View
-        style={[
-          styles.iconContainer,
+    tabBarStyle: {
+      height: 70 + (insets?.bottom || 0), 
+      backgroundColor: COLORS.surface,
+      borderTopColor: COLORS.black05,
+      elevation: 8,
+      paddingTop: 8,
+      paddingBottom: insets?.bottom > 0 ? insets.bottom : 8,
+    },
 
-          focused &&
-            styles.iconContainerActive,
-        ]}
-      >
+    tabBarIcon: ({ focused, color }) => (
+      <View style={[styles.iconContainer, focused && styles.iconContainerActive]}>
         <FontAwesome6
           name={TAB_ICONS[route.name]}
           size={18}
@@ -93,15 +56,11 @@ const styles = StyleSheet.create({
   iconContainer: {
     width: 64,
     height: 32,
-
     borderRadius: 999,
-
     alignItems: 'center',
     justifyContent: 'center',
   },
-
   iconContainerActive: {
-    backgroundColor:
-      COLORS.primary20,
+    backgroundColor: COLORS.primary20,
   },
 });
