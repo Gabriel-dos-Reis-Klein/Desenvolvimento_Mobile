@@ -1,5 +1,4 @@
 import { useState } from 'react';
-
 import {
   FlatList,
   StyleSheet,
@@ -24,6 +23,7 @@ import {
 import SearchInput from '../common/SearchInput';
 import Text from '../common/Text';
 import IconButton from '../common/IconButton';
+import CustomerSkeleton from '../customers/CustomerSkeleton'; 
 
 export default function CustomerPicker({
   visible,
@@ -31,6 +31,7 @@ export default function CustomerPicker({
   selectedCustomer,
   onDismiss,
   onSelect,
+  loading = false,
 }) {
   const [searchText, setSearchText] = useState('');
 
@@ -61,7 +62,7 @@ export default function CustomerPicker({
         {/* TOOLBAR */}
         <View style={styles.toolbar}>
           <Chip compact icon="account">
-            {filteredCustomers.length} clientes
+            {loading ? 'Carregando...' : `${filteredCustomers.length} clientes`}
           </Chip>
 
           <IconButton
@@ -75,59 +76,67 @@ export default function CustomerPicker({
 
         <Divider />
 
-        {/* LIST */}
-        <FlatList
-          data={filteredCustomers}
-          keyExtractor={(item) => item.id}
-          showsVerticalScrollIndicator={false}
-          contentContainerStyle={styles.list}
-          renderItem={({ item }) => {
-            const isSelected =
-              selectedCustomer?.id === item.id;
+        {/* LIST / SKELETON */}
+        {loading ? (
+          // Exibe os skeletons em loop se estiver carregando
+          <View style={styles.skeletonContainer}>
+            <CustomerSkeleton />
+          </View>
+        ) : (
+          // Exibe a lista real quando terminar de carregar
+          <FlatList
+            data={filteredCustomers}
+            keyExtractor={(item) => item.id}
+            showsVerticalScrollIndicator={false}
+            contentContainerStyle={styles.list}
+            renderItem={({ item }) => {
+              const isSelected =
+                selectedCustomer?.id === item.id;
 
-            return (
-              <TouchableOpacity
-                activeOpacity={0.7}
-                style={[
-                  styles.card,
-                  isSelected && styles.cardSelected,
-                ]}
-                onPress={() => {
-                  onSelect(item);
-                  setSearchText('');
-                  onDismiss();
-                }}
-              >
-                <View style={styles.avatar}>
-                  <Text style={styles.avatarText}>
-                    {item.nome.charAt(0).toUpperCase()}
-                  </Text>
-                </View>
+              return (
+                <TouchableOpacity
+                  activeOpacity={0.7}
+                  style={[
+                    styles.card,
+                    isSelected && styles.cardSelected,
+                  ]}
+                  onPress={() => {
+                    onSelect(item);
+                    setSearchText('');
+                    onDismiss();
+                  }}
+                >
+                  <View style={styles.avatar}>
+                    <Text style={styles.avatarText}>
+                      {item.nome.charAt(0).toUpperCase()}
+                    </Text>
+                  </View>
 
-                <View style={styles.info}>
-                  <Text style={styles.name}>
-                    {item.nome}
-                  </Text>
+                  <View style={styles.info}>
+                    <Text style={styles.name}>
+                      {item.nome}
+                    </Text>
 
-                  <Text
-                    variant="small"
-                    color={COLORS.textSecondary}
-                  >
-                    {item.telefone}
-                  </Text>
-                </View>
+                    <Text
+                      variant="small"
+                      color={COLORS.textSecondary}
+                    >
+                      {item.telefone}
+                    </Text>
+                  </View>
 
-                {isSelected && (
-                  <IconButton
-                    icon="check"
-                    size={18}
-                    color={COLORS.primary}
-                  />
-                )}
-              </TouchableOpacity>
-            );
-          }}
-        />
+                  {isSelected && (
+                    <IconButton
+                      icon="check"
+                      size={18}
+                      color={COLORS.primary}
+                    />
+                  )}
+                </TouchableOpacity>
+              );
+            }}
+          />
+        )}
       </Modal>
     </Portal>
   );
@@ -153,6 +162,12 @@ const styles = StyleSheet.create({
   list: {
     paddingHorizontal: SPACING.lg,
     paddingBottom: SPACING.lg,
+  },
+
+  // Ajuste de padding interno para o skeleton alinhar perfeitamente com a margem do modal
+  skeletonContainer: {
+    paddingTop: SPACING.md,
+    paddingHorizontal: 0, 
   },
 
   card: {

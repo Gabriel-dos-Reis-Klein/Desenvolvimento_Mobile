@@ -1,18 +1,7 @@
-import {
-  Card,
-  Searchbar,
-  Avatar,
-} from 'react-native-paper';
-
-import {
-  FlatList,
-  StyleSheet,
-} from 'react-native';
-
-import {
-  COLORS,
-  SPACING,
-} from '../../theme';
+import { Card, Searchbar, Avatar } from 'react-native-paper';
+import { FlatList, StyleSheet } from 'react-native';
+import { COLORS, SPACING } from '../../theme';
+import CustomerSkeleton from '../customers/CustomerSkeleton'; 
 
 export default function CustomerSelector({
   customers,
@@ -20,6 +9,7 @@ export default function CustomerSelector({
   onSearch,
   selectedCustomer,
   onSelect,
+  loading = false,
 }) {
   return (
     <>
@@ -38,11 +28,7 @@ export default function CustomerSelector({
             left={() => (
               <Avatar.Text
                 size={40}
-                label={
-                  selectedCustomer.nome
-                    .charAt(0)
-                    .toUpperCase()
-                }
+                label={selectedCustomer.nome.charAt(0).toUpperCase()}
               />
             )}
           />
@@ -50,25 +36,31 @@ export default function CustomerSelector({
       )}
 
       {!selectedCustomer && (
-        <FlatList
-          data={customers}
-          keyExtractor={(item) => item.id}
-          renderItem={({ item }) => (
-            <Card
-              style={styles.card}
-              onPress={() =>
-                onSelect(item)
-              }
-            >
-              <Card.Title
-                title={item.nome}
-                subtitle={
-                  item.telefone
-                }
-              />
-            </Card>
-          )}
-        />
+        loading ? (
+          <CustomerSkeleton />
+        ) : (
+          <FlatList
+            data={customers}
+            keyExtractor={(item) => item.id}
+            renderItem={({ item }) => (
+              <Card
+                style={styles.card}
+                onPress={() => onSelect(item)}
+              >
+                <Card.Title
+                  title={item.nome}
+                  subtitle={item.telefone}
+                  left={() => (
+                    <Avatar.Text
+                      size={40}
+                      label={item.nome.charAt(0).toUpperCase()}
+                    />
+                  )}
+                />
+              </Card>
+            )}
+          />
+        )
       )}
     </>
   );
@@ -77,14 +69,11 @@ export default function CustomerSelector({
 const styles = StyleSheet.create({
   search: {
     marginBottom: SPACING.md,
-    backgroundColor:
-      COLORS.surface,
+    backgroundColor: COLORS.surface,
   },
-
   selected: {
     marginBottom: SPACING.lg,
   },
-
   card: {
     marginBottom: SPACING.sm,
   },
