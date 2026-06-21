@@ -15,6 +15,16 @@ class UserService extends BaseService {
 
     return response.data;
   }
+
+  async passwordConfirm(data, config = {}){
+    const response = await this.api.post(
+      `${this.endpoint}/validar-senha`,
+      data,
+      config
+    );
+
+    return response.data;
+  }
 }
 
 export default new UserService();
