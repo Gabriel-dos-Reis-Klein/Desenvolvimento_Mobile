@@ -1,66 +1,75 @@
-import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
-
-import FontAwesome6 from 'react-native-vector-icons/FontAwesome6';
+import { StyleSheet } from 'react-native';
+import { Appbar } from 'react-native-paper'; 
 
 import {
   COLORS,
-  SPACING,
   FONT_FAMILY,
+  SPACING,
 } from '../../theme';
 
 export default function PageHeader({
   title,
   onBack,
-  rightComponent,
+  rightComponent, 
 }) {
   return (
-    <View style={styles.container}>
-      <View style={styles.side}>
-        {onBack && (
-          <TouchableOpacity
-            onPress={onBack}
-            hitSlop={10}
-          >
-            <FontAwesome6
-              name="arrow-left"
-              size={20}
-              color={COLORS.text}
-            />
-          </TouchableOpacity>
-        )}
-      </View>
+    <Appbar.Header style={styles.header}>
+      {onBack && (
+        <Appbar.BackAction 
+          color={COLORS.text} 
+          onPress={onBack}
+          style={styles.backAction}
+        />
+      )}
+      
+      <Appbar.Content 
+        title={title} 
+        titleStyle={styles.title}
+        style={styles.contentContainer}
+      />
 
-      <Text
-        numberOfLines={1}
-        style={styles.title}
-      >
-        {title}
-      </Text>
-
-      <View style={styles.side}>
-        {rightComponent}
-      </View>
-    </View>
+      {/* Renderiza o componente da direita ou o espaçador para manter o título centralizado */}
+      {rightComponent ? (
+        <Appbar.Action icon={() => rightComponent} style={styles.rightAction} />
+      ) : (
+        onBack && <StyleSpacer />
+      )}
+    </Appbar.Header>
   );
 }
 
+const StyleSpacer = () => <Appbar.Action icon={() => null} disabled style={styles.spacer} />;
+
 const styles = StyleSheet.create({
-  container: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginBottom: SPACING.xl,
+  header: {
+    backgroundColor: COLORS.background || 'transparent',
+    /* 🌟 PADRONIZAÇÃO AQUI: O Header agora assume o papel do seu antigo headerContainer */
+    paddingHorizontal: SPACING.md,
+    marginTop: 0,
+    marginBottom: SPACING.md, // Reduzido um pouco para não distanciar demais do primeiro input
+    elevation: 0, 
+    shadowOpacity: 0,
+    justifyContent: 'center',
+    height: 56, // Altura padrão estável para Appbar
   },
-
-  side: {
-    width: 32,
+  contentContainer: {
     alignItems: 'center',
+    justifyContent: 'center',
   },
-
   title: {
-    flex: 1,
-    textAlign: 'center',
-    color: COLORS.text,
     fontSize: 22,
     fontFamily: FONT_FAMILY.robotoBold,
+    color: COLORS.text,
+    textAlign: 'center', 
   },
+  backAction: {
+    marginLeft: -8, // 🌟 Compensa o padding interno do botão para alinhar o ícone perfeitamente à esquerda
+  },
+  rightAction: {
+    marginRight: -8, // 🌟 Compensa o padding interno para alinhar as ações perfeitamente à direita
+  },
+  spacer: {
+    width: 48,
+    marginRight: -8,
+  }
 });

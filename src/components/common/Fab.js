@@ -34,7 +34,7 @@ const styles = {
     right: SPACING.md,
     bottom: SPACING.xl,
     backgroundColor: COLORS.primary,
-    borderRadius: RADIUS.xl,
+    borderRadius: RADIUS.md,
     elevation: 6,
   },
 };
