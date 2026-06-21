@@ -1,5 +1,6 @@
-import { View, StyleSheet } from 'react-native';
-import { Card, Text, Badge, IconButton } from 'react-native-paper';
+import React, { useState } from 'react';
+import { View, StyleSheet, TouchableOpacity, Platform } from 'react-native';
+import { Card, Text, Badge, Menu, Divider } from 'react-native-paper';
 import FontAwesome6 from 'react-native-vector-icons/FontAwesome6';
 
 import { 
@@ -33,7 +34,9 @@ const formatDate = (date) => {
   }
 };
 
-export default function OrderItemCard({ item = {}, onEdit, onDelete }) {
+export default function OrderItemCard({ item = {}, onEdit, onDelete, onDuplicate }) {
+  const [menuVisible, setMenuVisible] = useState(false);
+
   const currentType = item?.tipo ? String(item.tipo).toUpperCase() : 'CONFECCAO';
   
   const typeStyle = ORDER_TYPE_STYLES?.[currentType] || {
@@ -45,11 +48,26 @@ export default function OrderItemCard({ item = {}, onEdit, onDelete }) {
 
   const typeLabel = typeStyle?.label || FALLBACK_LABELS[currentType] || 'Confecção';
 
+  const openMenu = () => setMenuVisible(true);
+  const closeMenu = () => setMenuVisible(false);
+
+  // Componente interno para garantir o alinhamento e centralização perfeita dos ícones do Menu
+  const renderMenuIcon = (iconName, iconColor) => (
+    <View style={styles.menuIconContainer}>
+      <FontAwesome6 name={iconName} size={12} color={iconColor} />
+    </View>
+  );
+
   return (
-    <Card style={styles.card} mode="outlined">
+    <Card 
+      style={styles.card} 
+      mode="flat" // Volta ao modo flat da versão anterior
+      elevation={0}
+      onPress={onEdit}
+    >
       <Card.Content style={styles.cardContent}>
         
-        {/* CABEÇALHO COM TÍTULO E CHIP DE TIPO */}
+        {/* HEADER */}
         <View style={styles.header}>
           <Text numberOfLines={1} style={styles.title}>
             {item?.titulo || 'Sem Título'}
@@ -63,59 +81,79 @@ export default function OrderItemCard({ item = {}, onEdit, onDelete }) {
           </View>
         </View>
 
-        {/* DATAS IMPORTANTES (GRID ATUALIZADO SEMPRE LOGO ABAIXO DO TÍTULO) */}
+        {/* DATAS */}
         <View style={styles.datesGrid}>
           {!!item?.dataProva && (
             <View style={styles.dateBadge}>
-              <FontAwesome6 name="location-dot" size={11} color={COLORS.textSecondary} />
-              <Text style={styles.dateText}>Prova: {formatDate(item.dataProva)}</Text>
+              <FontAwesome6 name="scissors" size={10} color="#6B7280" />
+              <Text style={styles.dateText}>Prova: <Text style={styles.dateValueBold}>{formatDate(item.dataProva)}</Text></Text>
             </View>
           )}
           {!!item?.dataPrazo && (
             <View style={styles.dateBadge}>
-              <FontAwesome6 name="clock" size={11} color={COLORS.textSecondary} />
-              <Text style={styles.dateText}>Prazo: {formatDate(item.dataPrazo)}</Text>
+              <FontAwesome6 name="calendar" size={10} color="#6B7280" />
+              <Text style={styles.dateText}>Prazo: <Text style={styles.dateValueBold}>{formatDate(item.dataPrazo)}</Text></Text>
             </View>
           )}
           {!!item?.dataEntrega && (
             <View style={styles.dateBadge}>
-              <FontAwesome6 name="truck" size={11} color={COLORS.textSecondary} />
-              <Text style={styles.dateText}>Entrega: {formatDate(item.dataEntrega)}</Text>
+              <FontAwesome6 name="truck" size={10} color="#10B981" />
+              <Text style={[styles.dateText, { color: '#047857' }]}>Entrega: {formatDate(item.dataEntrega)}</Text>
             </View>
           )}
         </View>
 
+        {/* FOOTER */}
         <View style={styles.footer}>
           <View style={styles.priceContainer}>
-            <Text style={styles.priceLabel}>Valor Total</Text>
+            <Text style={styles.priceLabel}>Valor do item</Text>
+            {/* COR DO PREÇO: Retornou para COLORS.text da versão antiga */}
             <Text style={styles.priceValue}>{formatCurrency(item?.valor)}</Text>
           </View>
 
           <View style={styles.actionsContainer}>
+            {/* CONTADOR DE IMAGENS */}
             {!!item?.imagem?.length && item.imagem[0] !== "string" && (
               <View style={styles.imageBadgeContainer}>
-                <FontAwesome6 name="image" size={14} color={COLORS.textSecondary} />
+                <FontAwesome6 name="image" size={14} color={COLORS.textSecondary || '#4B5563'} />
                 <Badge size={16} style={styles.imageBadge}>
                   {item.imagem.length}
                 </Badge>
               </View>
             )}
 
-            <IconButton
-              icon={() => <FontAwesome6 name="pen" size={12} color={COLORS.textSecondary} />}
-              mode="contained-tonal"
-              size={20}
-              containerColor={COLORS.black05}
-              onPress={onEdit}
-            />
-
-            <IconButton
-              icon={() => <FontAwesome6 name="xmark" size={13} color={COLORS.primary} />}
-              mode="contained-tonal"
-              size={20}
-              containerColor={COLORS.primary10}
-              onPress={onDelete}
-            />
+            {/* GATILHO DO MENU TRÊS PONTOS */}
+            <Menu
+              visible={menuVisible}
+              onDismiss={closeMenu}
+              anchorPosition="bottom"
+              contentStyle={styles.menuContent}
+              anchor={
+                <TouchableOpacity style={styles.threeDotsButton} onPress={openMenu}>
+                  <FontAwesome6 name="ellipsis-vertical" size={14} color="#4B5563" />
+                </TouchableOpacity>
+              }
+            >
+              <Menu.Item 
+                leadingIcon={() => renderMenuIcon("pen", COLORS.text || '#1F2937')}
+                onPress={() => { closeMenu(); onEdit(); }} 
+                title="Editar"
+                titleStyle={styles.menuItemText}
+              />
+              <Menu.Item 
+                leadingIcon={() => renderMenuIcon("copy", COLORS.text || '#1F2937')}
+                onPress={() => { closeMenu(); onDuplicate(); }} 
+                title="Duplicar"
+                titleStyle={styles.menuItemText}
+              />
+              <Divider style={styles.menuDivider} />
+              <Menu.Item 
+                leadingIcon={() => renderMenuIcon("trash", "#EF4444")}
+                onPress={() => { closeMenu(); onDelete(); }} 
+                title="Excluir"
+                titleStyle={[styles.menuItemText, styles.deleteItemText]}
+              />
+            </Menu>
           </View>
         </View>
 
@@ -127,9 +165,11 @@ export default function OrderItemCard({ item = {}, onEdit, onDelete }) {
 const styles = StyleSheet.create({
   card: {
     backgroundColor: COLORS.surface,
-    borderColor: COLORS.border,
-    borderRadius: RADIUS.lg,
+    borderRadius: 16, 
     marginBottom: SPACING.md,
+    // ESTILO DA BORDA ANTIGA: Retornou para a linha contínua sutil sem sombras pesadas
+    borderWidth: 1,
+    borderColor: 'rgba(0, 0, 0, 0.08)', 
   },
   cardContent: {
     padding: SPACING.md,
@@ -142,45 +182,49 @@ const styles = StyleSheet.create({
   },
   title: { 
     flex: 1, 
-    fontFamily: FONT_FAMILY.poppinsBold,
+    fontFamily: FONT_FAMILY.poppinsBold || 'System',
     fontSize: 16,
+    fontWeight: '600',
     color: COLORS.text,
   },
   typeChip: { 
     flexDirection: 'row', 
     alignItems: 'center',
-    gap: 4, 
-    paddingHorizontal: SPACING.sm,
+    gap: 5, 
+    paddingHorizontal: 8,
     paddingVertical: 4, 
-    borderRadius: RADIUS.full,
+    borderRadius: RADIUS.full || 99,
   },
   typeText: {
     fontSize: 10,
-    fontFamily: FONT_FAMILY.poppinsSemiBold,
+    fontFamily: FONT_FAMILY.poppinsSemiBold || 'System',
+    fontWeight: '700',
     textTransform: 'uppercase',
     letterSpacing: 0.5,
   },
   datesGrid: { 
     flexDirection: 'row',
     flexWrap: 'wrap',
-    gap: SPACING.sm,
-    marginTop: SPACING.md,
+    gap: 6,
+    marginTop: 12,
   },
   dateBadge: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 6,
-    backgroundColor: COLORS.surfaceSecondary,
-    paddingHorizontal: SPACING.sm,
+    gap: 5,
+    backgroundColor: '#F3F4F6',
+    paddingHorizontal: 8,
     paddingVertical: 4,
-    borderRadius: RADIUS.sm,
-    borderWidth: 1,
-    borderColor: COLORS.border,
+    borderRadius: 6,
   },
   dateText: { 
-    fontSize: 12, 
-    fontFamily: FONT_FAMILY.robotoRegular,
-    color: COLORS.textSecondary,
+    fontSize: 11, 
+    fontFamily: FONT_FAMILY.robotoRegular || 'System',
+    color: '#4B5563',
+  },
+  dateValueBold: {
+    fontWeight: '600',
+    color: '#1F2937',
   },
   footer: { 
     flexDirection: 'row', 
@@ -189,30 +233,40 @@ const styles = StyleSheet.create({
     marginTop: SPACING.md,
     paddingTop: SPACING.sm,
     borderTopWidth: 1,
-    borderTopColor: COLORS.border,
+    borderTopColor: '#F3F4F6',
   },
   priceContainer: {
-    gap: 2,
+    gap: 1,
   },
   priceLabel: {
     fontSize: 10,
-    fontFamily: FONT_FAMILY.poppinsMedium,
-    color: COLORS.textMuted,
+    fontFamily: FONT_FAMILY.poppinsMedium || 'System',
+    color: '#9CA3AF',
     textTransform: 'uppercase',
+    letterSpacing: 0.5,
   },
   priceValue: { 
-    fontFamily: FONT_FAMILY.poppinsBold, 
-    fontSize: 18,
-    color: COLORS.primary, 
+    fontFamily: FONT_FAMILY.poppinsBold || 'System', 
+    fontSize: 16,
+    fontWeight: '700',
+    color: COLORS.text || '#1F2937', // Ajustado para a cor clássica do tema antigo
   },
   actionsContainer: { 
     flexDirection: 'row', 
     alignItems: 'center',
-    gap: SPACING.xs,
+    gap: 4,
+  },
+  threeDotsButton: {
+    width: 36,
+    height: 36,
+    borderRadius: 10,
+    backgroundColor: '#F3F4F6',
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   imageBadgeContainer: {
     position: 'relative',
-    marginRight: SPACING.sm,
+    marginRight: 4,
     padding: 4,
   },
   imageBadge: {
@@ -220,8 +274,44 @@ const styles = StyleSheet.create({
     top: -2,
     right: -4,
     backgroundColor: COLORS.primary,
-    color: COLORS.white,
-    fontFamily: FONT_FAMILY.robotoBold,
+    color: '#FFFFFF',
     fontSize: 9,
+  },
+  /* CENTRALIZADOR DE ÍCONES DO MENU */
+  menuIconContainer: {
+    width: 24,
+    height: 24,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  menuContent: {
+    backgroundColor: COLORS.surface || '#FFFFFF',
+    borderRadius: 12,
+    paddingVertical: 4,
+    borderWidth: 1,
+    borderColor: 'rgba(0, 0, 0, 0.05)',
+    ...Platform.select({
+      ios: {
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 4 },
+        shadowOpacity: 0.1,
+        shadowRadius: 10,
+      },
+      android: {
+        elevation: 4,
+      },
+    }),
+  },
+  menuItemText: {
+    fontSize: 14,
+    fontFamily: FONT_FAMILY.poppinsMedium || 'System',
+    color: COLORS.text || '#1F2937',
+  },
+  deleteItemText: {
+    color: '#EF4444',
+  },
+  menuDivider: {
+    marginVertical: 4,
+    backgroundColor: '#E5E7EB',
   },
 });
