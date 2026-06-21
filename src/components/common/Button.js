@@ -1,96 +1,76 @@
-import {
-  StyleSheet,
-  TouchableOpacity,
-} from 'react-native';
+import { Pressable, StyleSheet, ActivityIndicator, Text } from 'react-native';
+import * as Haptics from 'expo-haptics'; // IMPORTAÇÃO DO EXPO HAPTICS
+import { COLORS } from '../../theme'; 
 
-import Text from './Text';
+export default function Button({ title, onPress, variant = 'primary', loading, disabled }) {
+  
+  // Função interna para interceptar o clique e acionar a vibração
+  const handlePress = async () => {
+    if (variant === 'primary') {
+      // Dispara o feedback de impacto leve apenas no botão primário
+      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light).catch(() => {
+        // Silencia falhas caso o dispositivo não tenha suporte a haptics
+      });
+    }
+    
+    if (onPress) {
+      onPress();
+    }
+  };
 
-import {
-  COLORS,
-  RADIUS,
-  FONT_FAMILY,
-} from '../../theme';
-
-export default function Button({
-  title,
-  onPress,
-  loading,
-  disabled,
-  variant = 'primary',
-}) {
   return (
-    <TouchableOpacity
-      style={[
+    <Pressable
+      onPress={handlePress} // TROCADO PARA A FUNÇÃO COM HAPTICS
+      disabled={disabled || loading}
+      style={({ pressed }) => [
         styles.button,
-        styles[variant],
-        disabled &&
-          styles.disabled,
+        variant === 'primary' ? styles.primary : styles.secondary,
+        pressed && styles.pressed,
+        (disabled || loading) && styles.disabled
       ]}
-      onPress={onPress}
-      disabled={
-        disabled || loading
-      }
-      activeOpacity={0.8}
     >
-      <Text
-        style={[
-          styles.text,
-          styles[
-            `${variant}Text`
-          ],
-        ]}
-      >
-        {loading
-          ? 'Carregando...'
-          : title}
-      </Text>
-    </TouchableOpacity>
+      {loading ? (
+        <ActivityIndicator color={variant === 'primary' ? '#FFFFFF' : COLORS.primary} />
+      ) : (
+        <Text style={[styles.text, variant === 'primary' ? styles.textPrimary : styles.textSecondary]}>
+          {title}
+        </Text>
+      )}
+    </Pressable>
   );
 }
 
-const styles =
-  StyleSheet.create({
-    button: {
-      height: 52,
-
-      borderRadius:
-        RADIUS.lg,
-
-      justifyContent:
-        'center',
-
-      alignItems:
-        'center',
-    },
-
-    text: {
-      fontFamily:
-        FONT_FAMILY.robotoBold,
-
-      fontSize: 16,
-    },
-
-    primary: {
-      backgroundColor:
-        COLORS.primary,
-    },
-
-    secondary: {
-      backgroundColor: COLORS.surfaceSecondary,
-
-      borderWidth: 1,
-      borderColor: COLORS.border,
-    },
-
-    secondaryText: {
-      color: COLORS.black70,
-    },
-
-    primaryText: {
-      color: COLORS.white,
-    },
-
-    disabled: {
-      opacity: 0.5,
-    },
-  });
+const styles = StyleSheet.create({
+  button: {
+    height: 48,
+    borderRadius: 8,
+    justifyContent: 'center',
+    alignItems: 'center',
+    flexDirection: 'row',
+  },
+  primary: {
+    backgroundColor: COLORS.primary,
+  },
+  secondary: {
+    backgroundColor: COLORS.black05,
+    borderWidth: 1,
+    borderColor: COLORS.black10,
+  },
+  pressed: {
+    opacity: 0.75, 
+    transform: [{ scale: 0.95 }], 
+  },
+  disabled: {
+    opacity: 0.5,
+  },
+  text: {
+    fontSize: 16,
+    fontWeight: 'bold',
+  },
+  textPrimary: {
+    color: '#FFFFFF',
+  },
+  textSecondary: {
+    color: COLORS.textSecondary || '#6C757D',
+  },
+});
