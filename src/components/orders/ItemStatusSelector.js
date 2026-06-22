@@ -4,21 +4,21 @@ import { Chip } from 'react-native-paper';
 import OrderSection from './OrderSection';
 import { COLORS, RADIUS, SPACING } from '../../theme';
 
-export default function ServiceTypeSelector({ value, onChange }) {
+export default function ItemStatusSelector({ value, onChange }) {
   useEffect(() => {
     if (!value && onChange) {
-      onChange('CONFECCAO');
+      onChange('PRODUCAO');
     }
   }, [value, onChange]);
 
   const OPTIONS = [
-    { id: 'CONFECCAO', label: 'Confecção', icon: 'hanger' },
-    { id: 'REPARO', label: 'Reparo', icon: 'wrench' },
-    { id: 'MODIFICACAO', label: 'Modif.', icon: 'content-cut' },
+    { id: 'PRODUCAO', label: 'Produção', icon: 'progress-wrench' },
+    { id: 'PRONTO', label: 'Pronto', icon: 'check-circle-outline' },
+    { id: 'ENTREGUE', label: 'Entregue', icon: 'package-variant-closed' },
   ];
 
   return (
-    <OrderSection title="Tipo de Serviço">
+    <OrderSection title="Status do Item">
       <View style={styles.container}>
         {OPTIONS.map((option) => {
           const isSelected = value === option.id;

@@ -40,6 +40,6 @@ const styles = StyleSheet.create({
     color: COLORS.text,
 
     fontFamily:
-      FONT_FAMILY.robotoBold,
+      FONT_FAMILY.robotoMedium,
   },
 });

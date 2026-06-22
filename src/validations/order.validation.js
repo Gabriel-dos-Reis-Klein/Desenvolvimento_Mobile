@@ -1,6 +1,5 @@
 import { z } from 'zod';
 
-// Configura as mensagens padrão do Zod para o Português
 z.setErrorMap((issue, ctx) => {
   if (issue.code === z.ZodIssueCode.invalid_type) {
     if (issue.received === 'null' || issue.received === 'undefined') {
@@ -54,6 +53,8 @@ const optionalDateField = (fieldName) =>
 
 export const orderItemSchema = z
   .object({
+    id: z.union([z.string(), z.number()]).optional(),
+
     titulo: z
       .string()
       .trim()
@@ -73,13 +74,17 @@ export const orderItemSchema = z
 
     imagem: z.array(z.string()).default([]),
 
-    dataPrazo: dateField('Data de prazo'), // AGORA OBRIGATÓRIO
+    dataPrazo: dateField('Data de prazo'),
 
-    dataEntrega: optionalDateField('Data de entrega'), // AGORA OPCIONAL
+    dataEntrega: optionalDateField('Data de entrega'),
 
     dataProva: optionalDateField('Data de prova'),
 
     tipo: TipoServicoEnum,
+
+    status: z.string().optional().default('PRODUCAO'),
+
+    statusPedido: z.string().optional().default('PRODUCAO'),
   })
   .superRefine((data, ctx) => {
     if (!data.dataPrazo) return;
@@ -95,18 +100,22 @@ export const orderItemSchema = z
       return;
     }
 
-    const hoje = new Date();
-    hoje.setHours(0, 0, 0, 0);
+    const isEdicao = data.id !== undefined && data.id !== null && data.id !== '';
 
-    const dataComparacao = new Date(prazo);
-    dataComparacao.setHours(0, 0, 0, 0);
+    if (!isEdicao) {
+      const hoje = new Date();
+      hoje.setHours(0, 0, 0, 0);
 
-    if (dataComparacao < hoje) {
-      ctx.addIssue({
-        code: z.ZodIssueCode.custom,
-        path: ['dataPrazo'],
-        message: 'A data de prazo não pode ser uma data no passado',
-      });
+      const dataComparacao = new Date(prazo);
+      dataComparacao.setHours(0, 0, 0, 0);
+
+      if (dataComparacao < hoje) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          path: ['dataPrazo'],
+          message: 'A data de prazo não pode ser uma data no passado',
+        });
+      }
     }
 
     if (data.dataEntrega) {

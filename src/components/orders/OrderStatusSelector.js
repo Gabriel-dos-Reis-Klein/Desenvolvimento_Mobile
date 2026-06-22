@@ -1,24 +1,49 @@
 import { useEffect } from 'react'; 
 import { View, StyleSheet, Platform } from 'react-native';
 import { Chip } from 'react-native-paper';
+import { useAudioPlayer } from 'expo-audio';
 import OrderSection from './OrderSection';
 import { COLORS, RADIUS, SPACING } from '../../theme';
 
-export default function ServiceTypeSelector({ value, onChange }) {
+const doneSoundAsset = require('../../assets/sounds/done.mp3');
+
+export default function OrderStatusSelector({ value, onChange }) {
+  const player = useAudioPlayer(doneSoundAsset);
+
   useEffect(() => {
     if (!value && onChange) {
-      onChange('CONFECCAO');
+      onChange('PENDENTE');
     }
   }, [value, onChange]);
 
+  const playSuccessSound = () => {
+    try {
+      if (player) {
+        player.seekTo(0);
+        player.play();
+      }
+    } catch (error) {
+      console.warn('Erro ao reproduzir áudio:', error);
+    }
+  };
+
+  const handleStatusChange = (statusId) => {
+    if (statusId === 'CONCLUIDO' && value !== 'CONCLUIDO') {
+      playSuccessSound();
+    }
+    if (onChange) {
+      onChange(statusId);
+    }
+  };
+
   const OPTIONS = [
-    { id: 'CONFECCAO', label: 'Confecção', icon: 'hanger' },
-    { id: 'REPARO', label: 'Reparo', icon: 'wrench' },
-    { id: 'MODIFICACAO', label: 'Modif.', icon: 'content-cut' },
+    { id: 'PENDENTE', label: 'Pendente', icon: 'clock-outline' },
+    { id: 'EXECUTANDO', label: 'Executando', icon: 'progress-wrench' },
+    { id: 'CONCLUIDO', label: 'Concluído', icon: 'check-circle-outline' },
   ];
 
   return (
-    <OrderSection title="Tipo de Serviço">
+    <OrderSection title="Status do Pedido">
       <View style={styles.container}>
         {OPTIONS.map((option) => {
           const isSelected = value === option.id;
@@ -31,7 +56,7 @@ export default function ServiceTypeSelector({ value, onChange }) {
               selected={isSelected} 
               showSelectedOverlay={false}
               mode="outlined"
-              onPress={isEditable ? () => onChange(option.id) : undefined}
+              onPress={isEditable ? () => handleStatusChange(option.id) : undefined}
               selectedColor={isSelected ? COLORS.primary : COLORS.text}
               style={[
                 styles.chip,
@@ -83,7 +108,7 @@ const styles = StyleSheet.create({
     color: COLORS.text,
   },
   chipTextSelected: {
-    color: COLORS.black,
+    color: COLORS.primary,
     fontWeight: '600',
   },
 });

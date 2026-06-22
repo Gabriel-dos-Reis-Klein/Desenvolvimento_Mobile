@@ -1,5 +1,5 @@
-import { useEffect, useState } from 'react';
-import { Platform, StyleSheet, View } from 'react-native';
+import { useEffect, useState, useMemo, useRef } from 'react';
+import { Platform, StyleSheet, View, Alert } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import * as ImagePicker from 'expo-image-picker';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
@@ -8,6 +8,7 @@ import PageHeader from '../../components/common/PageHeader';
 import Input from '../../components/common/Input';
 import Button from '../../components/common/Button';
 import ServiceTypeSelector from '../../components/orders/ServiceTypeSelector'; 
+import ItemStatusSelector from '../../components/orders/ItemStatusSelector';
 
 import ItemTabs from '../../components/orders/ItemTabs';
 import ItemAttachmentsTab from '../../components/orders/ItemAttachmentsTab';
@@ -35,44 +36,136 @@ const parseCurrencyToNumber = (formattedValue) => {
 };
 
 export default function ItemForm({ navigation, route }) {
-  const { item, mode = 'create', index } = route.params || {};
+  const { item, mode = 'create', index, origin = 'CreateOrder' } = route.params || {};
 
   const [activeTab, setActiveTab] = useState('DADOS');
   const [titulo, setTitulo] = useState('');
   const [descricao, setDescricao] = useState('');
   const [valor, setValor] = useState('');
   const [tipo, setTipo] = useState('CONFECCAO');
+  const [statusItemPedido, setStatusItemPedido] = useState('PRODUCAO'); // Renomeado com sucesso
   const [imagens, setImagens] = useState([]); 
 
   const [fieldErrors, setFieldErrors] = useState({});
+  const isSavingRef = useRef(false);
 
   const [dataPrazo, setDataPrazo] = useState(null);
   const [dataEntrega, setDataEntrega] = useState(null);
   const [dataProva, setDataProva] = useState(null);
 
   const [showProva, setShowProva] = useState(false);
-  const [showEntrega, setShowEntrega] = useState(false); // Mudado de showPrazo para showEntrega
+  const [showEntrega, setShowEntrega] = useState(false);
 
   const [activeField, setActiveField] = useState(null); 
   const [pickerMode, setPickerMode] = useState('date'); 
   const [tempDate, setTempDate] = useState(new Date());
 
+  const [initialFormState, setInitialFormState] = useState({
+    titulo: '',
+    descricao: '',
+    valor: '',
+    tipo: 'CONFECCAO',
+    statusItemPedido: 'PRODUCAO',
+    imagens: [],
+    dataPrazo: null,
+    dataEntrega: null,
+    dataProva: null,
+  });
+
   useEffect(() => {
-    if (mode === 'edit' && item) {
-      setTitulo(item.titulo || '');
-      setDescricao(item.descricao || '');
-      setValor(item.valor ? formatCurrency(item.valor) : '');
-      setTipo(item.tipo ? String(item.tipo).toUpperCase() : 'CONFECCAO');
-      setImagens(item.imagem || []);
+    if ((mode === 'edit' || mode === 'view') && item) {
+      const initialTitulo = item.titulo || item.descricaoPeca || '';
+      const initialDescricao = item.descricao || item.observacoes || '';
+      const initialValor = item.valor ? formatCurrency(item.valor) : '';
+      const initialTipo = item.tipo ? String(item.tipo).toUpperCase() : 'CONFECCAO';
+      const initialStatus = item.statusItemPedido || item.statusPedido || item.status || 'PRODUCAO';
+      const initialImagens = item.imagem || item.fotos || [];
+
+      const initialDataPrazo = item.dataPrazo ? new Date(item.dataPrazo).toISOString() : null;
+      const initialDataEntrega = item.dataEntrega ? new Date(item.dataEntrega).toISOString() : null;
+      const initialDataProva = item.dataProva ? new Date(item.dataProva).toISOString() : null;
+
+      setTitulo(initialTitulo);
+      setDescricao(initialDescricao);
+      setValor(initialValor);
+      setTipo(initialTipo);
+      setStatusItemPedido(initialStatus);
+      setImagens(initialImagens);
 
       setDataPrazo(item.dataPrazo ? new Date(item.dataPrazo) : null);
       setDataEntrega(item.dataEntrega ? new Date(item.dataEntrega) : null);
       setDataProva(item.dataProva ? new Date(item.dataProva) : null);
 
       if (item.dataProva) setShowProva(true);
-      if (item.dataEntrega) setShowEntrega(true); // Controla visibilidade da entrega opcional
+      if (item.dataEntrega) setShowEntrega(true);
+
+      setInitialFormState({
+        titulo: initialTitulo,
+        descricao: initialDescricao,
+        valor: initialValor,
+        tipo: initialTipo,
+        statusItemPedido: initialStatus,
+        imagens: initialImagens,
+        dataPrazo: initialDataPrazo,
+        dataEntrega: item.dataEntrega ? initialDataEntrega : null,
+        dataProva: item.dataProva ? initialDataProva : null,
+      });
     }
-  }, [item]);
+  }, [item, mode]);
+
+  const isFormModified = useMemo(() => {
+    if (mode === 'create') {
+      return (
+        titulo !== '' ||
+        descricao !== '' ||
+        valor !== '' ||
+        tipo !== 'CONFECCAO' ||
+        statusItemPedido !== 'PRODUCAO' ||
+        dataPrazo !== null ||
+        dataEntrega !== null ||
+        dataProva !== null ||
+        imagens.length > 0
+      );
+    }
+
+    const currentDataPrazo = dataPrazo ? dataPrazo.toISOString() : null;
+    const currentDataEntrega = showEntrega && dataEntrega ? dataEntrega.toISOString() : null;
+    const currentDataProva = showProva && dataProva ? dataProva.toISOString() : null;
+
+    return (
+      titulo !== initialFormState.titulo ||
+      descricao !== initialFormState.descricao ||
+      valor !== initialFormState.valor ||
+      tipo !== initialFormState.tipo ||
+      statusItemPedido !== initialFormState.statusItemPedido ||
+      currentDataPrazo !== initialFormState.dataPrazo ||
+      currentDataEntrega !== initialFormState.dataEntrega ||
+      currentDataProva !== initialFormState.dataProva ||
+      JSON.stringify(imagens) !== JSON.stringify(initialFormState.imagens)
+    );
+  }, [titulo, descricao, valor, tipo, statusItemPedido, dataPrazo, dataEntrega, dataProva, showEntrega, showProva, imagens, initialFormState, mode]);
+
+  useEffect(() => {
+    const unsubscribe = navigation.addListener('beforeRemove', (e) => {
+      if (!isFormModified || isSavingRef.current) {
+        return;
+      }
+      e.preventDefault();
+      Alert.alert(
+        'Alterações não salvas',
+        'Você possui alterações que não foram salvas. Deseja realmente sair e descartar essas alterações?',
+        [
+          { text: 'Continuar editando', style: 'cancel', onPress: () => {} },
+          {
+            text: 'Descartar e sair',
+            style: 'destructive',
+            onPress: () => navigation.dispatch(e.data.action),
+          },
+        ]
+      );
+    });
+    return unsubscribe;
+  }, [navigation, isFormModified]);
 
   const handlePickImage = async () => {
     const permissionResult = await ImagePicker.requestMediaLibraryPermissionsAsync();
@@ -177,12 +270,14 @@ export default function ItemForm({ navigation, route }) {
 
   const handleSave = () => {
     const payload = {
+      id: item?.id || undefined,
       titulo,
       descricao,
       valor: parseCurrencyToNumber(valor),
       imagem: imagens,
       tipo,
-      dataPrazo: dataPrazo ? dataPrazo.toISOString() : null, // Mapeado como obrigatório
+      statusItemPedido: statusItemPedido,
+      dataPrazo: dataPrazo ? dataPrazo.toISOString() : null,
       dataEntrega: showEntrega && dataEntrega ? dataEntrega.toISOString() : null,
       dataProva: showProva && dataProva ? dataProva.toISOString() : null,
     };
@@ -196,13 +291,28 @@ export default function ItemForm({ navigation, route }) {
     }
 
     setFieldErrors({});
-    navigation.navigate('CreateOrder', { savedItem: validation.data, savedIndex: index });
+    isSavingRef.current = true;
+
+    const finalData = {
+      ...validation.data,
+      statusItemPedido: statusItemPedido,
+      status: statusItemPedido // Fallback opcional para compatibilidade
+    };
+
+    navigation.navigate({
+      name: origin,
+      params: { 
+        savedItem: finalData, 
+        savedIndex: index 
+      },
+      merge: true,
+    });
   };
 
   return (
     <SafeAreaView style={styles.container} edges={['top', 'bottom']}>
       <View style={styles.header}>
-        <PageHeader title={mode === 'edit' ? 'Editar Item' : 'Novo Item'} onBack={() => navigation.goBack()} />
+        <PageHeader title={mode === 'create' ? 'Novo Item' : 'Editar Item'} onBack={() => navigation.goBack()} />
       </View>
 
       <ItemTabs activeTab={activeTab} setActiveTab={setActiveTab} attachmentsCount={imagens.length} />
@@ -231,7 +341,7 @@ export default function ItemForm({ navigation, route }) {
               type="textarea" 
               value={descricao} 
               onChangeText={(text) => {
-                if (fieldErrors.descricao) setFieldErrors(prev => ({ ...prev, descricao: undefined }));
+                if (fieldErrors.descricao) setFieldErrors(prev => ({ ...prev, dataDescricao: undefined }));
                 setDescricao(text);
               }} 
               error={fieldErrors.descricao}
@@ -239,6 +349,13 @@ export default function ItemForm({ navigation, route }) {
             <View style={styles.inputGroup}>
               <ServiceTypeSelector value={tipo} onChange={setTipo} />
             </View>
+            
+            {mode !== 'create' && (
+              <View style={styles.inputGroup}>
+                <ItemStatusSelector value={statusItemPedido} onChange={setStatusItemPedido} />
+              </View>
+            )}
+
             <Input 
               label="Valor" 
               keyboardType="numeric" 
@@ -248,7 +365,6 @@ export default function ItemForm({ navigation, route }) {
               error={fieldErrors.valor}
             />
 
-            {/* PRAZO FINAL: AGORA FIXO E OBRIGATÓRIO NO TOPO */}
             <DateSelectorRow
               label="Prazo Final"
               dateValue={dataPrazo}
@@ -257,7 +373,6 @@ export default function ItemForm({ navigation, route }) {
               error={fieldErrors.dataPrazo}
             />
 
-            {/* DATA DA PROVA: OPCIONAL */}
             <DateSelectorRow
               label="Data da Prova"
               dateValue={dataProva}
@@ -277,7 +392,6 @@ export default function ItemForm({ navigation, route }) {
               error={fieldErrors.dataProva}
             />
 
-            {/* DATA DE ENTREGA: AGORA OPCIONAL COM TOGGLE */}
             <DateSelectorRow
               label="Data de Entrega"
               dateValue={dataEntrega}
@@ -303,7 +417,7 @@ export default function ItemForm({ navigation, route }) {
       </KeyboardAwareScrollView>
 
       <View style={styles.footer}>
-        <Button title="Salvar" onPress={handleSave} />
+        <Button title="Salvar" disabled={!isFormModified} onPress={handleSave} />
         <Button title="Cancelar" variant="secondary" onPress={() => navigation.goBack()} />
       </View>
 
@@ -324,14 +438,34 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: COLORS.background,
     ...Platform.select({
-      web: { position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, height: '100%', width: '100%' },
+      web: { 
+        position: 'fixed', 
+        top: 0, 
+        left: 0, 
+        right: 0, 
+        bottom: 0, 
+        height: '100%', 
+        width: '100%' 
+      },
     }),
   },
-  header: { paddingHorizontal: SPACING.md, paddingTop: 0 },
-  body: { flex: 1 },
-  content: { paddingHorizontal: SPACING.xl, paddingVertical: SPACING.xl },
-  innerFormContainer: { gap: SPACING.lg },
-  inputGroup: { gap: SPACING.xs },
+  header: { 
+    paddingHorizontal: SPACING.md, 
+    paddingTop: 0 
+  },
+  body: { 
+    flex: 1 
+  },
+  content: { 
+    paddingHorizontal: SPACING.xl, 
+    paddingVertical: SPACING.xl 
+  },
+  innerFormContainer: { 
+    gap: SPACING.lg 
+  },
+  inputGroup: { 
+    gap: SPACING.xs 
+  },
   footer: {
     paddingHorizontal: SPACING.xl,
     paddingTop: SPACING.md,
