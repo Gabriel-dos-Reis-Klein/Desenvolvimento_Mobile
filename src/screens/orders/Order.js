@@ -47,9 +47,13 @@ import {
   COLORS,
   SPACING,
 } from '../../theme';
+import { SafeAreaView } from 'react-native-safe-area-context';
+
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export default function OrdersScreen({
   navigation,
+  route,
 }) {
   const [orders, setOrders] =
     useState([]);
@@ -76,24 +80,32 @@ export default function OrdersScreen({
     async () => {
       try {
         setLoading(true);
-
         const data =
           await orderService.getAll();
-
-        setOrders(data);
+        setOrders(data || []);
       } catch (error) {
         console.error(error);
       } finally {
         setLoading(false);
       }
     },
-
     []
   );
 
   useEffect(() => {
-    fetchOrders();
-  }, []);
+    const unsubscribe = navigation.addListener('focus', () => {
+      fetchOrders();
+    });
+
+    return unsubscribe;
+  }, [navigation, fetchOrders]);
+
+  useEffect(() => {
+    if (route.params?.shouldRefresh) {
+      fetchOrders();
+      navigation.setParams({ shouldRefresh: undefined });
+    }
+  }, [route.params?.shouldRefresh, fetchOrders]);
 
   const filteredOrders = useMemo(() => {
     let filtered =
@@ -103,7 +115,7 @@ export default function OrdersScreen({
       filtered =
         filtered.filter(
           (order) =>
-            order.tipoPedido ===
+            order.tipoServico ===
             selectedType
         );
     }
@@ -159,25 +171,26 @@ export default function OrdersScreen({
     selectedSort,
   ]);
 
-  console.log(orders);
-
   return (
-    <View style={styles.container}>
+    <SafeAreaView style={styles.container}>
       <ListHeader
         title="Pedidos"
         total={filteredOrders.length}
+        onPressSettings={() => {
+          AsyncStorage.clear()
+        }}
       />
 
       <View style={styles.filterRow}>
         <FilterButton
-          icon="sort-variant"
+          icon="sort-alpha-down"
           onPress={() =>
             setSortVisible(true)
           }
         />
 
         <FilterButton
-          icon="filter-variant"
+          icon="filter"
           onPress={() =>
             setFilterVisible(true)
           }
@@ -195,17 +208,19 @@ export default function OrdersScreen({
           data={filteredOrders}
 
           keyExtractor={(item) =>
-            item.id.toString()
+            item.id
           }
 
           renderItem={({ item }) => (
             <OrderCard
               order={item}
               onPress={() =>
-                navigation.navigate('Details', {
-                screen: 'PedidosDescricao',      // informa qual tela dentro da Stack
-                params: { orderId: item.id },    // parâmetros para a tela PedidosDescricao
-                })
+                navigation.navigate(
+                  'OrderDetails',
+                  {
+                    orderId: item.id,
+                  }
+                )
               }
             />
           )}
@@ -221,11 +236,9 @@ export default function OrdersScreen({
       )}
 
       <Fab
-        onPress={() =>
-          navigation.navigate(
-            'Criacao', { screen: 'PedidoCriacao' }
-          )
-        }
+        onPress={() => {
+          navigation.navigate('CreateOrder');
+        }}
       />
 
       <OrderFilterModal
@@ -252,7 +265,7 @@ export default function OrdersScreen({
         selectedSort={selectedSort}
         setSelectedSort={setSelectedSort}
       />
-    </View>
+    </SafeAreaView>
   );
 }
 

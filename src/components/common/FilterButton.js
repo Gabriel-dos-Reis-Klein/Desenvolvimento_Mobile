@@ -4,7 +4,7 @@ import {
 } from 'react-native';
 
 import {
-  MaterialCommunityIcons,
+  FontAwesome5,
 } from '@expo/vector-icons';
 
 import {
@@ -30,7 +30,7 @@ export default function FilterButton({
       activeOpacity={0.7}
       {...props}
     >
-      <MaterialCommunityIcons
+      <FontAwesome5
         name={icon}
         size={iconSize}
         color={iconColor}

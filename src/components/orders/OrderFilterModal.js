@@ -11,27 +11,27 @@ import Text
   from '../common/Text';
 
 import {
-  ORDER_TYPES,
-  ORDER_STATUS,
-} from '../../constants';
-
-import {
   COLORS,
   SPACING,
 } from '../../theme';
 
+import { 
+  ORDER_TYPE_LABELS,
+  ORDER_STATUS_LABELS
+} from '../../constants';
+
 const TYPES = [
   null,
-  ORDER_TYPES.MANUFACTURING,
-  ORDER_TYPES.MODIFICATION,
-  ORDER_TYPES.REPAIR,
+  ORDER_TYPE_LABELS.MANUFACTURING,
+  ORDER_TYPE_LABELS.REPAIR,
+  ORDER_TYPE_LABELS.MODIFICATION
 ];
 
 const STATUS = [
   null,
-  ORDER_STATUS.WAITING,
-  ORDER_STATUS.PRODUCTION,
-  ORDER_STATUS.DELIVERED,
+  ORDER_STATUS_LABELS.WAITING,
+  ORDER_STATUS_LABELS.PRODUCTION,
+  ORDER_STATUS_LABELS.DELIVERED,
 ];
 
 export default function OrderFilterModal({

@@ -1,5 +1,5 @@
 import {
-  MaterialCommunityIcons,
+  FontAwesome6
 } from '@expo/vector-icons';
 
 import {
@@ -8,6 +8,7 @@ import {
 
 import {
   COLORS,
+  ORDER_TYPE_STYLES,
 } from '../../theme';
 
 export default function OrderIcon({
@@ -18,12 +19,12 @@ export default function OrderIcon({
   ...props
 }) {
   const icon =
-    ORDER_TYPE_ICONS[
+    ORDER_TYPE_STYLES[
       type
     ] || 'dots-horizontal';
 
   return (
-    <MaterialCommunityIcons
+    <FontAwesome6
       name={icon}
       size={size}
       color={color}

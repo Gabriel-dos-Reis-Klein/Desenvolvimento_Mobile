@@ -1,134 +1,126 @@
+import { useState } from 'react';
 import {
-  useEffect,
-  useState,
-  useCallback,
-} from 'react';
-
-import {
-  View,
   FlatList,
   StyleSheet,
+  View,
 } from 'react-native';
-
 import {
-  customerService,
-} from '../../services';
-
-import CustomerCard
-  from '../../components/customers/CustomerCard';
-
-import Loading
-  from '../../components/common/Loading';
-
-import EmptyState
-  from '../../components/common/EmptyState';
-
-import ListHeader
-  from '../../components/common/ListHeader';
-
-import FilterButton
-  from '../../components/common/FilterButton';
-
-import Fab
-  from '../../components/common/Fab';
+  SafeAreaView,
+} from 'react-native-safe-area-context';
+import {
+  Menu,
+  Divider,
+  Chip,
+} from 'react-native-paper';
 
 import {
   COLORS,
   SPACING,
 } from '../../theme';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import {
+  useCustomers,
+} from '../../hooks/useCustomers';
 
-export default function Customer({
-  navigation,
-}) {
-  const [customers, setCustomers] =
-    useState([]);
+import ListHeader from '../../components/common/ListHeader';
+import SearchInput from '../../components/common/SearchInput';
+import IconButton from '../../components/common/IconButton';
+import EmptyState from '../../components/common/EmptyState';
+import Fab from '../../components/common/Fab';
+import CustomerCard from '../../components/customers/CustomerCard';
+import CustomerSkeleton from '../../components/customers/CustomerSkeleton';
 
-  const [loading, setLoading] =
-    useState(true);
+export default function Customer({ navigation }) {
+  const {
+    customers,
+    loading,
+    refreshing,
+    searchText,
+    setSearchText,
+    sortBy,
+    setSortBy,
+    refresh,
+  } = useCustomers();
 
-  const fetchCustomers = useCallback(
-    async () => {
-      try {
-        setLoading(true);
-        const data =
-          await customerService.getAll();
-
-        setCustomers(data);
-      } catch (error) {
-        console.error(error);
-      } finally {
-        setLoading(false);
-      }
-    },
-
-    []
-  );
-
-  useEffect(() => {
-    fetchCustomers();
-  }, []);
+  const [menuVisible, setMenuVisible] = useState(false);
 
   return (
-    <SafeAreaView style={styles.container}>
+    <SafeAreaView style={styles.container} edges={['top']}>
       <ListHeader
         title="Clientes"
         total={customers.length}
       />
 
-      <View style={styles.filterRow}>
-        <FilterButton
-          icon="sort-variant"
-          onPress={fetchCustomers}
-        />
+      <SearchInput
+        value={searchText}
+        onChangeText={setSearchText}
+      />
 
-        <FilterButton
-          icon="filter-variant"
-        />
+      <View style={styles.toolbar}>
+        <Chip compact icon="sort">
+          {sortBy === 'NOME' ? 'A-Z' : 'Recentes'}
+        </Chip>
+
+        <Menu
+          visible={menuVisible}
+          onDismiss={() => setMenuVisible(false)}
+          anchor={
+            <IconButton
+              icon="tune"
+              onPress={() => setMenuVisible(true)}
+            />
+          }
+        >
+          <Menu.Item
+            title="Mais recentes"
+            leadingIcon="clock-outline"
+            onPress={() => {
+              setSortBy('CRIACAO');
+              setMenuVisible(false);
+            }}
+          />
+          <Divider />
+          <Menu.Item
+            title="Ordem alfabética"
+            leadingIcon="sort-alphabetical-ascending"
+            onPress={() => {
+              setSortBy('NOME');
+              setMenuVisible(false);
+            }}
+          />
+        </Menu>
       </View>
 
-      {loading ? (
-        <Loading />
-      ) : customers.length === 0 ? (
-        <EmptyState
-          message="Nenhum cliente encontrado"
-        />
-      ) : (
-        <FlatList
-          data={customers}
-          keyExtractor={(item) =>
-            item.id
-          }
-
-          renderItem={({ item }) => (
-            <CustomerCard
-              customer={item}
-              onPress={() =>
-               navigation.navigate('Details', {
-              screen: 'ClientesDescricao',
-              params: { customersId: item.id },
-    }
-                )
-              }
-            />
-          )}
-
-          contentContainerStyle={
-            styles.listPadding
-          }
-
-          showsVerticalScrollIndicator={
-            false
-          }
-        />
-      )}
+      <View style={styles.contentContainer}>
+        {loading ? (
+          <CustomerSkeleton />
+        ) : customers.length === 0 ? (
+          <EmptyState message="Nenhum cliente encontrado" />
+        ) : (
+          <FlatList
+            data={customers}
+            keyExtractor={(item) => item.id}
+            renderItem={({ item }) => (
+              <CustomerCard
+                customer={item}
+                highlightQuery={searchText}
+                onPress={() =>
+                  navigation.navigate('CustomerDetails', {
+                    customerId: item.id,
+                  })
+                }
+              />
+            )}
+            style={styles.listContainer}
+            contentContainerStyle={styles.listPadding}
+            showsVerticalScrollIndicator={false}
+            refreshing={refreshing}
+            onRefresh={refresh}
+          />
+        )}
+      </View>
 
       <Fab
-        onPress={() =>
-          navigation.navigate(
-            'Criacao', { screen: 'ClienteCriacao' }
-          )
-        }
+        onPress={() => navigation.navigate('CreateCustomer')}
       />
     </SafeAreaView>
   );
@@ -137,22 +129,23 @@ export default function Customer({
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor:
-      COLORS.background,
+    backgroundColor: COLORS.background,
   },
-
-  filterRow: {
+  toolbar: {
     flexDirection: 'row',
-    justifyContent: 'center',
-    gap: SPACING.md,
-    marginBottom: SPACING.lg,
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingHorizontal: SPACING.lg,
+    paddingBottom: SPACING.md,
   },
-
+  contentContainer: {
+    flex: 1,
+  },
+  listContainer: {
+    flex: 1,
+  },
   listPadding: {
-    paddingHorizontal:
-      SPACING.lg,
-
-    paddingBottom:
-      100,
-  },
+    paddingHorizontal: SPACING.lg,
+    paddingBottom: 32, 
+  }
 });
