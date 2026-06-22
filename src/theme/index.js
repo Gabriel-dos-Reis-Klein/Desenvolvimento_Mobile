@@ -5,3 +5,4 @@ export * from './typography';
 export * from './radius';
 export * from './shadows';
 export * from './orders/status';
+export * from './orders/order-type-styles'
