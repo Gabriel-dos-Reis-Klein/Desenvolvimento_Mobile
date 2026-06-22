@@ -7,6 +7,7 @@ import {
   View,
   LayoutAnimation,
   UIManager,
+  Alert,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
@@ -25,7 +26,6 @@ import { customerService, orderService } from '../../services';
 import { showError } from '../../errors/showError';
 import { showSuccess } from '../../errors/showSuccess';
 
-// Validações com Zod
 import { orderSchema } from '../../validations/order.validation';
 import { validateSchema } from '../../validations/validation.utils';
 
@@ -54,6 +54,7 @@ export default function CreateOrder({ navigation, route }) {
   const [paymentType, setPaymentType] = useState('');
   const [loading, setLoading] = useState(false);
   const [customerVisible, setCustomerVisible] = useState(false);
+  const [isSavingOrNavigating, setIsSavingOrNavigating] = useState(false);
 
   const [orderErrors, setOrderErrors] = useState({});
 
@@ -76,12 +77,51 @@ export default function CreateOrder({ navigation, route }) {
     }
   }, [route.params?.savedItem, route.params?.savedIndex]);
 
+  useEffect(() => {
+    const unsubscribe = navigation.addListener('focus', () => {
+      setIsSavingOrNavigating(false);
+    });
+    return unsubscribe;
+  }, [navigation]);
+
   const total = useMemo(() => {
     return items.reduce((acc, item) => {
       const value = Number(item.valor);
       return acc + (isNaN(value) ? 0 : value);
     }, 0);
   }, [items]);
+
+  const isFormModified = useMemo(() => {
+    return (
+      title !== '' ||
+      selectedCustomer !== null ||
+      items.length > 0 ||
+      advance !== '' ||
+      paymentType !== ''
+    );
+  }, [title, selectedCustomer, items, advance, paymentType]);
+
+  useEffect(() => {
+    const unsubscribe = navigation.addListener('beforeRemove', (e) => {
+      if (!isFormModified || isSavingOrNavigating) {
+        return;
+      }
+      e.preventDefault();
+      Alert.alert(
+        'Alterações não salvas',
+        'Você possui alterações que não foram salvas. Deseja realmente sair e descartar essas alterações?',
+        [
+          { text: 'Continuar editando', style: 'cancel', onPress: () => {} },
+          {
+            text: 'Descartar e sair',
+            style: 'destructive',
+            onPress: () => navigation.dispatch(e.data.action),
+          },
+        ]
+      );
+    });
+    return unsubscribe;
+  }, [navigation, isFormModified, isSavingOrNavigating]);
 
   const loadCustomers = async () => {
     try {
@@ -99,6 +139,7 @@ export default function CreateOrder({ navigation, route }) {
   };
 
   const handleEditItem = (item, index) => {
+    setIsSavingOrNavigating(true);
     navigation.navigate('ItemForm', {
       mode: 'edit',
       item,
@@ -127,6 +168,7 @@ export default function CreateOrder({ navigation, route }) {
   };
 
   const handleAddItem = () => {
+    setIsSavingOrNavigating(true);
     navigation.navigate('ItemForm', {
       mode: 'create',
     });
@@ -170,9 +212,11 @@ export default function CreateOrder({ navigation, route }) {
 
     try {
       setLoading(true);
+      setIsSavingOrNavigating(true);
       await orderService.create(validation.data);
       showSuccess('Pedido criado com sucesso!', () => navigation.goBack());
     } catch (error) {
+      setIsSavingOrNavigating(false);
       showError(error);
     } finally {
       setLoading(false);
@@ -255,16 +299,43 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: COLORS.background,
     ...Platform.select({
-      web: { position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, height: '100%', width: '100%' },
+      web: { 
+        position: 'fixed', 
+        top: 0, 
+        left: 0, 
+        right: 0, 
+        bottom: 0, 
+        height: '100%', 
+        width: '100%' 
+      },
     }),
   },
-  headerContainer: { paddingHorizontal: SPACING.md },
-  body: { flex: 1, overflow: 'hidden' },
-  keyboardView: { flex: 1 },
+  headerContainer: { 
+    paddingHorizontal: SPACING.md 
+  },
+  body: { 
+    flex: 1, 
+    overflow: 'hidden' 
+  },
+  keyboardView: { 
+    flex: 1 
+  },
   scroll: {
     flex: 1,
-    ...Platform.select({ web: { overflowY: 'auto' } }),
+    ...Platform.select({ 
+      web: { 
+        overflowY: 'auto' 
+      } 
+    }),
   },
-  content: { paddingHorizontal: SPACING.xl, paddingVertical: SPACING.xl, flexGrow: 1 },
-  footer: { padding: SPACING.xl, gap: SPACING.md, backgroundColor: COLORS.background },
+  content: { 
+    paddingHorizontal: SPACING.xl, 
+    paddingVertical: SPACING.xl, 
+    flexGrow: 1 
+  },
+  footer: { 
+    padding: SPACING.xl, 
+    gap: SPACING.md, 
+    backgroundColor: COLORS.background 
+  },
 });

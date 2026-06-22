@@ -1,13 +1,12 @@
-import { useState } from 'react';
-
+import { useState, useEffect, useMemo } from 'react';
 import {
   StyleSheet,
   KeyboardAvoidingView,
   ScrollView,
   Platform,
   View,
+  Alert,
 } from 'react-native';
-
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { COLORS, SPACING } from '../../theme';
@@ -35,6 +34,36 @@ export default function CreateCustomer({ navigation }) {
     phone: '',
     description: '',
   });
+
+  const isFormModified = useMemo(() => {
+    return (
+      form.values.name !== '' ||
+      form.values.phone !== '' ||
+      form.values.description !== ''
+    );
+  }, [form.values.name, form.values.phone, form.values.description]);
+
+  useEffect(() => {
+    const unsubscribe = navigation.addListener('beforeRemove', (e) => {
+      if (!isFormModified) {
+        return;
+      }
+      e.preventDefault();
+      Alert.alert(
+        'Alterações não salvas',
+        'Você possui alterações que não foram salvas. Deseja realmente sair e descartar essas alterações?',
+        [
+          { text: 'Continuar editando', style: 'cancel', onPress: () => {} },
+          {
+            text: 'Descartar e sair',
+            style: 'destructive',
+            onPress: () => navigation.dispatch(e.data.action),
+          },
+        ]
+      );
+    });
+    return unsubscribe;
+  }, [navigation, isFormModified]);
 
   const setField = (field) => (value) => {
     form.setField(field, value);
@@ -161,7 +190,9 @@ const styles = StyleSheet.create({
   scroll: {
     flex: 1,
     ...Platform.select({
-      web: { overflowY: 'auto' },
+      web: { 
+        overflowY: 'auto' 
+      },
     }),
   },
   content: {

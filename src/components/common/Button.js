@@ -1,16 +1,11 @@
 import { Pressable, StyleSheet, ActivityIndicator, Text } from 'react-native';
-import * as Haptics from 'expo-haptics'; // IMPORTAÇÃO DO EXPO HAPTICS
+import * as Haptics from 'expo-haptics';
 import { COLORS } from '../../theme'; 
 
 export default function Button({ title, onPress, variant = 'primary', loading, disabled }) {
-  
-  // Função interna para interceptar o clique e acionar a vibração
   const handlePress = async () => {
     if (variant === 'primary') {
-      // Dispara o feedback de impacto leve apenas no botão primário
-      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light).catch(() => {
-        // Silencia falhas caso o dispositivo não tenha suporte a haptics
-      });
+      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light).catch(() => {});
     }
     
     if (onPress) {
@@ -18,21 +13,29 @@ export default function Button({ title, onPress, variant = 'primary', loading, d
     }
   };
 
+  const isButtonDisabled = disabled || loading;
+
   return (
     <Pressable
-      onPress={handlePress} // TROCADO PARA A FUNÇÃO COM HAPTICS
-      disabled={disabled || loading}
+      onPress={handlePress}
+      disabled={isButtonDisabled}
       style={({ pressed }) => [
         styles.button,
         variant === 'primary' ? styles.primary : styles.secondary,
         pressed && styles.pressed,
-        (disabled || loading) && styles.disabled
+        isButtonDisabled && styles.disabled
       ]}
     >
       {loading ? (
         <ActivityIndicator color={variant === 'primary' ? '#FFFFFF' : COLORS.primary} />
       ) : (
-        <Text style={[styles.text, variant === 'primary' ? styles.textPrimary : styles.textSecondary]}>
+        <Text 
+          style={[
+            styles.text, 
+            variant === 'primary' ? styles.textPrimary : styles.textSecondary,
+            (isButtonDisabled && variant === 'primary') && styles.textPrimaryDisabled
+          ]}
+        >
           {title}
         </Text>
       )}
@@ -68,6 +71,9 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
   },
   textPrimary: {
+    color: '#FFFFFF',
+  },
+  textPrimaryDisabled: {
     color: '#FFFFFF',
   },
   textSecondary: {

@@ -22,7 +22,6 @@ export default function OrderHeaderSection({
         />
       </View>
 
-      {/* Se houver erro, aplica a margem estendida (styles.wrapperWithError) */}
       <View style={[
         styles.selectorWrapper, 
         !!errorCustomer ? styles.wrapperWithError : null
@@ -33,15 +32,18 @@ export default function OrderHeaderSection({
             !!errorCustomer ? { borderColor: COLORS.error || '#ff3b30' } : null 
           ]} 
           onPress={onSelectCustomer}
+          activeOpacity={0.7}
         >
-          <Text variant="small" color={COLORS.textSecondary}>
+          <Text variant="small" color={COLORS.textSecondary} style={styles.label}>
             Cliente
           </Text>
-          <Text variant="body">
+          
+          <Text variant="body" style={styles.customerName}>
             {selectedCustomer ? selectedCustomer.nome : 'Selecionar cliente'}
           </Text>
-          {!!selectedCustomer && (
-            <Text variant="small" color={COLORS.textSecondary}>
+          
+          {!!selectedCustomer && !!selectedCustomer.telefone && (
+            <Text variant="small" color={COLORS.textSecondary} style={styles.phoneText}>
               {selectedCustomer.telefone}
             </Text>
           )}
@@ -58,17 +60,15 @@ export default function OrderHeaderSection({
 }
 
 const styles = StyleSheet.create({
-  container: {
-    // Mantém o espaçamento geral da seção limpo
-  },
+  container: {},
   inputWrapper: {
     marginBottom: SPACING.md,
   },
   selectorWrapper: {
-    marginBottom: SPACING.md, // Espaçamento padrão normal quando está tudo certo
+    marginBottom: SPACING.md,
   },
   wrapperWithError: {
-    marginBottom: SPACING.xl, // Aumenta consideravelmente o espaçamento se houver erro
+    marginBottom: SPACING.xl,
   },
   selectorCard: {
     backgroundColor: COLORS.surface,
@@ -76,7 +76,20 @@ const styles = StyleSheet.create({
     borderColor: COLORS.border,
     borderRadius: 16,
     padding: SPACING.lg,
-    marginBottom: SPACING.xs, // Margem pequena para separar o card do texto do erro
+    marginBottom: SPACING.xs,
+  },
+  label: {
+    marginBottom: 4,
+  },
+  customerName: {
+    fontSize: 16,
+    fontWeight: '500',
+    color: COLORS.text || '#000000',
+  },
+  phoneText: {
+    marginTop: 4,
+    fontSize: 14,
+    color: COLORS.textSecondary || '#666666',
   },
   errorText: {
     color: COLORS.error || '#ff3b30',
