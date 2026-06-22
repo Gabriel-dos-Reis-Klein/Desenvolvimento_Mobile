@@ -10,7 +10,7 @@ export default function UploadButton({ onPress, isLoading = false }) {
   return (
     <View style={styles.buttonContainer}>
       <Pressable 
-        onPress={isLoading ? null : onPress} // Desativa o clique se estiver carregando
+        onPress={isLoading ? null : onPress}
         onPressIn={() => setIsPressed(true)}
         onPressOut={() => setIsPressed(false)}
         android_ripple={{ 
@@ -19,7 +19,6 @@ export default function UploadButton({ onPress, isLoading = false }) {
         }}
         style={[
           styles.uploadButton,
-          // Força a aplicação dos estilos injetando-os diretamente pelo estado
           isPressed && styles.uploadButtonPressed
         ]}
       >
@@ -28,7 +27,6 @@ export default function UploadButton({ onPress, isLoading = false }) {
           isPressed && styles.iconCirclePressed
         ]}>
           {isLoading ? (
-            // Exibe o Spinner de carregamento com a cor do seu app
             <ActivityIndicator size="small" color={COLORS.primary} />
           ) : (
             <FontAwesome6 name="cloud-arrow-up" size={22} color={COLORS.primary} />
@@ -66,7 +64,7 @@ const styles = StyleSheet.create({
     backgroundColor: COLORS.primary10 || 'rgba(255, 0, 84, 0.05)',
     ...Platform.select({
       ios: {
-        transform: [{ scale: 0.97 }], // Força o efeito de clique tátil no iOS
+        transform: [{ scale: 0.97 }],
       }
     })
   },
@@ -80,7 +78,7 @@ const styles = StyleSheet.create({
     marginBottom: 8,
   },
   iconCirclePressed: {
-    backgroundColor: 'rgba(255, 0, 84, 0.2)', // Escurece o círculo do ícone no clique
+    backgroundColor: 'rgba(255, 0, 84, 0.2)',
   },
   uploadTitle: {
     fontSize: 15,

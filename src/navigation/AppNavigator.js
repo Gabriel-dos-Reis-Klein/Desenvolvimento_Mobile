@@ -25,8 +25,8 @@ import CreateCustomer
 import CreateOrder
   from '../screens/orders/CreateOrder';
 
-import DetailsPedidos
-  from '../screens/orders/DetailsPedidos';
+import OrderDetails
+  from '../screens/orders/OrderDetails';
 
 import { 
   AuthContext 
@@ -63,8 +63,8 @@ export default function AppNavigator() {
             />
 
             <Stack.Screen
-              name="DetailsPedidos"
-              component={DetailsPedidos}
+              name="OrderDetails"
+              component={OrderDetails}
             />
 
             <Stack.Screen

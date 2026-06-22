@@ -1,22 +1,18 @@
 import { z } from 'zod';
 
-const passwordRegex =
+export const passwordRegex =
   /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z\d]).{8,}$/;
 
-export const loginSchema =
-  z.object({
-    email: z
+export const loginSchema = z.object({
+  email: z
     .string()
     .trim()
     .email('E-mail inválido'),
 
-    password: z
-      .string()
-      .min(
-        1,
-        'Senha obrigatória'
-      ),
-  });
+  password: z
+    .string()
+    .min(1, 'Senha obrigatória'),
+});
 
 export const registerSchema = z.object({
   name: z
@@ -44,3 +40,11 @@ export const registerSchema = z.object({
     message: 'As senhas não coincidem',
   }
 );
+
+export const passwordConfirmSchema = z
+  .string()
+  .min(1, 'Este campo é obrigatório')
+  .regex(
+    passwordRegex,
+    'A senha deve conter no mínimo 8 caracteres, incluindo letra maiúscula, minúscula, número e caractere especial'
+  );

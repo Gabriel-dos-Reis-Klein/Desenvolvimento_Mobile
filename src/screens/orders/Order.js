@@ -49,11 +49,11 @@ import {
 } from '../../theme';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
-// Importação para teste, vou remover depois
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export default function OrdersScreen({
   navigation,
+  route,
 }) {
   const [orders, setOrders] =
     useState([]);
@@ -80,23 +80,32 @@ export default function OrdersScreen({
     async () => {
       try {
         setLoading(true);
-
         const data =
           await orderService.getAll();
-        setOrders(data);
+        setOrders(data || []);
       } catch (error) {
         console.error(error);
       } finally {
         setLoading(false);
       }
     },
-
     []
   );
 
   useEffect(() => {
-    fetchOrders();
-  }, []);
+    const unsubscribe = navigation.addListener('focus', () => {
+      fetchOrders();
+    });
+
+    return unsubscribe;
+  }, [navigation, fetchOrders]);
+
+  useEffect(() => {
+    if (route.params?.shouldRefresh) {
+      fetchOrders();
+      navigation.setParams({ shouldRefresh: undefined });
+    }
+  }, [route.params?.shouldRefresh, fetchOrders]);
 
   const filteredOrders = useMemo(() => {
     let filtered =
@@ -207,7 +216,7 @@ export default function OrdersScreen({
               order={item}
               onPress={() =>
                 navigation.navigate(
-                  'DetailsPedidos',
+                  'OrderDetails',
                   {
                     orderId: item.id,
                   }
@@ -228,9 +237,6 @@ export default function OrdersScreen({
 
       <Fab
         onPress={() => {
-          // Simple navigation call — React Navigation will resolve the correct
-          // navigator if the route name exists. This avoids complex state
-          // traversal which was failing to find the route.
           navigation.navigate('CreateOrder');
         }}
       />
