@@ -182,7 +182,7 @@ const styles = StyleSheet.create({
   },
   title: { 
     flex: 1, 
-    fontFamily: FONT_FAMILY.poppinsBold || 'System',
+    fontFamily: FONT_FAMILY.robotoMedium || 'System',
     fontSize: 16,
     fontWeight: '600',
     color: COLORS.text,
@@ -246,10 +246,9 @@ const styles = StyleSheet.create({
     letterSpacing: 0.5,
   },
   priceValue: { 
-    fontFamily: FONT_FAMILY.poppinsBold || 'System', 
+    fontFamily: FONT_FAMILY.robotoBold|| 'System', 
     fontSize: 16,
-    fontWeight: '700',
-    color: COLORS.text || '#1F2937', // Ajustado para a cor clássica do tema antigo
+    color: COLORS.text || '#1F2937',
   },
   actionsContainer: { 
     flexDirection: 'row', 
@@ -277,7 +276,6 @@ const styles = StyleSheet.create({
     color: '#FFFFFF',
     fontSize: 9,
   },
-  /* CENTRALIZADOR DE ÍCONES DO MENU */
   menuIconContainer: {
     width: 24,
     height: 24,
