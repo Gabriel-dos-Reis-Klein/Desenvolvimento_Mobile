@@ -8,7 +8,7 @@ import {
 export default function SearchInput(props) {
   return (
     <Searchbar
-      placeholder="Buscar cliente por nome ou telefone"
+      placeholder="Buscar cliente"
       icon="magnify"
       inputStyle={{
         minHeight: 0,

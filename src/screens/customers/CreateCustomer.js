@@ -1,12 +1,12 @@
-import { useState } from 'react';
-
+import { useState, useEffect, useMemo } from 'react';
 import {
   StyleSheet,
   KeyboardAvoidingView,
   ScrollView,
   Platform,
+  View,
+  Alert,
 } from 'react-native';
-
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { COLORS, SPACING } from '../../theme';
@@ -34,6 +34,36 @@ export default function CreateCustomer({ navigation }) {
     phone: '',
     description: '',
   });
+
+  const isFormModified = useMemo(() => {
+    return (
+      form.values.name !== '' ||
+      form.values.phone !== '' ||
+      form.values.description !== ''
+    );
+  }, [form.values.name, form.values.phone, form.values.description]);
+
+  useEffect(() => {
+    const unsubscribe = navigation.addListener('beforeRemove', (e) => {
+      if (!isFormModified) {
+        return;
+      }
+      e.preventDefault();
+      Alert.alert(
+        'Alterações não salvas',
+        'Você possui alterações que não foram salvas. Deseja realmente sair e descartar essas alterações?',
+        [
+          { text: 'Continuar editando', style: 'cancel', onPress: () => {} },
+          {
+            text: 'Descartar e sair',
+            style: 'destructive',
+            onPress: () => navigation.dispatch(e.data.action),
+          },
+        ]
+      );
+    });
+    return unsubscribe;
+  }, [navigation, isFormModified]);
 
   const setField = (field) => (value) => {
     form.setField(field, value);
@@ -68,50 +98,64 @@ export default function CreateCustomer({ navigation }) {
   };
 
   return (
-    <SafeAreaView style={styles.container}>
-      <KeyboardAvoidingView
-        style={styles.container}
-        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-      >
-        <ScrollView
-          keyboardShouldPersistTaps="handled"
-          contentContainerStyle={styles.scrollContent}
+    <SafeAreaView style={styles.container} edges={['top', 'bottom']}>
+      <View style={styles.header}>
+        <PageHeader
+          title="Criar Cliente"
+          onBack={() => navigation.goBack()}
+        />
+      </View>
+
+      <View style={styles.body}>
+        <KeyboardAvoidingView
+          style={styles.keyboardView}
+          behavior={Platform.OS === 'ios' ? 'padding' : undefined}
         >
-          <PageHeader
-            title="Criar Cliente"
-            onBack={() => navigation.goBack()}
-          />
+          <ScrollView
+            keyboardShouldPersistTaps="handled"
+            style={styles.scroll}
+            contentContainerStyle={styles.content}
+            showsVerticalScrollIndicator={false}
+          >
+            <Input
+              label="Nome"
+              value={form.values.name}
+              onChangeText={setField('name')}
+              error={form.errors.name}
+            />
 
-          <Input
-            label="Nome"
-            value={form.values.name}
-            onChangeText={setField('name')}
-            error={form.errors.name}
-          />
+            <Input
+              label="Telefone"
+              value={form.values.phone}
+              onChangeText={handlePhoneChange}
+              error={form.errors.phone}
+              keyboardType="phone-pad"
+            />
 
-          <Input
-            label="Telefone"
-            value={form.values.phone}
-            onChangeText={handlePhoneChange}
-            error={form.errors.phone}
-            keyboardType="phone-pad"
-          />
+            <Input
+              label="Descrição"
+              type='textarea'
+              value={form.values.description}
+              onChangeText={setField('description')}
+              error={form.errors.description}
+            />
+          </ScrollView>
+        </KeyboardAvoidingView>
+      </View>
 
-          <Input
-            label="Descrição"
-            type='textarea'
-            value={form.values.description}
-            onChangeText={setField('description')}
-            error={form.errors.description}
-          />
-
-          <Button
-            title="Cadastrar Cliente"
-            loading={loading}
-            onPress={handleCreateCustomer}
-          />
-        </ScrollView>
-      </KeyboardAvoidingView>
+      <View style={styles.footer}>
+        <Button
+          title="Cadastrar"
+          loading={loading}
+          onPress={handleCreateCustomer}
+        />
+        <Button 
+          title="Cancelar" 
+          variant="secondary" 
+          onPress={() => navigation.goBack()} 
+          disabled={loading}
+        />
+      </View>
     </SafeAreaView>
   );
 }
@@ -120,11 +164,48 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: COLORS.background,
+    ...Platform.select({
+      web: {
+        position: 'fixed',
+        top: 0,
+        left: 0,
+        right: 0,
+        bottom: 0,
+        height: '100%',
+        width: '100%',
+      },
+    }),
   },
-
-  scrollContent: {
-    flexGrow: 1,
+  header: {
+    paddingHorizontal: SPACING.md,
+    paddingTop: 0,
+  },
+  body: {
+    flex: 1,
+    overflow: 'hidden',
+  },
+  keyboardView: {
+    flex: 1,
+  },
+  scroll: {
+    flex: 1,
+    ...Platform.select({
+      web: { 
+        overflowY: 'auto' 
+      },
+    }),
+  },
+  content: {
     paddingHorizontal: SPACING.xl,
     paddingVertical: SPACING.xl,
+    gap: SPACING.lg,
+    flexGrow: 1,
+  },
+  footer: {
+    paddingHorizontal: SPACING.xl,
+    paddingTop: SPACING.md,
+    paddingBottom: Platform.OS === 'ios' ? 0 : SPACING.xl,
+    gap: SPACING.md,
+    backgroundColor: COLORS.background,
   },
 });

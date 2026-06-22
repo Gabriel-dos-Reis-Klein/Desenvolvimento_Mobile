@@ -22,15 +22,18 @@ import MainTab
 import CreateCustomer
   from '../screens/customers/CreateCustomer';
 
-import PedidoCriacao
-  from '../screens/orders/PedidoCriacao';
+import CreateOrder
+  from '../screens/orders/CreateOrder';
 
-import DetailsPedidos
-  from '../screens/orders/DetailsPedidos';
+import OrderDetails
+  from '../screens/orders/OrderDetails';
 
 import { 
   AuthContext 
 } from '../contexts/AuthContext';
+
+import ItemForm 
+  from '../screens/orders/ItemForm';
 
 const Stack = createStackNavigator();
 
@@ -55,13 +58,18 @@ export default function AppNavigator() {
             />
 
             <Stack.Screen
-              name="PedidoCriacao"
-              component={PedidoCriacao}
+              name="CreateOrder"
+              component={CreateOrder}
             />
 
             <Stack.Screen
-              name="DetailsPedidos"
-              component={DetailsPedidos}
+              name="OrderDetails"
+              component={OrderDetails}
+            />
+
+            <Stack.Screen
+              name="ItemForm"
+              component={ItemForm}
             />
           </>
         ) : (

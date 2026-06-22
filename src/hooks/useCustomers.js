@@ -59,7 +59,6 @@ export function useCustomers() {
         query.replace(/\D/g, '');
 
       const isPhoneSearch =
-        onlyNumbers.length >= 8 &&
         onlyNumbers.length ===
           query.replace(
             /[\s()-]/g,

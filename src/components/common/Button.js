@@ -1,47 +1,82 @@
-import { StyleSheet } from 'react-native';
-import { Button as PaperButton } from 'react-native-paper';
+import { Pressable, StyleSheet, ActivityIndicator, Text } from 'react-native';
+import * as Haptics from 'expo-haptics';
+import { COLORS } from '../../theme'; 
 
-import {
-  COLORS,
-  RADIUS,
-  FONT_FAMILY,
-  SPACING,
-} from '../../theme';
+export default function Button({ title, onPress, variant = 'primary', loading, disabled }) {
+  const handlePress = async () => {
+    if (variant === 'primary') {
+      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light).catch(() => {});
+    }
+    
+    if (onPress) {
+      onPress();
+    }
+  };
 
-export default function Button({
-  title,
-  loading = false,
-  style,
-  ...props
-}) {
+  const isButtonDisabled = disabled || loading;
+
   return (
-    <PaperButton
-      mode="contained"
-      buttonColor={COLORS.primary}
-      contentStyle={styles.content}
-      labelStyle={styles.label}
-      style={[styles.button, style]}
-      loading={loading}
-      disabled={loading}
-      {...props}
+    <Pressable
+      onPress={handlePress}
+      disabled={isButtonDisabled}
+      style={({ pressed }) => [
+        styles.button,
+        variant === 'primary' ? styles.primary : styles.secondary,
+        pressed && styles.pressed,
+        isButtonDisabled && styles.disabled
+      ]}
     >
-      {title}
-    </PaperButton>
+      {loading ? (
+        <ActivityIndicator color={variant === 'primary' ? '#FFFFFF' : COLORS.primary} />
+      ) : (
+        <Text 
+          style={[
+            styles.text, 
+            variant === 'primary' ? styles.textPrimary : styles.textSecondary,
+            (isButtonDisabled && variant === 'primary') && styles.textPrimaryDisabled
+          ]}
+        >
+          {title}
+        </Text>
+      )}
+    </Pressable>
   );
 }
 
 const styles = StyleSheet.create({
   button: {
-    borderRadius: RADIUS.md,
-    marginTop: SPACING.lg,
+    height: 48,
+    borderRadius: 8,
+    justifyContent: 'center',
+    alignItems: 'center',
+    flexDirection: 'row',
   },
-
-  content: {
-    height: 52,
+  primary: {
+    backgroundColor: COLORS.primary,
   },
-
-  label: {
-    fontFamily: FONT_FAMILY.robotoBold,
+  secondary: {
+    backgroundColor: COLORS.black05,
+    borderWidth: 1,
+    borderColor: COLORS.black10,
+  },
+  pressed: {
+    opacity: 0.75, 
+    transform: [{ scale: 0.95 }], 
+  },
+  disabled: {
+    opacity: 0.5,
+  },
+  text: {
     fontSize: 16,
+    fontWeight: 'bold',
+  },
+  textPrimary: {
+    color: '#FFFFFF',
+  },
+  textPrimaryDisabled: {
+    color: '#FFFFFF',
+  },
+  textSecondary: {
+    color: COLORS.textSecondary || '#6C757D',
   },
 });
