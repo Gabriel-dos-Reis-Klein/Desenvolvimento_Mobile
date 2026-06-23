@@ -19,8 +19,3 @@
 ## Recursos Nativos e Funcionalidades
 * **Flash Calendar:** Componente otimizado para exibição, controle e manipulação de calendários e datas.
 * **expo-media-library:** Permite que o aplicativo acesse, leia e salve fotos ou vídeos na galeria do celular.
-
-<!--
-Também adicionar explicar sobre as ferramentas:
-- axios
--->

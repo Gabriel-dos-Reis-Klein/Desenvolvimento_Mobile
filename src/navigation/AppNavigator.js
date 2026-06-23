@@ -28,6 +28,9 @@ import CreateOrder
 import OrderDetails
   from '../screens/orders/OrderDetails';
 
+import CustomerDetails
+  from '../screens/customers/CustomerDetails';
+
 import { 
   AuthContext 
 } from '../contexts/AuthContext';
@@ -65,6 +68,11 @@ export default function AppNavigator() {
             <Stack.Screen
               name="OrderDetails"
               component={OrderDetails}
+            />
+
+            <Stack.Screen
+              name="CustomerDetails"
+              component={CustomerDetails}
             />
 
             <Stack.Screen
