@@ -1,0 +1,10 @@
+export const ORDER_TYPES = {
+  MANUFACTURING:
+    'CONFECCAO',
+
+  REPAIR:
+    'REPARO',
+
+  MODIFICATION:
+    'MODIFICACAO',
+};
