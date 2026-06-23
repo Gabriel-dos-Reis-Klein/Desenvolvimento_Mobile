@@ -12,7 +12,11 @@
     "android": {
       "package": "com.anonymous.Desenvolvimento_Mobile",
       "edgeToEdgeEnabled": true,
-      "primaryColor": "#FF0054"
+      "primaryColor": "#FF0054",
+      "permissions": [
+        "android.permission.RECORD_AUDIO",
+        "android.permission.MODIFY_AUDIO_SETTINGS"
+      ]
     },
     "plugins": [
       "expo-font",
@@ -30,6 +34,11 @@
         }
       ],
       "expo-audio"
-    ]
+    ],
+    "extra": {
+      "eas": {
+        "projectId": "f0b87add-34a6-45b5-b351-08f3bd1ad979"
+      }
+    }
   }
 }
