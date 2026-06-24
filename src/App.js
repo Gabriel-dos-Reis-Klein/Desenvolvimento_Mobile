@@ -6,6 +6,9 @@ import {
   Provider as PaperProvider,
 } from 'react-native-paper';
 
+// IMPORTANTE: Importar o NavigationContainer aqui!
+import { NavigationContainer } from '@react-navigation/native';
+
 import AppNavigator
   from './navigation';
 
@@ -29,8 +32,8 @@ export default function App() {
 
   useEffect(() => {
     async function lockToPortraitSensor() {
-    await ScreenOrientation.lockAsync(ScreenOrientation.OrientationLock.PORTRAIT);
-  }
+      await ScreenOrientation.lockAsync(ScreenOrientation.OrientationLock.PORTRAIT);
+    }
     
     lockToPortraitSensor();
   }, []);
@@ -39,7 +42,9 @@ export default function App() {
     <SafeAreaProvider style={{ flex: 1 }}>
       <PaperProvider>
         <AuthProvider>
-          <AppNavigator />
+          <NavigationContainer>
+            <AppNavigator />
+          </NavigationContainer>
         </AuthProvider>
       </PaperProvider>
     </SafeAreaProvider>

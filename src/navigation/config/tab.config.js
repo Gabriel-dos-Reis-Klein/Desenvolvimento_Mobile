@@ -9,6 +9,7 @@ export const TAB_ICONS = {
   Pedidos: 'shirt',
   Clientes: 'users',
   'Config.': 'gear',
+  Agenda: 'calendar-days',
 };
 
 export const styleOptions = {
