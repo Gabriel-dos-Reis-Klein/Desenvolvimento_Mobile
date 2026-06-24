@@ -23,6 +23,7 @@ import OrderPaymentSection from '../../components/orders/OrderPaymentSection';
 import OrderItemsListSection from '../../components/orders/OrderItemsListSection';
 import OrderStatusSelector from '../../components/orders/OrderStatusSelector';
 
+import { orderSchema } from '../../validations/order.validation';
 import { customerService, orderService, userService } from '../../services';
 import { showError } from '../../errors/showError';
 import { showSuccess } from '../../errors/showSuccess';
@@ -83,7 +84,7 @@ export default function OrderDetails({ navigation, route }) {
       
       let formattedAdvance = 'R$ 0,00';
       if (data.pagamentoAntecipado !== undefined && data.pagamentoAntecipado !== null) {
-        const numericAdvance = Number(data.pagamentoAntecipado);
+        const numericAdvance = Number(data.pagamentoAntecipated);
         formattedAdvance = isNaN(numericAdvance)
           ? 'R$ 0,00'
           : numericAdvance.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
@@ -304,6 +305,25 @@ export default function OrderDetails({ navigation, route }) {
   };
 
   const handleSaveChanges = async () => {
+    const parsedItems = items.map(item => ({
+      ...item,
+      status: item.statusItemPedido,
+    }));
+
+    const result = orderSchema.safeParse({
+      titulo: title,
+      itens: parsedItems,
+      idCliente: selectedCustomer?.id || '',
+      pagamentoAntecipado: currentAdvanceNumber,
+      tipoPagamento: paymentType,
+    });
+
+    if (!result.success) {
+      const firstIssue = result.error.issues[0];
+      Alert.alert('Erro de validação', firstIssue.message);
+      return;
+    }
+
     try {
       setSaveLoading(true);
       setIsSavingOrNavigating(true);
@@ -332,12 +352,12 @@ export default function OrderDetails({ navigation, route }) {
       });
 
       const payload = {
-        titulo: title,
+        titulo: result.data.titulo,
         itens: sanitizedItems,
-        idCliente: selectedCustomer?.id || '',
-        pagamentoAntecipado: currentAdvanceNumber,
+        idCliente: result.data.idCliente,
+        pagamentoAntecipado: result.data.pagamentoAntecipado,
         statusPedido: status,
-        tipoPagamento: paymentType,
+        tipoPagamento: result.data.tipoPagamento,
       };
 
       const response = await orderService.update(orderId, payload);

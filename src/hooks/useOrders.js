@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
+import { useFocusEffect } from '@react-navigation/native';
 import { orderService } from '../services';
 import { showError } from '../errors/showError';
 
@@ -33,36 +34,35 @@ export function useOrders() {
     return filters;
   }, [search, statusFilter, sortBy]);
 
-  const fetchOrders = useCallback(async (showFeedback = false) => {
+  const fetchOrders = useCallback(async (showLoading = false) => {
+    if (showLoading) setLoading(true);
     try {
       const data = await orderService.getAll({
         params: buildFilters(),
       });
-
       setOrders(data || []);
     } catch (error) {
-      if (showFeedback) {
-        showError(error);
-      }
+      showError(error);
     } finally {
       setLoading(false);
       setRefreshing(false);
     }
   }, [buildFilters]);
 
-  const refresh = async () => {
-    setRefreshing(true);
-    await fetchOrders(true);
-  };
+  useFocusEffect(
+    useCallback(() => {
+      fetchOrders(false);
+    }, [fetchOrders])
+  );
 
   useEffect(() => {
     fetchOrders(true);
-  }, [fetchOrders]);
-
-  useEffect(() => {
-    if (loading) return;
-    fetchOrders(false);
   }, [search, statusFilter, sortBy]);
+
+  const refresh = async () => {
+    setRefreshing(true);
+    await fetchOrders(false);
+  };
 
   return {
     orders,

@@ -7,10 +7,10 @@ import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view
 import PageHeader from '../../components/common/PageHeader';
 import Input from '../../components/common/Input';
 import Button from '../../components/common/Button';
+import Tabs from '../../components/common/Tabs'; // Importando o novo componente genérico
+
 import ServiceTypeSelector from '../../components/orders/ServiceTypeSelector'; 
 import ItemStatusSelector from '../../components/orders/ItemStatusSelector';
-
-import ItemTabs from '../../components/orders/ItemTabs';
 import ItemAttachmentsTab from '../../components/orders/ItemAttachmentsTab';
 import DateSelectorRow from '../../components/orders/DateSelectorRow';
 import DateTimePickerModal from '../../components/orders/DateTimePickerModal';
@@ -43,7 +43,7 @@ export default function ItemForm({ navigation, route }) {
   const [descricao, setDescricao] = useState('');
   const [valor, setValor] = useState('');
   const [tipo, setTipo] = useState('CONFECCAO');
-  const [statusItemPedido, setStatusItemPedido] = useState('PRODUCAO'); // Renomeado com sucesso
+  const [statusItemPedido, setStatusItemPedido] = useState('PRODUCAO'); 
   const [imagens, setImagens] = useState([]); 
 
   const [fieldErrors, setFieldErrors] = useState({});
@@ -71,6 +71,12 @@ export default function ItemForm({ navigation, route }) {
     dataEntrega: null,
     dataProva: null,
   });
+
+  // Configuração dinâmica das abas para o componente Tabs
+  const itemTabsConfig = useMemo(() => [
+    { id: 'DADOS', label: 'Dados Gerais' },
+    { id: 'ANEXOS', label: 'Anexos', count: imagens.length }
+  ], [imagens.length]);
 
   useEffect(() => {
     if ((mode === 'edit' || mode === 'view') && item) {
@@ -296,7 +302,7 @@ export default function ItemForm({ navigation, route }) {
     const finalData = {
       ...validation.data,
       statusItemPedido: statusItemPedido,
-      status: statusItemPedido // Fallback opcional para compatibilidade
+      status: statusItemPedido 
     };
 
     navigation.navigate({
@@ -315,7 +321,12 @@ export default function ItemForm({ navigation, route }) {
         <PageHeader title={mode === 'create' ? 'Novo Item' : 'Editar Item'} onBack={() => navigation.goBack()} />
       </View>
 
-      <ItemTabs activeTab={activeTab} setActiveTab={setActiveTab} attachmentsCount={imagens.length} />
+      {/* Aplicado o novo componente genérico de abas */}
+      <Tabs 
+        tabs={itemTabsConfig} 
+        activeTab={activeTab} 
+        setActiveTab={setActiveTab} 
+      />
 
       <KeyboardAwareScrollView 
         style={styles.body}

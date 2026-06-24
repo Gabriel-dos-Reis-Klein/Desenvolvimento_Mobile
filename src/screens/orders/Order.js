@@ -16,7 +16,7 @@ import IconButton from '../../components/common/IconButton';
 import EmptyState from '../../components/common/EmptyState';
 import Fab from '../../components/common/Fab';
 import OrderCard from '../../components/orders/OrderCard';
-import Loading from '../../components/common/Loading';
+import OrderSkeleton from '../../components/orders/OrderSkeleton';
 
 export default function Order({ navigation }) {
   const {
@@ -95,14 +95,14 @@ export default function Order({ navigation }) {
           <Menu.Item title="Filtrar: Concluídos" leadingIcon="check-circle-outline" onPress={() => { setStatusFilter('CONCLUIDO'); setMenuVisible(false); }} />
           <Divider />
           <Menu.Item title="Ordenar: Título" leadingIcon="sort-alphabetical-ascending" onPress={() => { setSortBy('TITULO'); setMenuVisible(false); }} />
-          <Menu.Item title="Ordenar: Cliente" leadingIcon="account-sort" onPress={() => { setSortBy('NOME'); setMenuVisible(false); }} />
+          <Menu.Item title="Ordenar: Cliente" leadingIcon="account" onPress={() => { setSortBy('NOME'); setMenuVisible(false); }} />
           <Menu.Item title="Ordenar: Prazo" leadingIcon="calendar-clock" onPress={() => { setSortBy('PRAZO'); setMenuVisible(false); }} />
         </Menu>
       </View>
 
       <View style={styles.contentContainer}>
         {loading ? (
-          <Loading />
+          <OrderSkeleton />
         ) : orders.length === 0 ? (
           <EmptyState message="Nenhum pedido encontrado" />
         ) : (

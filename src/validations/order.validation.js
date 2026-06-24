@@ -117,30 +117,6 @@ export const orderItemSchema = z
         });
       }
     }
-
-    if (data.dataEntrega) {
-      const entrega = new Date(data.dataEntrega);
-
-      if (entrega > prazo) {
-        ctx.addIssue({
-          code: z.ZodIssueCode.custom,
-          path: ['dataEntrega'],
-          message: 'A data de entrega não pode ser posterior ao prazo final',
-        });
-      }
-    }
-
-    if (data.dataProva) {
-      const prova = new Date(data.dataProva);
-
-      if (prova > prazo) {
-        ctx.addIssue({
-          code: z.ZodIssueCode.custom,
-          path: ['dataProva'],
-          message: 'A data da prova deve ocorrer antes do prazo final',
-        });
-      }
-    }
   });
 
 export const orderSchema = z

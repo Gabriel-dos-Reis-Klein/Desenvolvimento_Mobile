@@ -10,6 +10,7 @@ import CreateCustomer from '../screens/customers/CreateCustomer';
 import CreateOrder from '../screens/orders/CreateOrder';
 import OrderDetails from '../screens/orders/OrderDetails';
 import ItemForm from '../screens/orders/ItemForm';
+import CustomerDetails from '../screens/customers/CustomerDetails'
 
 import { EditProfile, CreateUser } from '../screens/settings';
 
@@ -36,6 +37,7 @@ export default function AppNavigator() {
 
             {/* Customers */}
             <Stack.Screen name="CreateCustomer" component={CreateCustomer} />
+            <Stack.Screen name="CustomerDetails" component={CustomerDetails} />
 
             {/* Settings */}
             <Stack.Screen name="EditProfile" component={EditProfile} />

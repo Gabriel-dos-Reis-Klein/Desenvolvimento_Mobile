@@ -3,23 +3,24 @@ import { View, Pressable, StyleSheet } from 'react-native';
 import { Text } from 'react-native-paper';
 import { COLORS, SPACING, FONT_FAMILY } from '../../theme';
 
-export default function ItemTabs({ activeTab, setActiveTab, attachmentsCount }) {
+export default function Tabs({ tabs, activeTab, setActiveTab }) {
   return (
     <View style={styles.tabContainer}>
-      <Pressable 
-        style={[styles.tabButton, activeTab === 'DADOS' && styles.tabButtonActive]} 
-        onPress={() => setActiveTab('DADOS')}
-      >
-        <Text style={[styles.tabText, activeTab === 'DADOS' && styles.tabTextActive]}>Dados Gerais</Text>
-      </Pressable>
-      <Pressable 
-        style={[styles.tabButton, activeTab === 'ANEXOS' && styles.tabButtonActive]} 
-        onPress={() => setActiveTab('ANEXOS')}
-      >
-        <Text style={[styles.tabText, activeTab === 'ANEXOS' && styles.tabTextActive]}>
-          Anexos ({attachmentsCount})
-        </Text>
-      </Pressable>
+      {tabs.map((tab) => {
+        const isActive = activeTab === tab.id;
+        
+        return (
+          <Pressable 
+            key={tab.id}
+            style={[styles.tabButton, isActive && styles.tabButtonActive]} 
+            onPress={() => setActiveTab(tab.id)}
+          >
+            <Text style={[styles.tabText, isActive && styles.tabTextActive]}>
+              {tab.label} {tab.count !== undefined ? `(${tab.count})` : ''}
+            </Text>
+          </Pressable>
+        );
+      })}
     </View>
   );
 }
