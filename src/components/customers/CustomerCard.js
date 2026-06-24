@@ -112,8 +112,8 @@ const styles = StyleSheet.create({
   },
 
   highlight: {
-    color: '#6750A4',
-    backgroundColor: '#f3edf7',
+    color: COLORS.primary,
+    backgroundColor: COLORS.primary10,
     fontWeight: '700',
     borderRadius: 4,
   },

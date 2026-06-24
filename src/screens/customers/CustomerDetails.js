@@ -1,4 +1,4 @@
-import { useEffect, useState, useMemo } from 'react';
+import { useEffect, useState, useMemo, useRef } from 'react';
 import {
   KeyboardAvoidingView,
   Platform,
@@ -7,6 +7,7 @@ import {
   View,
   ActivityIndicator,
   Alert,
+  Text,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
@@ -15,23 +16,50 @@ import { COLORS, SPACING } from '../../theme';
 import PageHeader from '../../components/common/PageHeader';
 import Button from '../../components/common/Button';
 import PasswordConfirmModal from '../../components/common/PasswordConfirmModal';
+import Tabs from '../../components/common/Tabs';
+
+// Importando o OrderCard (ajuste o caminho se a sua estrutura de pastas for diferente)
+import OrderCard from '../../components/orders/OrderCard'; 
 
 import CustomerNameSection from '../../components/customers/CustomerNameSection';
 import CustomerPhoneSection from '../../components/customers/CustomerPhoneSection';
 import CustomerDescSection from '../../components/customers/CustomerDescSection';
 
-import { customerService, userService } from '../../services';
+import { customerSchema } from '../../validations/customer.validation';
+import { customerService, orderService, userService } from '../../services';
 import { showError } from '../../errors/showError';
 import { showSuccess } from '../../errors/showSuccess';
 
-export default function OrderDetails({ navigation, route }) {
+const maskPhone = (value) => {
+  if (!value) return '';
+  const cleanValue = value.replace(/\D/g, '');
+  
+  if (cleanValue.length <= 10) {
+    return cleanValue
+      .replace(/^(\d{2})(\d)/g, '($1) $2')
+      .replace(/(\d{4})(\d)/, '$1-$2')
+      .substring(0, 14);
+  }
+  
+  return cleanValue
+    .replace(/^(\d{2})(\d)/g, '($1) $2')
+    .replace(/(\d{5})(\d)/, '$1-$2')
+    .substring(0, 15);
+};
+
+export default function CustomerDetails({ navigation, route }) {
   const { customerId } = route.params || {};
+
+  const [activeTab, setActiveTab] = useState('DADOS'); 
+  const [pedidos, setPedidos] = useState([]);
 
   const [nome, setNome] = useState('');
   const [telefone, setTelefone] = useState('');
   const [descricao, setDescricao] = useState('');
+  
+  const [errors, setErrors] = useState({});
   const [passwordModalVisible, setPasswordModalVisible] = useState(false);
-  const [isSavingOrNavigating, setIsSavingOrNavigating] = useState(false);
+  const isSavingOrNavigatingRef = useRef(false);
 
   const [initialState, setInitialState] = useState({
     nome: '',
@@ -43,18 +71,28 @@ export default function OrderDetails({ navigation, route }) {
   const [saveLoading, setSaveLoading] = useState(false);
   const [deleteLoading, setDeleteLoading] = useState(false);
 
-  const loadCustomerDetails = async () => {
+  const customerTabsConfig = useMemo(() => [
+    { id: 'DADOS', label: 'Dados Gerais' },
+    { id: 'PEDIDOS', label: 'Pedidos', count: pedidos.length }
+  ], [pedidos.length]);
+
+  const loadCustomerData = async () => {
     try {
       setLoading(true);
-      const data = await customerService.getById(customerId);
       
-      const formattedName = data.nome || '';
-      const formattedTelephone = data.telefone || '';
-      const formattedDescription = data.descricao || '';
+      const [customerData, ordersData] = await Promise.all([
+        customerService.getById(customerId),
+        orderService.getByCustomer(customerId)
+      ]);
+      
+      const formattedName = customerData.nome || '';
+      const formattedTelephone = maskPhone(customerData.telefone || '');
+      const formattedDescription = customerData.descricao || '';
       
       setNome(formattedName);
       setTelefone(formattedTelephone);
       setDescricao(formattedDescription);
+      setPedidos(ordersData || []);
 
       setInitialState({
         nome: formattedName,
@@ -71,19 +109,19 @@ export default function OrderDetails({ navigation, route }) {
   };
 
   useEffect(() => {
-    loadCustomerDetails();
+    loadCustomerData();
   }, [customerId]);
 
   useEffect(() => {
     if (route.params?.shouldRefresh) {
-      loadCustomerDetails();
+      loadCustomerData();
       navigation.setParams({ shouldRefresh: undefined });
     }
   }, [route.params?.shouldRefresh]);
 
   useEffect(() => {
     const unsubscribe = navigation.addListener('focus', () => {
-      setIsSavingOrNavigating(false);
+      isSavingOrNavigatingRef.current = false;
     });
     return unsubscribe;
   }, [navigation]);
@@ -98,7 +136,7 @@ export default function OrderDetails({ navigation, route }) {
 
   useEffect(() => {
     const unsubscribe = navigation.addListener('beforeRemove', (e) => {
-      if (!isModified || isSavingOrNavigating) {
+      if (!isModified || isSavingOrNavigatingRef.current) {
         return;
       }
       e.preventDefault();
@@ -116,20 +154,48 @@ export default function OrderDetails({ navigation, route }) {
       );
     });
     return unsubscribe;
-  }, [navigation, isModified, isSavingOrNavigating]);
+  }, [navigation, isModified]);
+
+  const handlePhoneChange = (text) => {
+    if (errors.phone) setErrors(prev => ({ ...prev, phone: undefined }));
+    setTelefone(maskPhone(text));
+  };
 
   const handleSaveChanges = async () => {
+    setErrors({});
+    
+    const result = customerSchema.safeParse({
+      name: nome,
+      phone: telefone,
+      description: descricao,
+    });
+
+    if (!result.success) {
+      const formattedErrors = {};
+      result.error.issues.forEach((issue) => {
+        const path = issue.path[0];
+        formattedErrors[path] = issue.message;
+      });
+      
+      setErrors(formattedErrors);
+      setActiveTab('DADOS'); 
+      
+      const firstMessage = result.error.issues[0].message;
+      Alert.alert('Erro de validação', firstMessage);
+      return;
+    }
+
     try {
       setSaveLoading(true);
-      setIsSavingOrNavigating(true);
+      isSavingOrNavigatingRef.current = true;
       
       const payload = {
-        nome: nome,
-        telefone: telefone,
-        descricao: descricao,
+        nome: result.data.name,
+        telefone: result.data.phone,
+        descricao: result.data.description,
       };
 
-      const response = await customerService.update(customerId, payload); 
+      await customerService.update(customerId, payload); 
 
       setInitialState({
         nome,
@@ -139,7 +205,7 @@ export default function OrderDetails({ navigation, route }) {
 
       showSuccess('Alterações salvas com sucesso!');
     } catch (error) {
-      setIsSavingOrNavigating(false);
+      isSavingOrNavigatingRef.current = false;
       showError(error);
     } finally {
       setSaveLoading(false);
@@ -150,20 +216,20 @@ export default function OrderDetails({ navigation, route }) {
     setPasswordModalVisible(false);
     try {
       setDeleteLoading(true);
-      setIsSavingOrNavigating(true);
+      isSavingOrNavigatingRef.current = true;
       const validation = await userService.passwordConfirm({ senha: password });
 
       if (validation && validation.valido) {
         await customerService.remove(customerId);
-        showSuccess('Pedido excluído com sucesso!', () => {
+        showSuccess('Cliente excluído com sucesso!', () => {
           navigation.navigate('Main');
         });
       } else {
-        setIsSavingOrNavigating(false);
+        isSavingOrNavigatingRef.current = false;
         Alert.alert('Erro', 'Senha incorreta. Ação cancelada.');
       }
     } catch (error) {
-      setIsSavingOrNavigating(false);
+      isSavingOrNavigatingRef.current = false;
       showError(error);
     } finally {
       setDeleteLoading(false);
@@ -179,56 +245,100 @@ export default function OrderDetails({ navigation, route }) {
   }
 
   return (
-    <SafeAreaView style={styles.container}>
+    <SafeAreaView style={styles.container} edges={['top', 'bottom']}>
       <View style={styles.headerContainer}>
         <PageHeader title="Detalhes do Cliente" onBack={() => navigation.goBack()} />
       </View>
 
+      <Tabs 
+        tabs={customerTabsConfig} 
+        activeTab={activeTab} 
+        setActiveTab={setActiveTab} 
+      />
+
       <View style={styles.body}>
-        <KeyboardAvoidingView
-          behavior={Platform.OS === 'ios' ? 'padding' : undefined}
-          style={styles.keyboardView}
-        >
-          <ScrollView
-            showsVerticalScrollIndicator={false}
-            keyboardShouldPersistTaps="handled"
-            style={styles.scroll}
-            contentContainerStyle={styles.content}
+        {activeTab === 'DADOS' ? (
+          <KeyboardAvoidingView
+            behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+            style={styles.keyboardView}
           >
-            <CustomerNameSection
-              nome={nome}
-              onNameChange={setNome}
-              editable={true}
-            />
-            <CustomerPhoneSection
-              telefone={telefone}
-              onPhoneChange={setTelefone}
-              editable={true}
-            />
-            <CustomerDescSection
-              descricao={descricao}
-              onDescChange={setDescricao}
-              editable={true}
-            />
+            <ScrollView
+              showsVerticalScrollIndicator={false}
+              keyboardShouldPersistTaps="handled"
+              style={styles.scroll}
+              contentContainerStyle={styles.content}
+            >
+              <CustomerNameSection
+                nome={nome}
+                onNameChange={(text) => {
+                  if (errors.name) setErrors(prev => ({ ...prev, name: undefined }));
+                  setNome(text);
+                }}
+                editable={true}
+                error={errors.name}
+              />
+              <CustomerPhoneSection
+                telefone={telefone}
+                onPhoneChange={handlePhoneChange}
+                editable={true}
+                error={errors.phone}
+              />
+              <CustomerDescSection
+                descricao={descricao}
+                onDescChange={(text) => {
+                  if (errors.description) setErrors(prev => ({ ...prev, description: undefined }));
+                  setDescricao(text);
+                }}
+                editable={true}
+                error={errors.description}
+              />
+            </ScrollView>
+          </KeyboardAvoidingView>
+        ) : (
+          <ScrollView 
+            style={styles.scroll} 
+            contentContainerStyle={styles.ordersContent}
+            showsVerticalScrollIndicator={false}
+          >
+            {pedidos.length === 0 ? (
+              <View style={styles.emptyContainer}>
+                <Text style={styles.emptyText}>Nenhum pedido encontrado para este cliente.</Text>
+              </View>
+            ) : (
+              // Substituído o TouchableOpacity customizado pelo componente reaproveitável OrderCard
+              pedidos.map((pedido) => (
+                <OrderCard 
+                  key={pedido.id} 
+                  order={pedido}
+                  onPress={() => {
+                    isSavingOrNavigatingRef.current = true;
+                    navigation.navigate('OrderDetails', { orderId: pedido.id });
+                  }}
+                />
+              ))
+            )}
           </ScrollView>
-        </KeyboardAvoidingView>
+        )}
       </View>
 
-      <View style={styles.footer}>
-        <Button 
-          title="Salvar Alterações" 
-          disabled={!isModified} 
-          loading={saveLoading}
-          onPress={handleSaveChanges} 
-        />
-        <Button 
-          title="Excluir Pedido" 
-          variant="secondary" 
-          style={styles.btnDelete}
-          textColor={COLORS.error || '#ff3b30'}
-          onPress={() => setPasswordModalVisible(true)} 
-        />
-      </View>
+      {activeTab === 'DADOS' && (
+        <View style={styles.footer}>
+          <Button 
+            title="Salvar Alterações" 
+            disabled={!isModified} 
+            loading={saveLoading}
+            onPress={handleSaveChanges} 
+          />
+          <Button 
+            title="Excluir Cliente" 
+            variant="secondary" 
+            style={styles.btnDelete}
+            textColor={COLORS.error || '#ff3b30'}
+            onPress={() => setPasswordModalVisible(true)} 
+          />
+        </View>
+      )}
+
       <PasswordConfirmModal
         visible={passwordModalVisible}
         onClose={() => setPasswordModalVisible(false)}
@@ -284,6 +394,22 @@ const styles = StyleSheet.create({
     paddingVertical: SPACING.xl, 
     flexGrow: 1, 
     gap: SPACING.md 
+  },
+  ordersContent: {
+    paddingHorizontal: SPACING.xl,
+    paddingVertical: SPACING.xl,
+    gap: SPACING.md,
+  },
+  emptyContainer: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: SPACING.xxl,
+  },
+  emptyText: {
+    color: '#586069',
+    fontSize: 15,
+    textAlign: 'center',
   },
   footer: { 
     padding: SPACING.xl, 
