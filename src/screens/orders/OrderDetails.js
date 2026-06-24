@@ -340,12 +340,8 @@ export default function OrderDetails({ navigation, route }) {
         tipoPagamento: paymentType,
       };
 
-      console.log("PAYLOAD ENVIADO PARA A API:", JSON.stringify(payload, null, 2));
-
       const response = await orderService.update(orderId, payload);
       
-      console.log("RESPOSTA DA API:", response);
-
       if (response && response.itens) {
         const updatedFromResponse = response.itens.map((apiItem, idx) => {
           const apiStatus = apiItem.statusItemPedido || apiItem.status || 'PRODUCAO';

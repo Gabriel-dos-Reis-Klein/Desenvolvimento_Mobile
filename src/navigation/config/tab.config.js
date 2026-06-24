@@ -8,6 +8,7 @@ import { FONT_FAMILY } from '../../theme';
 export const TAB_ICONS = {
   Pedidos: 'shirt',
   Clientes: 'users',
+  Configurações: 'gear',
 };
 
 export const styleOptions = {
