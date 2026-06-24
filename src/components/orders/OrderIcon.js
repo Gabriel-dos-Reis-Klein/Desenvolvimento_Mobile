@@ -1,35 +1,33 @@
-import {
-  FontAwesome6
-} from '@expo/vector-icons';
-
-import {
-  ORDER_TYPE_ICONS,
-} from '../../constants';
-
-import {
-  COLORS,
-  ORDER_TYPE_STYLES,
-} from '../../theme';
+import { MaterialCommunityIcons } from '@expo/vector-icons';
+import { COLORS } from '../../theme';
 
 export default function OrderIcon({
-  type,
+  status,
   size = 24,
-  color = COLORS.black70,
+  color = '#6750A4', // 💜 Violeta padrão do React Native Paper (MD3 Primary)
   style,
   ...props
 }) {
-  const icon =
-    ORDER_TYPE_STYLES[
-      type
-    ] || 'dots-horizontal';
+  const getStatusIcon = () => {
+    switch (status) {
+      case 'PENDENTE':
+        return 'clock-outline';
+      case 'EXECUTANDO':
+        return 'progress-wrench';
+      case 'CONCLUIDO':
+        return 'check-circle-outline';
+      default:
+        return 'help-circle-outline';
+    }
+  };
 
   return (
-    <FontAwesome6
-      name={icon}
+    <MaterialCommunityIcons
+      name={getStatusIcon()}
       size={size}
       color={color}
       style={style}
       {...props}
-    />
+    />  
   );
 }

@@ -3,7 +3,6 @@ import { View, StyleSheet, TouchableOpacity, Text } from 'react-native';
 import {
   COLORS,
   SPACING,
-  RADIUS,
   TYPOGRAPHY,
   FONT_FAMILY,
 } from '../../theme';
@@ -17,8 +16,6 @@ export default function CustomerCard({
 }) {
   const firstLetter =
     customer?.nome?.charAt(0)?.toUpperCase() || '?';
-
-  const normalize = (text = '') => text.toString();
 
   const renderHighlighted = (text = '') => {
     if (!highlightQuery.trim()) {
@@ -47,7 +44,7 @@ export default function CustomerCard({
     <TouchableOpacity
       style={[styles.card, style]}
       onPress={onPress}
-      activeOpacity={0.8}
+      activeOpacity={0.7}
       {...props}
     >
       <View style={styles.avatar}>
@@ -56,11 +53,11 @@ export default function CustomerCard({
 
       <View style={styles.content}>
         <Text style={styles.name} numberOfLines={1}>
-          {renderHighlighted(customer.nome)}
+          {renderHighlighted(customer?.nome)}
         </Text>
 
         <Text style={styles.phone}>
-          {renderHighlighted(customer.telefone)}
+          {renderHighlighted(customer?.telefone)}
         </Text>
       </View>
     </TouchableOpacity>
@@ -71,31 +68,31 @@ const styles = StyleSheet.create({
   card: {
     flexDirection: 'row',
     alignItems: 'center',
-    paddingVertical: SPACING.sm,
-    borderRadius: RADIUS.lg,
-    backgroundColor: COLORS.surface,
-    marginBottom: SPACING.md,
+    paddingVertical: SPACING.md || 12,
+    marginBottom: SPACING.xs || 4,
+    borderBottomWidth: 1,
+    borderBottomColor: '#f1f3f5',
   },
 
   avatar: {
-    width: 55,
-    height: 55,
-    borderRadius: 55 / 2,
+    width: 48, 
+    height: 48,
+    borderRadius: 48 / 2,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: COLORS.primary10,
+    backgroundColor: COLORS.surfaceSecondary || '#f1f3f5',
   },
 
   avatarText: {
     ...TYPOGRAPHY.body,
     fontFamily: FONT_FAMILY.robotoBold,
-    color: COLORS.primary,
-    fontSize: 20,
+    color: '#6750A4',
+    fontSize: 18,
   },
 
   content: {
     flex: 1,
-    marginLeft: SPACING.md,
+    marginLeft: SPACING.md || 12,
   },
 
   name: {
@@ -105,7 +102,8 @@ const styles = StyleSheet.create({
   },
 
   phone: {
-    marginTop: SPACING.xs,
+    marginTop: 2,
+    fontSize: 13,
     color: COLORS.textSecondary,
   },
 
@@ -114,8 +112,8 @@ const styles = StyleSheet.create({
   },
 
   highlight: {
-    color: COLORS.primary,
-    backgroundColor: COLORS.primary10,
+    color: '#6750A4',
+    backgroundColor: '#f3edf7',
     fontWeight: '700',
     borderRadius: 4,
   },
