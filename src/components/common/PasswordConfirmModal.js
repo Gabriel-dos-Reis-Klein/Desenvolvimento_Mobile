@@ -1,100 +1,78 @@
-import { useState } from 'react';
-import {
-  Modal,
-  StyleSheet,
-  View,
-  TouchableOpacity,
-} from 'react-native';
-import FontAwesome6 from 'react-native-vector-icons/FontAwesome6';
+import React, { useState } from 'react';
+import { Modal, StyleSheet, Text, View, TouchableOpacity } from 'react-native';
+import { Ionicons } from '@expo/vector-icons'; // Certifique-se de ter o pacote de ícones ou substitua pelo seu componente de ícone
 
 import { COLORS, SPACING } from '../../theme';
-import { passwordConfirmSchema } from '../../validations/auth.validation';
-import Text from './Text';
+import Input from './Input';
 import Button from './Button';
-import Input from './Input'; 
 
 export default function PasswordConfirmModal({
   visible,
   onClose,
   onConfirm,
   loading,
+  title = "Confirmar Senha",
+  description = "Por favor, insira sua senha atual para confirmar esta operação.",
+  buttonTitle = "Confirmar"
 }) {
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
 
-    const handleConfirm = () => {
-        try {
-            const { passwordRegex } = require('../../validations/auth.validation');
-            
-            if (!password.trim()) {
-              setError('Este campo é obrigatório');
-              return;
-            }
-
-            if (!passwordRegex.test(password)) {
-              setError('A senha deve conter no mínimo 8 caracteres, incluindo letra maiúscula, minúscula, número e caractere especial');
-              return;
-            }
-
-            setError('');
-            onConfirm(password);
-            setPassword('');
-        } catch (e) {
-            setError('Erro ao validar os dados.');
-        }
-    };
+  const handleConfirm = () => {
+    if (!password.trim()) {
+      setError('A senha é obrigatória');
+      return;
+    }
+    setError('');
+    onConfirm(password);
+    setPassword('');
+  };
 
   const handleClose = () => {
-    setPassword('');
     setError('');
+    setPassword('');
     onClose();
   };
 
   return (
     <Modal
       visible={visible}
-      transparent={true}
+      transparent
       animationType="fade"
-      statusBarTranslucent={true}
       onRequestClose={handleClose}
     >
       <View style={styles.overlay}>
         <View style={styles.content}>
-          <TouchableOpacity
-            style={styles.closeButton}
+          {/* Botão de fechar absoluto no topo direito */}
+          <TouchableOpacity 
+            style={styles.closeButton} 
             onPress={handleClose}
             disabled={loading}
+            activeOpacity={0.7}
           >
-            <FontAwesome6
-              name="xmark"
-              size={20}
-              color={COLORS.textSecondary || '#6C757D'}
-            />
+            <Ionicons name="close" size={22} color={COLORS.textSecondary || '#6C757D'} />
           </TouchableOpacity>
 
-          <Text style={styles.title}>Confirmar Exclusão</Text>
-          <Text style={styles.subtitle}>
-            Digite sua senha para confirmar a exclusão do pedido:
-          </Text>
+          <Text style={styles.title}>{title}</Text>
+          <Text style={styles.subtitle}>{description}</Text>
 
           <Input
-            label="Senha"
             type="password"
+            label="Senha Atual"
+            placeholder="Digite sua senha de acesso"
             value={password}
             onChangeText={(text) => {
-              setPassword(text);
               if (error) setError('');
+              setPassword(text);
             }}
             error={error}
-            editable={!loading}
-            autoFocus={true}
           />
 
           <Button
-            title="Excluir"
-            onPress={handleConfirm}
-            disabled={!password || loading}
+            title={buttonTitle}
             loading={loading}
+            disabled={loading}
+            onPress={handleConfirm}
             style={styles.actionButton}
           />
         </View>
@@ -119,6 +97,8 @@ const styles = StyleSheet.create({
     padding: SPACING.xl,
     gap: SPACING.md,
     position: 'relative',
+    borderWidth: 1,
+    borderColor: COLORS.border,
   },
   closeButton: {
     position: 'absolute',
@@ -137,9 +117,12 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: COLORS.textSecondary || '#6C757D',
     marginBottom: SPACING.xs,
+    lineHeight: 20,
   },
   actionButton: {
-    backgroundColor: COLORS.error || '#ff3b30',
+    // Se quiser o botão vermelho de erro original, use COLORS.error. 
+    // Para alteração de senha, o COLORS.primary costuma ser mais amigável.
+    backgroundColor: COLORS.primary, 
     marginTop: SPACING.xs,
   },
 });

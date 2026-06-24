@@ -1,8 +1,8 @@
 import { Pressable, StyleSheet, ActivityIndicator, Text } from 'react-native';
 import * as Haptics from 'expo-haptics';
-import { COLORS } from '../../theme'; 
+import { COLORS, SPACING } from '../../theme'; 
 
-export default function Button({ title, onPress, variant = 'primary', loading, disabled }) {
+export default function Button({ title, onPress, variant = 'primary', loading, disabled, style }) {
   const handlePress = async () => {
     if (variant === 'primary') {
       Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light).catch(() => {});
@@ -23,7 +23,8 @@ export default function Button({ title, onPress, variant = 'primary', loading, d
         styles.button,
         variant === 'primary' ? styles.primary : styles.secondary,
         pressed && styles.pressed,
-        isButtonDisabled && styles.disabled
+        isButtonDisabled && styles.disabled,
+        style
       ]}
     >
       {loading ? (
