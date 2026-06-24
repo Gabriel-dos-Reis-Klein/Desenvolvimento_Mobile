@@ -8,6 +8,7 @@ import { FONT_FAMILY } from '../../theme';
 export const TAB_ICONS = {
   Pedidos: 'shirt',
   Clientes: 'users',
+  Configurações: 'gear',
 };
 
 export const styleOptions = {
@@ -31,7 +32,7 @@ export function createScreenOptions({ route }, insets) {
     ...styleOptions,
 
     tabBarStyle: {
-      height: 70 + (insets?.bottom || 0), 
+      height: 70 + (insets?.bottom || 0),
       backgroundColor: COLORS.surface,
       borderTopColor: COLORS.black05,
       elevation: 8,
