@@ -98,10 +98,7 @@ export default function OrderDetails({ navigation, route }) {
           titulo: item.titulo || item.descricaoPeca || '',
           descricao: item.descricao || item.observacoes || '',
           valor: Number(item.valor) || 0,
-          tipo: String(item.tipo).toUpperCase(),
-          status: currentStatus,
-          statusPedido: currentStatus,
-          statusItem: currentStatus,
+          tipo: String(item.tipo || 'CONFECCAO').toUpperCase(),
           statusItemPedido: currentStatus,
           dataPrazo: item.dataPrazo ? new Date(item.dataPrazo).toISOString() : null,
           dataEntrega: item.dataEntrega ? new Date(item.dataEntrega).toISOString() : null,
@@ -178,7 +175,7 @@ export default function OrderDetails({ navigation, route }) {
     const duplicated = {
       ...itemToDuplicate,
       id: undefined,
-      titulo: `${itemToDuplicate.titulo || itemToDuplicate.descricaoPeca || ''} (Cópia)`,
+      titulo: `${itemToDuplicate.titulo || ''} (Cópia)`,
     };
     setItems((prevItems) => [...prevItems, duplicated]);
   };
@@ -190,9 +187,6 @@ export default function OrderDetails({ navigation, route }) {
         index === indexToUpdate
           ? {
               ...item,
-              status: safeStatus,
-              statusPedido: safeStatus,
-              statusItem: safeStatus,
               statusItemPedido: safeStatus,
             }
           : item
@@ -229,13 +223,10 @@ export default function OrderDetails({ navigation, route }) {
 
         updatedItems[targetIndex] = {
           id: itemId || updatedItems[targetIndex]?.id,
-          titulo: rawItem.titulo || rawItem.descricaoPeca || '',
-          descricao: rawItem.descricao || rawItem.observacoes || '',
+          titulo: rawItem.titulo || '',
+          descricao: rawItem.descricao || '',
           valor: Number(rawItem.valor) || 0,
-          tipo: String(rawItem.tipo).toUpperCase(),
-          status: currentStatus,
-          statusPedido: currentStatus,
-          statusItem: currentStatus,
+          tipo: String(rawItem.tipo || 'CONFECCAO').toUpperCase(),
           statusItemPedido: currentStatus,
           dataPrazo: rawItem.dataPrazo ? new Date(rawItem.dataPrazo).toISOString() : null,
           dataEntrega: rawItem.dataEntrega ? new Date(rawItem.dataEntrega).toISOString() : null,
@@ -318,19 +309,19 @@ export default function OrderDetails({ navigation, route }) {
       setIsSavingOrNavigating(true);
 
       const sanitizedItems = items.map(item => {
-        const currentStatus = item.statusItemPedido || item.status || item.statusPedido || item.statusItem || 'PRODUCAO';
+        const currentStatus = item.statusItemPedido || 'PRODUCAO';
         const itemId = item.id || item.idItem || item._id || item.id_item;
         
         const cleanItem = {
-          titulo: item.titulo || item.descricaoPeca || '',
-          descricao: item.descricao || item.observacoes || '',
+          titulo: item.titulo || '',
+          descricao: item.descricao || '',
           valor: Number(item.valor) || 0,
-          statusItemPedido: currentStatus, 
-          imagem: item.imagem || item.fotos || [],
+          statusItemPedido: currentStatus,
+          imagem: item.imagem || [],
           dataPrazo: item.dataPrazo ? new Date(item.dataPrazo).toISOString() : null,
           dataEntrega: item.dataEntrega ? new Date(item.dataEntrega).toISOString() : null,
           dataProva: item.dataProva ? new Date(item.dataProva).toISOString() : null,
-          tipo: String(item.tipo).toUpperCase(),
+          tipo: String(item.tipo || 'CONFECCAO').toUpperCase(),
         };
 
         if (itemId) {
@@ -349,32 +340,42 @@ export default function OrderDetails({ navigation, route }) {
         tipoPagamento: paymentType,
       };
 
+      console.log("PAYLOAD ENVIADO PARA A API:", JSON.stringify(payload, null, 2));
+
       const response = await orderService.update(orderId, payload);
+      
+      console.log("RESPOSTA DA API:", response);
 
       if (response && response.itens) {
         const updatedFromResponse = response.itens.map((apiItem, idx) => {
-          const apiStatus = apiItem.statusItemPedido || items[idx]?.statusItemPedido || 'PRODUCAO';
+          const apiStatus = apiItem.statusItemPedido || apiItem.status || 'PRODUCAO';
           const apiId = apiItem.id || items[idx]?.id;
           return {
             ...items[idx],
             id: apiId,
-            status: apiStatus,
-            statusPedido: apiStatus,
-            statusItem: apiStatus,
             statusItemPedido: apiStatus,
           };
         });
         setItems(updatedFromResponse);
+        
+        setInitialState({
+          title,
+          customerId: selectedCustomer?.id ? String(selectedCustomer.id) : '',
+          paymentType,
+          status,
+          advance,
+          items: JSON.parse(JSON.stringify(updatedFromResponse)),
+        });
+      } else {
+        setInitialState({
+          title,
+          customerId: selectedCustomer?.id ? String(selectedCustomer.id) : '',
+          paymentType,
+          status,
+          advance,
+          items: JSON.parse(JSON.stringify(items)),
+        });
       }
-      
-      setInitialState({
-        title,
-        customerId: selectedCustomer?.id ? String(selectedCustomer.id) : '',
-        paymentType,
-        status,
-        advance,
-        items: JSON.parse(JSON.stringify(items)),
-      });
 
       showSuccess('Alterações salvas com sucesso!');
     } catch (error) {
