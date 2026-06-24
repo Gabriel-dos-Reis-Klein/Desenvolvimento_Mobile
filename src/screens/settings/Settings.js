@@ -28,7 +28,6 @@ export default function Settings({ navigation }) {
         try {
           const userId = user.id || user.sub;
           
-          // Alterado de getProfile para getById, acompanhando a padronização do BaseService
           const freshData = await userService.getById(userId);
           
           if (freshData) {
@@ -44,21 +43,19 @@ export default function Settings({ navigation }) {
   }, [navigation, user, refreshUser]);
 
   const handleLogout = () => {
+    if (Platform.OS === 'web') {
+      const confirm = window.confirm('Deseja sair da conta?');
+      if (confirm) signOut();
+      return;
+    }
+
     Alert.alert(
       'Sair da Conta',
-      'Tem certeza que deseja encerrar sua sessão atual? Você precisará fazer login novamente para acessar seus dados.',
+      'Tem certeza?',
       [
-        {
-          text: 'Cancelar',
-          style: 'cancel',
-        },
-        {
-          text: 'Sair',
-          style: 'destructive',
-          onPress: signOut,
-        },
-      ],
-      { cancelable: true }
+        { text: 'Cancelar', style: 'cancel' },
+        { text: 'Sair', style: 'destructive', onPress: signOut },
+      ]
     );
   };
 
