@@ -7,6 +7,7 @@ import {
 } from '../services/storage/auth.storage';
 
 import { setLogoutCallback } from '../services/api/interceptors';
+import { userService } from '../services';
 
 function decodeJwt(token) {
   try {
@@ -23,30 +24,43 @@ export const AuthContext = createContext({});
 export function AuthProvider({ children }) {
   const [signed, setSigned] = useState(false);
   const [loading, setLoading] = useState(true);
-  const [user, setUser] = useState(null); // { id, nome, email, permissao }
+  const [user, setUser] = useState(null);
+
+  const fetchUserProfile = useCallback(async (token) => {
+      try {
+        const payload = decodeJwt(token);
+
+        if (payload && payload.sub) {
+          const fullUserData = await userService.getById(payload.sub);
+          setUser(fullUserData);
+          setSigned(true);
+        }
+      } catch (error) {
+        console.error("Erro ao carregar dados do usuário:", error);
+        await removeAuth();
+        setUser(null);
+        setSigned(false);
+      }
+    }, []);
 
   useEffect(() => {
     async function loadAuth() {
       const token = await getToken();
 
       if (token) {
-        const payload = decodeJwt(token);
-        setUser(payload);
-        setSigned(true);
+        await fetchUserProfile(token);
       }
 
       setLoading(false);
     }
 
     loadAuth();
-  }, []);
+  }, [fetchUserProfile]);
 
   const signIn = useCallback(async ({ token }) => {
     await saveAuth({ token });
-    const payload = decodeJwt(token);
-    setUser(payload);
-    setSigned(true);
-  }, []);
+    await fetchUserProfile(token);
+  }, [fetchUserProfile]);
 
   const signOut = useCallback(async () => {
     await removeAuth();
@@ -73,7 +87,6 @@ export function AuthProvider({ children }) {
         signOut,
         user,
         refreshUser,
-        isAdmin: user?.permissao === 'ADMIN',
       }}
     >
       {children}

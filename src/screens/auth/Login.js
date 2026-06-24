@@ -100,6 +100,7 @@ export default function Login({ navigation }) {
             title="Entrar"
             loading={loading}
             onPress={handleLogin}
+            style={styles.button}
           />
         </ScrollView>
       </KeyboardAvoidingView>
@@ -118,5 +119,9 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     paddingHorizontal: SPACING.xl,
     paddingVertical: SPACING.xl,
+  },
+
+  button:{
+    marginTop: SPACING.md,
   },
 });

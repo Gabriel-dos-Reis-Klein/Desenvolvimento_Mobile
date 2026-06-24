@@ -130,6 +130,7 @@ export default function Register({ navigation }) {
             title="Cadastrar-se"
             loading={loading}
             onPress={handleRegister}
+            style={styles.button}
           />
         </ScrollView>
       </KeyboardAvoidingView>
@@ -148,5 +149,9 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     paddingHorizontal: SPACING.xl,
     paddingVertical: SPACING.xl,
+  },
+
+  button:{
+    marginTop: SPACING.md,
   },
 });
