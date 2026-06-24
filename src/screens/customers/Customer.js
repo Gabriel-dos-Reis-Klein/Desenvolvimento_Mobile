@@ -53,6 +53,7 @@ export default function Customer({ navigation }) {
       <SearchInput
         value={searchText}
         onChangeText={setSearchText}
+        placeholder="Pesquisar por cliente"
       />
 
       <View style={styles.toolbar}>
