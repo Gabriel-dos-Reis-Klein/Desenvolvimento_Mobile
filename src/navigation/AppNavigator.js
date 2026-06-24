@@ -10,43 +10,50 @@ import CreateCustomer from '../screens/customers/CreateCustomer';
 import CreateOrder from '../screens/orders/CreateOrder';
 import OrderDetails from '../screens/orders/OrderDetails';
 import ItemForm from '../screens/orders/ItemForm';
-import CustomerDetails from '../screens/customers/CustomerDetails'
+import CustomerDetails from '../screens/customers/CustomerDetails';
 
-import { EditProfile, CreateUser } from '../screens/settings';
+import { Settings, EditProfile, ChangePassword } from '../screens/settings';
 
 import { AuthContext } from '../contexts/AuthContext';
 
 const Stack = createStackNavigator();
 
 export default function AppNavigator() {
-  const { signed, loading, isAdmin } = useContext(AuthContext);
+  const { signed, loading } = useContext(AuthContext);
 
   if (loading) return null;
 
   return (
     <NavigationContainer>
-      <Stack.Navigator screenOptions={{ headerShown: false }}>
+      <Stack.Navigator 
+        screenOptions={{ 
+          headerShown: false,
+          cardStyle: { backgroundColor: 'transparent' },
+          gestureEnabled: true,
+        }}
+      >
         {signed ? (
           <>
+            {/* Fluxo Principal com Abas */}
             <Stack.Screen name="Main" component={MainTab} />
 
-            {/* Orders */}
+            {/* Pedidos (Orders) */}
             <Stack.Screen name="CreateOrder" component={CreateOrder} />
             <Stack.Screen name="OrderDetails" component={OrderDetails} />
             <Stack.Screen name="ItemForm" component={ItemForm} />
 
-            {/* Customers */}
+            {/* Clientes (Customers) */}
             <Stack.Screen name="CreateCustomer" component={CreateCustomer} />
             <Stack.Screen name="CustomerDetails" component={CustomerDetails} />
 
-            {/* Settings */}
+            {/* Configurações (Settings) - Apenas visualização e edição do próprio perfil */}
+            <Stack.Screen name="Settings" component={Settings} />
             <Stack.Screen name="EditProfile" component={EditProfile} />
-            {isAdmin && (
-              <Stack.Screen name="CreateUser" component={CreateUser} />
-            )}
+            <Stack.Screen name="ChangePassword" component={ChangePassword} />
           </>
         ) : (
           <>
+            {/* Fluxo de Autenticação */}
             <Stack.Screen name="Login" component={Login} />
             <Stack.Screen name="Register" component={Register} />
           </>

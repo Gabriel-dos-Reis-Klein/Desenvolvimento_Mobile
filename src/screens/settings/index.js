@@ -1,3 +1,4 @@
-export { default as Settings } from './Settings';
-export { default as EditProfile } from './EditProfile';
-export { default as CreateUser } from './CreateUser';
+import Settings from './Settings';
+import EditProfile from './EditProfile';
+import ChangePassword from './ChangePassword';
+export { Settings, EditProfile, ChangePassword };

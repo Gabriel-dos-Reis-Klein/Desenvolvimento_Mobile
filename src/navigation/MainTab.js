@@ -3,10 +3,11 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import Customer from '../screens/customers/Customer';
 import Order from '../screens/orders/Order';
-import Settings from '../screens/settings/Settings';
 import { createScreenOptions } from './config/tab.config';
 
 const Tab = createBottomTabNavigator();
+
+const EmptyComponent = () => null;
 
 export default function MainTab() {
   const insets = useSafeAreaInsets();
@@ -17,7 +18,17 @@ export default function MainTab() {
     >
       <Tab.Screen name="Pedidos" component={Order} />
       <Tab.Screen name="Clientes" component={Customer} />
-      <Tab.Screen name="Config." component={Settings} />
+      <Tab.Screen 
+        name="Config." 
+        component={EmptyComponent} 
+        listeners={({ navigation }) => ({
+          tabPress: (e) => {
+            e.preventDefault(); 
+            
+            navigation.navigate('Settings');
+          },
+        })}
+      />
     </Tab.Navigator>
   );
 }

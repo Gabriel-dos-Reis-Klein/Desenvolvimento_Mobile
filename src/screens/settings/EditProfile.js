@@ -1,101 +1,97 @@
-import { useState, useContext, useMemo, useEffect } from 'react';
+import { useEffect, useState, useMemo, useRef, useContext } from 'react';
 import {
-  StyleSheet,
   KeyboardAvoidingView,
-  ScrollView,
   Platform,
+  ScrollView,
+  StyleSheet,
   View,
+  ActivityIndicator,
   Alert,
-  Text as RNText,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { COLORS, SPACING } from '../../theme';
+
 import PageHeader from '../../components/common/PageHeader';
-import Input from '../../components/common/Input';
 import Button from '../../components/common/Button';
+import Input from '../../components/common/Input'; 
 
-import { useForm } from '../../hooks';
-import {
-  editProfileSchema,
-  changePasswordSchema,
-} from '../../validations/settings.validation';
-
+import { editProfileSchema } from '../../validations/settings.validation';
 import { userService } from '../../services';
-import { showError } from '../../errors/showError';
-import { showSuccess } from '../../errors/showSuccess';
 import { AuthContext } from '../../contexts/AuthContext';
-
-function SectionTitle({ label, style }) {
-  return (
-    <View style={[sectionStyles.container, style]}>
-      <View style={sectionStyles.accent} />
-      <RNText style={sectionStyles.text}>{label}</RNText>
-    </View>
-  );
-}
-
-const sectionStyles = StyleSheet.create({
-  container: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: SPACING.sm,
-    marginBottom: SPACING.xs,
-  },
-  accent: {
-    width: 3,
-    height: 14,
-    borderRadius: 2,
-    backgroundColor: COLORS.primary,
-  },
-  text: {
-    fontSize: 13,
-    fontWeight: '700',
-    color: COLORS.textSecondary,
-    letterSpacing: 1,
-    textTransform: 'uppercase',
-  },
-});
+import { showError } from '../../errors/showError';
 
 export default function EditProfile({ navigation }) {
-  const { user, refreshUser } = useContext(AuthContext);
+  const { user, refreshUser } = useContext(AuthContext); 
 
-  const [loadingProfile, setLoadingProfile] = useState(false);
-  const [loadingPassword, setLoadingPassword] = useState(false);
+  const [nome, setNome] = useState('');
+  const [email, setEmail] = useState('');
+  
+  const [errors, setErrors] = useState({});
+  const isSavingOrNavigatingRef = useRef(false);
 
-  const profileForm = useForm(editProfileSchema, {
-    nome: user?.nome ?? '',
-    email: user?.email ?? '',
+  const [initialState, setInitialState] = useState({
+    nome: '',
+    email: '',
   });
 
-  const passwordForm = useForm(changePasswordSchema, {
-    novaSenha: '',
-    confirmarSenha: '',
-  });
+  const [loading, setLoading] = useState(true);
+  const [saveLoading, setSaveLoading] = useState(false);
 
-  const isProfileModified = useMemo(
-    () =>
-      profileForm.values.nome !== (user?.nome ?? '') ||
-      profileForm.values.email !== (user?.email ?? ''),
-    [profileForm.values, user]
-  );
+  const loadProfileData = async () => {
+    try {
+      setLoading(true);
+      const userId = user?.id || user?.sub; 
+      
+      const profileData = await userService.getById(userId);
+      
+      const formattedName = profileData.nome || '';
+      const formattedEmail = profileData.email || '';
+      
+      setNome(formattedName);
+      setEmail(formattedEmail);
 
-  const isPasswordModified = useMemo(
-    () =>
-      passwordForm.values.novaSenha !== '' ||
-      passwordForm.values.confirmarSenha !== '',
-    [passwordForm.values]
-  );
+      setInitialState({
+        nome: formattedName,
+        email: formattedEmail,
+      });
+    } catch (error) {
+      showError(error);
+      navigation.goBack();
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    loadProfileData();
+  }, []);
+
+  useEffect(() => {
+    const unsubscribe = navigation.addListener('focus', () => {
+      isSavingOrNavigatingRef.current = false;
+    });
+    return unsubscribe;
+  }, [navigation]);
+
+  const isModified = useMemo(() => {
+    return (
+      nome.trim() !== initialState.nome ||
+      email.trim().toLowerCase() !== initialState.email
+    );
+  }, [nome, email, initialState]);
 
   useEffect(() => {
     const unsubscribe = navigation.addListener('beforeRemove', (e) => {
-      if (!isProfileModified && !isPasswordModified) return;
+      if (!isModified || isSavingOrNavigatingRef.current) {
+        return;
+      }
       e.preventDefault();
       Alert.alert(
         'Alterações não salvas',
-        'Você possui alterações não salvas. Deseja sair e descartá-las?',
+        'Você possui alterações no seu perfil que não foram salvas. Deseja realmente descartar?',
         [
-          { text: 'Continuar editando', style: 'cancel' },
+          { text: 'Continuar editando', style: 'cancel', onPress: () => {} },
           {
             text: 'Descartar e sair',
             style: 'destructive',
@@ -105,112 +101,125 @@ export default function EditProfile({ navigation }) {
       );
     });
     return unsubscribe;
-  }, [navigation, isProfileModified, isPasswordModified]);
+  }, [navigation, isModified]);
 
-  const handleSaveProfile = async () => {
-    const data = profileForm.validate();
-    if (!data) return;
-    try {
-      setLoadingProfile(true);
-      const updated = await userService.updateMe({
-        nome: data.nome,
-        email: data.email,
+  const handleSaveChanges = async () => {
+    setErrors({});
+    
+    const result = editProfileSchema.safeParse({
+      nome: nome,
+      email: email,
+    });
+
+    if (!result.success) {
+      const formattedErrors = {};
+      result.error.issues.forEach((issue) => {
+        const path = issue.path[0];
+        formattedErrors[path] = issue.message;
       });
-      refreshUser(updated);
-      showSuccess('Perfil atualizado com sucesso!');
+      
+      setErrors(formattedErrors);
+      
+      const firstMessage = result.error.issues[0].message;
+      Alert.alert('Erro de validação', firstMessage);
+      return;
+    }
+
+    try {
+      setSaveLoading(true);
+      isSavingOrNavigatingRef.current = true;
+
+      const payload = {
+        nome: nome.trim(),
+        email: email.trim().toLowerCase(),
+      };
+
+      const updatedUserFromServer = await userService.updateMe(payload); 
+
+      setInitialState({
+        nome: updatedUserFromServer.nome || payload.nome,
+        email: updatedUserFromServer.email || payload.email,
+      });
+
+      refreshUser(updatedUserFromServer);
+
+      Alert.alert(
+        'Sucesso',
+        'Os dados do seu perfil foram atualizados com sucesso.',
+        [{ text: 'OK', onPress: () => navigation.goBack() }]
+      );
     } catch (error) {
-      showError(error);
+      isSavingOrNavigatingRef.current = false;
+      console.log('Detalhes do erro na requisição:', error?.response?.data || error);
+      Alert.alert(
+        'Falha na Atualização',
+        error?.response?.data?.message || 'Não foi possível atualizar seus dados. Tente novamente mais tarde.'
+      );
     } finally {
-      setLoadingProfile(false);
+      setSaveLoading(false);
     }
   };
 
-  const handleChangePassword = async () => {
-    const data = passwordForm.validate();
-    if (!data) return;
-    try {
-      setLoadingPassword(true);
-      await userService.updatePassword({ senha: data.novaSenha });
-      passwordForm.reset();
-      showSuccess('Senha alterada com sucesso!');
-    } catch (error) {
-      showError(error);
-    } finally {
-      setLoadingPassword(false);
-    }
-  };
+  if (loading) {
+    return (
+      <View style={styles.center}>
+        <ActivityIndicator size="large" color={COLORS.primary} />
+      </View>
+    );
+  }
 
   return (
     <SafeAreaView style={styles.container} edges={['top', 'bottom']}>
-      <View style={styles.header}>
+      <View style={styles.headerContainer}>
         <PageHeader title="Editar Perfil" onBack={() => navigation.goBack()} />
       </View>
 
-      <View style={styles.body}>
-        <KeyboardAvoidingView
-          style={styles.keyboardView}
-          behavior={Platform.OS === 'ios' ? 'padding' : undefined}
-        >
+      <KeyboardAvoidingView
+        behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+        style={styles.keyboardView}
+      >
+        <View style={styles.body}>
           <ScrollView
+            showsVerticalScrollIndicator={false}
             keyboardShouldPersistTaps="handled"
             style={styles.scroll}
             contentContainerStyle={styles.content}
-            showsVerticalScrollIndicator={false}
           >
-            {/* Dados pessoais */}
-            <SectionTitle label="Dados pessoais" />
-
             <Input
-              label="Nome"
-              value={profileForm.values.nome}
-              onChangeText={(v) => profileForm.setField('nome', v)}
-              error={profileForm.errors.nome}
+              label="Nome Completo"
+              value={nome}
+              onChangeText={(text) => {
+                if (errors.nome) setErrors(prev => ({ ...prev, nome: undefined }));
+                setNome(text);
+              }}
+              error={errors.nome}
+              placeholder="Digite seu nome"
             />
 
             <Input
               label="E-mail"
-              value={profileForm.values.email}
-              onChangeText={(v) => profileForm.setField('email', v)}
-              keyboardType="email-address"
+              value={email}
               autoCapitalize="none"
-              error={profileForm.errors.email}
-            />
-
-            <Button
-              title="Salvar dados"
-              loading={loadingProfile}
-              disabled={!isProfileModified || loadingProfile}
-              onPress={handleSaveProfile}
-            />
-
-            {/* Alterar senha */}
-            <SectionTitle label="Alterar senha" style={styles.sectionGap} />
-
-            <Input
-              type="password"
-              label="Nova senha"
-              value={passwordForm.values.novaSenha}
-              onChangeText={(v) => passwordForm.setField('novaSenha', v)}
-              error={passwordForm.errors.novaSenha}
-            />
-
-            <Input
-              type="password"
-              label="Confirmar nova senha"
-              value={passwordForm.values.confirmarSenha}
-              onChangeText={(v) => passwordForm.setField('confirmarSenha', v)}
-              error={passwordForm.errors.confirmarSenha}
-            />
-
-            <Button
-              title="Alterar senha"
-              loading={loadingPassword}
-              disabled={!isPasswordModified || loadingPassword}
-              onPress={handleChangePassword}
+              keyboardType="email-address"
+              onChangeText={(text) => {
+                if (errors.email) setErrors(prev => ({ ...prev, email: undefined }));
+                setEmail(text);
+              }}
+              error={errors.email}
+              placeholder="seu.email@provedor.com"
             />
           </ScrollView>
-        </KeyboardAvoidingView>
-      </View>
+        </View>
+
+        <View style={styles.footer}>
+          <Button 
+            title="Salvar Perfil" 
+            disabled={!isModified || saveLoading} 
+            loading={saveLoading}
+            onPress={handleSaveChanges} 
+          />
+        </View>
+      </KeyboardAvoidingView>
     </SafeAreaView>
   );
 }
@@ -219,35 +228,41 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: COLORS.background,
-    ...Platform.select({
-      web: {
-        position: 'fixed',
-        top: 0, left: 0, right: 0, bottom: 0,
-        height: '100%', width: '100%',
-      },
-    }),
   },
-  header: {
+  headerContainer: { 
     paddingHorizontal: SPACING.md,
+    paddingBottom: SPACING.xs,
   },
-  body: {
-    flex: 1,
-    overflow: 'hidden',
+  center: { 
+    flex: 1, 
+    justifyContent: 'center', 
+    alignItems: 'center', 
+    backgroundColor: COLORS.background 
   },
-  keyboardView: {
-    flex: 1,
+  keyboardView: { 
+    flex: 1 
+  },
+  body: { 
+    flex: 1, 
+    overflow: 'hidden' 
   },
   scroll: {
     flex: 1,
-    ...Platform.select({ web: { overflowY: 'auto' } }),
   },
-  content: {
-    paddingHorizontal: SPACING.xl,
-    paddingVertical: SPACING.lg,
-    gap: SPACING.md,
-    flexGrow: 1,
+  content: { 
+    paddingHorizontal: SPACING.xl, 
+    paddingVertical: SPACING.xl, 
+    flexGrow: 1, 
+    gap: SPACING.md 
   },
-  sectionGap: {
-    marginTop: SPACING.lg,
-  },
+  footer: { 
+    paddingHorizontal: SPACING.xl, 
+    paddingVertical: SPACING.md,
+    backgroundColor: COLORS.background,
+    ...Platform.select({
+      ios: {
+        paddingBottom: SPACING.xl,
+      }
+    })
+  }
 });
