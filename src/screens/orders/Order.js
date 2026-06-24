@@ -20,7 +20,7 @@ import OrderSkeleton from '../../components/orders/OrderSkeleton';
 
 export default function Order({ navigation }) {
   const {
-    orders,
+    orders = [], 
     loading,
     refreshing,
     searchText,
@@ -51,9 +51,12 @@ export default function Order({ navigation }) {
     }
   };
 
+  const safeOrdersList = orders || [];
+  const totalOrdersCount = safeOrdersList.length;
+
   return (
     <SafeAreaView style={styles.container} edges={['top']}>
-      <ListHeader title="Pedidos" total={orders.length} />
+      <ListHeader title="Pedidos" total={totalOrdersCount} />
 
       <SearchInput
         value={searchText}
@@ -103,12 +106,12 @@ export default function Order({ navigation }) {
       <View style={styles.contentContainer}>
         {loading ? (
           <OrderSkeleton />
-        ) : orders.length === 0 ? (
+        ) : totalOrdersCount === 0 ? (
           <EmptyState message="Nenhum pedido encontrado" />
         ) : (
           <FlatList
-            data={orders}
-            keyExtractor={(item) => item.id}
+            data={safeOrdersList}
+            keyExtractor={(item) => String(item.id)}
             renderItem={({ item }) => (
               <OrderCard
                 order={item}

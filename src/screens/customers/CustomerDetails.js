@@ -18,7 +18,6 @@ import Button from '../../components/common/Button';
 import PasswordConfirmModal from '../../components/common/PasswordConfirmModal';
 import Tabs from '../../components/common/Tabs';
 
-// Importando o OrderCard (ajuste o caminho se a sua estrutura de pastas for diferente)
 import OrderCard from '../../components/orders/OrderCard'; 
 
 import CustomerNameSection from '../../components/customers/CustomerNameSection';

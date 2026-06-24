@@ -84,7 +84,8 @@ export default function OrderDetails({ navigation, route }) {
       
       let formattedAdvance = 'R$ 0,00';
       if (data.pagamentoAntecipado !== undefined && data.pagamentoAntecipado !== null) {
-        const numericAdvance = Number(data.pagamentoAntecipated);
+        // Correção do erro de digitação (pagamentoAntecipated -> pagamentoAntecipado)
+        const numericAdvance = Number(data.pagamentoAntecipado); 
         formattedAdvance = isNaN(numericAdvance)
           ? 'R$ 0,00'
           : numericAdvance.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
@@ -165,7 +166,7 @@ export default function OrderDetails({ navigation, route }) {
           text: 'Remover',
           style: 'destructive',
           onPress: () => {
-            setItems((prevItems) => prevItems.filter((_, index) => index !== indexToRemove));
+            setItems((prevItems) => (prevItems || []).filter((_, index) => index !== indexToRemove));
           },
         },
       ]
@@ -178,13 +179,13 @@ export default function OrderDetails({ navigation, route }) {
       id: undefined,
       titulo: `${itemToDuplicate.titulo || ''} (Cópia)`,
     };
-    setItems((prevItems) => [...prevItems, duplicated]);
+    setItems((prevItems) => [...(prevItems || []), duplicated]);
   };
 
   const handleItemStatusChange = (indexToUpdate, newStatus) => {
     const safeStatus = newStatus || 'PRODUCAO';
     setItems((prevItems) =>
-      prevItems.map((item, index) =>
+      (prevItems || []).map((item, index) =>
         index === indexToUpdate
           ? {
               ...item,
@@ -214,7 +215,7 @@ export default function OrderDetails({ navigation, route }) {
       const itemId = rawItem.id || rawItem.idItem || rawItem._id;
 
       setItems((prevItems) => {
-        const updatedItems = [...prevItems];
+        const updatedItems = [...(prevItems || [])];
         
         let targetIndex = indexToUpdate;
         if (itemId) {
@@ -222,18 +223,20 @@ export default function OrderDetails({ navigation, route }) {
           if (foundIndex !== -1) targetIndex = foundIndex;
         }
 
-        updatedItems[targetIndex] = {
-          id: itemId || updatedItems[targetIndex]?.id,
-          titulo: rawItem.titulo || '',
-          descricao: rawItem.descricao || '',
-          valor: Number(rawItem.valor) || 0,
-          tipo: String(rawItem.tipo || 'CONFECCAO').toUpperCase(),
-          statusItemPedido: currentStatus,
-          dataPrazo: rawItem.dataPrazo ? new Date(rawItem.dataPrazo).toISOString() : null,
-          dataEntrega: rawItem.dataEntrega ? new Date(rawItem.dataEntrega).toISOString() : null,
-          dataProva: rawItem.dataProva ? new Date(rawItem.dataProva).toISOString() : null,
-          imagem: rawItem.imagem || rawItem.fotos || [],
-        };
+        if (updatedItems[targetIndex] || targetIndex === updatedItems.length) {
+          updatedItems[targetIndex] = {
+            id: itemId || updatedItems[targetIndex]?.id,
+            titulo: rawItem.titulo || '',
+            descricao: rawItem.descricao || '',
+            valor: Number(rawItem.valor) || 0,
+            tipo: String(rawItem.tipo || 'CONFECCAO').toUpperCase(),
+            statusItemPedido: currentStatus,
+            dataPrazo: rawItem.dataPrazo ? new Date(rawItem.dataPrazo).toISOString() : null,
+            dataEntrega: rawItem.dataEntrega ? new Date(rawItem.dataEntrega).toISOString() : null,
+            dataProva: rawItem.dataProva ? new Date(rawItem.dataProva).toISOString() : null,
+            imagem: rawItem.imagem || rawItem.fotos || [],
+          };
+        }
         return updatedItems;
       });
 
@@ -249,7 +252,7 @@ export default function OrderDetails({ navigation, route }) {
   }, [navigation]);
 
   const total = useMemo(() => {
-    return items.reduce((acc, item) => {
+    return (items || []).reduce((acc, item) => {
       const value = Number(item.valor);
       return acc + (isNaN(value) ? 0 : value);
     }, 0);
@@ -305,7 +308,7 @@ export default function OrderDetails({ navigation, route }) {
   };
 
   const handleSaveChanges = async () => {
-    const parsedItems = items.map(item => ({
+    const parsedItems = (items || []).map(item => ({
       ...item,
       status: item.statusItemPedido,
     }));
@@ -328,7 +331,7 @@ export default function OrderDetails({ navigation, route }) {
       setSaveLoading(true);
       setIsSavingOrNavigating(true);
 
-      const sanitizedItems = items.map(item => {
+      const sanitizedItems = (items || []).map(item => {
         const currentStatus = item.statusItemPedido || 'PRODUCAO';
         const itemId = item.id || item.idItem || item._id || item.id_item;
         
@@ -477,7 +480,7 @@ export default function OrderDetails({ navigation, route }) {
             />
 
             <OrderSummaryCard
-              quantity={items.length}
+              quantity={items ? items.length : 0}
               total={total}
               advance={currentAdvanceNumber}
               balance={dynamicSaldo}
@@ -491,12 +494,12 @@ export default function OrderDetails({ navigation, route }) {
             />
 
             <OrderItemsListSection
-              items={items}
+              items={items || []}
               onEditItem={(item, index) => handleNavigateToItem('edit', item, index)}
               onDeleteItem={(item, index) => handleDeleteItem(index)} 
               onDuplicateItem={(item) => handleDuplicateItem(item)} 
-              onAddItem={() => handleNavigateToItem('create', null, items.length)} 
-              onItemStatusChange={handleItemStatusChange}
+              onAddItem={() => handleNavigateToItem('create', null, items ? items.length : 0)} 
+              onStatusChange={handleItemStatusChange} // Ajustado para bater com a propriedade interna do componente
             />
           </ScrollView>
         </KeyboardAvoidingView>
@@ -576,18 +579,15 @@ const styles = StyleSheet.create({
       } 
     }),
   },
-  content: { 
-    paddingHorizontal: SPACING.xl, 
-    paddingVertical: SPACING.xl, 
-    flexGrow: 1, 
-    gap: SPACING.md 
+  content: {
+    paddingHorizontal: SPACING.xl,
+    paddingVertical: SPACING.xl,
+    flexGrow: 1,
+    gap: SPACING.md,
   },
   footer: { 
     padding: SPACING.xl, 
     gap: SPACING.md, 
     backgroundColor: COLORS.background 
   },
-  btnDelete: { 
-    borderColor: COLORS.error || '#ff3b30' 
-  }
 });
