@@ -17,7 +17,7 @@ export default function MainTab() {
     >
       <Tab.Screen name="Pedidos" component={Order} />
       <Tab.Screen name="Clientes" component={Customer} />
-      <Tab.Screen name="Configurações" component={Settings} />
+      <Tab.Screen name="Config." component={Settings} />
     </Tab.Navigator>
   );
 }

@@ -26,7 +26,6 @@ import { showError } from '../../errors/showError';
 import { showSuccess } from '../../errors/showSuccess';
 import { AuthContext } from '../../contexts/AuthContext';
 
-// ── Section title ────────────────────────────────────────────────────────────
 function SectionTitle({ label, style }) {
   return (
     <View style={[sectionStyles.container, style]}>
@@ -58,7 +57,6 @@ const sectionStyles = StyleSheet.create({
   },
 });
 
-// ── Screen ───────────────────────────────────────────────────────────────────
 export default function EditProfile({ navigation }) {
   const { user, refreshUser } = useContext(AuthContext);
 
