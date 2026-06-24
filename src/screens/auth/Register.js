@@ -56,6 +56,14 @@ export default function Register({ navigation }) {
 
       if (token) {
         await signIn({ token });
+        
+        setTimeout(() => {
+          navigation.reset({
+            index: 0,
+            routes: [{ name: 'Welcome' }],
+          });
+        }, 50);
+        
         return;
       }
 

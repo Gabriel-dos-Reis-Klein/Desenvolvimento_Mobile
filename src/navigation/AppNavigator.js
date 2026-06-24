@@ -11,6 +11,7 @@ import CreateOrder from '../screens/orders/CreateOrder';
 import OrderDetails from '../screens/orders/OrderDetails';
 import ItemForm from '../screens/orders/ItemForm';
 import CustomerDetails from '../screens/customers/CustomerDetails';
+import Welcome from '../screens/auth/Welcome';
 
 import { Settings, EditProfile, ChangePassword } from '../screens/settings';
 
@@ -34,8 +35,9 @@ export default function AppNavigator() {
       >
         {signed ? (
           <>
-            {/* Fluxo Principal com Abas */}
             <Stack.Screen name="Main" component={MainTab} />
+            
+            <Stack.Screen name="Welcome" component={Welcome} />
 
             {/* Pedidos (Orders) */}
             <Stack.Screen name="CreateOrder" component={CreateOrder} />
@@ -46,14 +48,13 @@ export default function AppNavigator() {
             <Stack.Screen name="CreateCustomer" component={CreateCustomer} />
             <Stack.Screen name="CustomerDetails" component={CustomerDetails} />
 
-            {/* Configurações (Settings) - Apenas visualização e edição do próprio perfil */}
+            {/* Configurações (Settings) */}
             <Stack.Screen name="Settings" component={Settings} />
             <Stack.Screen name="EditProfile" component={EditProfile} />
             <Stack.Screen name="ChangePassword" component={ChangePassword} />
           </>
         ) : (
           <>
-            {/* Fluxo de Autenticação */}
             <Stack.Screen name="Login" component={Login} />
             <Stack.Screen name="Register" component={Register} />
           </>
