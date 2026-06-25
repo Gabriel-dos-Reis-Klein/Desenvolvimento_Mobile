@@ -9,7 +9,6 @@ import {
   COLORS,
   SPACING,
   RADIUS,
-  SHADOWS,
   FONT_FAMILY,
   TYPOGRAPHY,
 } from '../../theme';

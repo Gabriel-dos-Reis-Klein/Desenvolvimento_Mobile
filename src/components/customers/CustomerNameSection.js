@@ -1,6 +1,5 @@
-import { View, TouchableOpacity, StyleSheet } from 'react-native';
+import { View,  StyleSheet } from 'react-native';
 import Input from '../common/Input';
-import Text from '../common/Text';
 import { COLORS, SPACING } from '../../theme';
 
 export default function CustomerNameSection({ 

@@ -1,10 +1,9 @@
 import { MaterialCommunityIcons } from '@expo/vector-icons';
-import { COLORS } from '../../theme';
 
 export default function OrderIcon({
   status,
   size = 24,
-  color = '#6750A4', // 💜 Violeta padrão do React Native Paper (MD3 Primary)
+  color = '#6750A4',
   style,
   ...props
 }) {

@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Modal, StyleSheet, Text, View, TouchableOpacity } from 'react-native';
-import { Ionicons } from '@expo/vector-icons'; // Certifique-se de ter o pacote de ícones ou substitua pelo seu componente de ícone
+import { Ionicons } from '@expo/vector-icons';
 
 import { COLORS, SPACING } from '../../theme';
 import Input from './Input';
@@ -43,7 +43,6 @@ export default function PasswordConfirmModal({
     >
       <View style={styles.overlay}>
         <View style={styles.content}>
-          {/* Botão de fechar absoluto no topo direito */}
           <TouchableOpacity 
             style={styles.closeButton} 
             onPress={handleClose}
@@ -120,8 +119,6 @@ const styles = StyleSheet.create({
     lineHeight: 20,
   },
   actionButton: {
-    // Se quiser o botão vermelho de erro original, use COLORS.error. 
-    // Para alteração de senha, o COLORS.primary costuma ser mais amigável.
     backgroundColor: COLORS.primary, 
     marginTop: SPACING.xs,
   },

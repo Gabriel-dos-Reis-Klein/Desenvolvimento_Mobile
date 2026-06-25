@@ -6,7 +6,6 @@ import {
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 
 import Text from '../common/Text';
-import { Text as RNText } from 'react-native';
 
 import OrderIcon from './OrderIcon';
 
@@ -17,7 +16,6 @@ import {
   TYPOGRAPHY,
   FONT_FAMILY,
 } from '../../theme';
-import { ORDER_STATUS_LABELS } from '../../constants';
 
 export default function OrderCard({
   order,
@@ -29,11 +27,11 @@ export default function OrderCard({
 }) {
   if (!order) return null;
 
-  const labelStatus = ORDER_STATUS_LABELS[order?.statusPedido] || order?.statusPedido;
-
-  const renderHighlighted = (text = '') => {
+  const renderHighlighted = (text = '', baseStyle = {}) => {
+    if (!text) return null;
+    
     if (!highlightQuery.trim()) {
-      return <RNText>{text}</RNText>;
+      return <Text style={baseStyle}>{text}</Text>;
     }
 
     const regex = new RegExp(`(${highlightQuery})`, 'gi');
@@ -42,15 +40,16 @@ export default function OrderCard({
     return parts.map((part, index) => {
       const isMatch = part.toLowerCase() === highlightQuery.toLowerCase();
       return (
-        <RNText
+        <Text
           key={index}
-          style={isMatch ? styles.highlight : null}
+          style={[baseStyle, isMatch ? styles.highlight : null]}
         >
           {part}
-        </RNText>
+        </Text>
       );
     });
   };
+
 
   const getProximoPrazo = () => {
     if (!order?.itens || order?.itens.length === 0) return null;
@@ -88,7 +87,7 @@ export default function OrderCard({
           <View style={styles.headerRow}>
             <View style={styles.titleWrapper}>
               <Text variant="body" numberOfLines={1} style={styles.title}>
-                {renderHighlighted(order?.titulo)}
+                {renderHighlighted(order?.titulo, styles.title)}
               </Text>
             </View>
           </View>
@@ -96,7 +95,12 @@ export default function OrderCard({
           <View style={styles.footerRow}>
             <View style={styles.clientNameWrapper}>
               <Text variant="small" style={styles.clientName} numberOfLines={1}>
-                {renderHighlighted(order?.nomeCliente || 'Cliente não informado')}
+                {
+                  renderHighlighted(
+                    order?.nomeCliente || 'Cliente não informado', 
+                    styles.clientName
+                  )
+                }
               </Text>
             </View>
             

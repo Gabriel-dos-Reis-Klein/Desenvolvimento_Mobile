@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { ScrollView, View, Image, Pressable, StyleSheet, Dimensions } from 'react-native';
 import { Text } from 'react-native-paper';
 import UploadButton from './UploadButton';

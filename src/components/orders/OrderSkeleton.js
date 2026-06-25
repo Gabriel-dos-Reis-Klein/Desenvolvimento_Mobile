@@ -1,6 +1,6 @@
 import { StyleSheet, View, Animated } from 'react-native';
 import { useEffect, useRef } from 'react';
-import { COLORS, SPACING, RADIUS } from '../../theme';
+import { SPACING, RADIUS } from '../../theme';
 
 export default function OrderSkeleton() {
   const opacity = useRef(new Animated.Value(0.3)).current;

@@ -1,4 +1,3 @@
-import React from 'react';
 import { View, Pressable, StyleSheet } from 'react-native';
 import { Text } from 'react-native-paper';
 import { COLORS, SPACING, FONT_FAMILY } from '../../theme';

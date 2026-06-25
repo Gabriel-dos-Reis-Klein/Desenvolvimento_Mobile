@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { Pressable, View, StyleSheet, Platform, ActivityIndicator } from 'react-native';
 import { Text } from 'react-native-paper';
 import FontAwesome6 from 'react-native-vector-icons/FontAwesome6';
