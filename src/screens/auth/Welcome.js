@@ -53,7 +53,7 @@ export default function Welcome({ navigation }) {
 
         <View style={styles.imageContainer}>
           <Image
-            source={require('../../assets/welcome-image.png')} 
+            source={require('../../assets/images/welcome-image.png')} 
             style={styles.image}
             resizeMode="contain"
           />
