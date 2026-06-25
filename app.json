@@ -1,22 +1,28 @@
 {
   "expo": {
-    "name": "Desenvolvimento_Mobile",
-    "slug": "Desenvolvimento_Mobile",
+    "name": "Ponto Gestor",
+    "slug": "ponto-gestor",
     "version": "1.0.0",
     "orientation": "default",
+    "icon": "./assets/images/icon.png", 
     "userInterfaceStyle": "light",
     "newArchEnabled": true,
     "ios": {
       "supportsTablet": true,
+      "icon": "./assets/images/icon.png",
       "supportedOrientations": [
         "portrait",
         "portraitUpsideDown"
       ]
     },
     "android": {
-      "package": "com.anonymous.Desenvolvimento_Mobile",
+      "package": "com.anonymous.ponto_gestor",
       "edgeToEdgeEnabled": true,
       "primaryColor": "#FF0054",
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/images/icon.png",
+        "backgroundColor": "#FF0054"
+      },
       "permissions": [
         "android.permission.RECORD_AUDIO",
         "android.permission.MODIFY_AUDIO_SETTINGS"
