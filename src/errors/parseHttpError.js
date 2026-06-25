@@ -26,7 +26,7 @@ export function parseHttpError(error) {
   }
 
   return {
-    type: status >= 500 ? 'server' : 'unknown',
+    type: status >= 505 ? 'server' : 'unknown',
     message: apiMessage || 'Erro inesperado',
     status,
   };
