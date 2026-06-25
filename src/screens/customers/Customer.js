@@ -19,7 +19,7 @@ import {
 } from '../../theme';
 import {
   useCustomers,
-} from '../../hooks/useCustomers';
+} from '../../hooks';
 
 import ListHeader from '../../components/common/ListHeader';
 import SearchInput from '../../components/common/SearchInput';

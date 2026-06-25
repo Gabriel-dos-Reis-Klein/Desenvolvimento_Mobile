@@ -1,4 +1,4 @@
-import { ORDER_TYPES } from "../../constants";
+import { ORDER_TYPES } from "../constants";
 
 export const ORDER_TYPE_STYLES = {
   [ORDER_TYPES.MANUFACTURING]: {

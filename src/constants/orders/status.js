@@ -1,5 +1,0 @@
-export const ORDER_STATUS = {
-  DONE: 'PRONTO',
-  PRODUCTION: 'PRODUCAO',
-  DELIVERED: 'ENTREGUE',
-};

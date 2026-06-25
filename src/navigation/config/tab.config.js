@@ -5,13 +5,13 @@ import { SPACING } from '../../theme/spacing';
 import { TYPOGRAPHY } from '../../theme/typography';
 import { FONT_FAMILY } from '../../theme';
 
-export const TAB_ICONS = {
+const TAB_ICONS = {
   Pedidos: 'shirt',
   Clientes: 'users',
   'Config.': 'gear',
 };
 
-export const styleOptions = {
+const styleOptions = {
   tabBarActiveTintColor: COLORS.primary,
   tabBarInactiveTintColor: COLORS.textSecondary,
   tabBarItemStyle: {

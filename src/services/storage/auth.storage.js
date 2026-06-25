@@ -16,7 +16,7 @@ export async function saveAuth({ token }) {
   );
 }
 
-export async function getAuth() {
+async function getAuth() {
   const raw = await AsyncStorage.getItem(AUTH_STORAGE_KEY);
 
   if (!raw) return null;
