@@ -70,7 +70,6 @@ export default function Settings({ navigation }) {
         contentContainerStyle={styles.scrollContent}
         showsVerticalScrollIndicator={false}
       >
-        {/* Bloco de Informações Detalhadas */}
         <Text style={styles.sectionTitle}>Seus Dados</Text>
         <View style={styles.infoGroup}>
           <View style={styles.infoRow}>
@@ -84,10 +83,8 @@ export default function Settings({ navigation }) {
           </View>
         </View>
 
-        {/* Bloco de Ações e Gerenciamento */}
         <Text style={styles.sectionTitle}>Gerenciamento</Text>
         <View style={styles.actionGroup}>
-          {/* Opção 1: Dados Cadastrais */}
           <TouchableOpacity 
             style={styles.actionItem} 
             activeOpacity={0.7}
@@ -104,7 +101,6 @@ export default function Settings({ navigation }) {
           
           <View style={styles.infoRowDivider} />
 
-          {/* Opção 2: Alterar Senha */}
           <TouchableOpacity 
             style={styles.actionItem} 
             activeOpacity={0.7}
@@ -120,7 +116,6 @@ export default function Settings({ navigation }) {
           </TouchableOpacity>
         </View>
 
-        {/* Botão Destrutivo de Logout com Feedback Premium */}
         <Pressable 
           style={({ pressed }) => [
             styles.logoutButton,

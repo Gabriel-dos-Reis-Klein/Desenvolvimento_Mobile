@@ -28,7 +28,6 @@ export default function PageHeader({
         style={styles.contentContainer}
       />
 
-      {/* Renderiza o componente da direita ou o espaçador para manter o título centralizado */}
       {rightComponent ? (
         <Appbar.Action icon={() => rightComponent} style={styles.rightAction} />
       ) : (
@@ -43,14 +42,13 @@ const StyleSpacer = () => <Appbar.Action icon={() => null} disabled style={style
 const styles = StyleSheet.create({
   header: {
     backgroundColor: COLORS.background || 'transparent',
-    /* 🌟 PADRONIZAÇÃO AQUI: O Header agora assume o papel do seu antigo headerContainer */
     paddingHorizontal: SPACING.md,
     marginTop: 0,
-    marginBottom: SPACING.md, // Reduzido um pouco para não distanciar demais do primeiro input
+    marginBottom: SPACING.md,
     elevation: 0, 
     shadowOpacity: 0,
     justifyContent: 'center',
-    height: 56, // Altura padrão estável para Appbar
+    height: 56,
   },
   contentContainer: {
     alignItems: 'center',
@@ -63,10 +61,10 @@ const styles = StyleSheet.create({
     textAlign: 'center', 
   },
   backAction: {
-    marginLeft: -8, // 🌟 Compensa o padding interno do botão para alinhar o ícone perfeitamente à esquerda
+    marginLeft: -8,
   },
   rightAction: {
-    marginRight: -8, // 🌟 Compensa o padding interno para alinhar as ações perfeitamente à direita
+    marginRight: -8,
   },
   spacer: {
     width: 48,

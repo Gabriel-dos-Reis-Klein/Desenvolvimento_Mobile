@@ -84,7 +84,6 @@ export default function OrderDetails({ navigation, route }) {
       
       let formattedAdvance = 'R$ 0,00';
       if (data.pagamentoAntecipado !== undefined && data.pagamentoAntecipado !== null) {
-        // Correção do erro de digitação (pagamentoAntecipated -> pagamentoAntecipado)
         const numericAdvance = Number(data.pagamentoAntecipado); 
         formattedAdvance = isNaN(numericAdvance)
           ? 'R$ 0,00'
@@ -499,7 +498,7 @@ export default function OrderDetails({ navigation, route }) {
               onDeleteItem={(item, index) => handleDeleteItem(index)} 
               onDuplicateItem={(item) => handleDuplicateItem(item)} 
               onAddItem={() => handleNavigateToItem('create', null, items ? items.length : 0)} 
-              onStatusChange={handleItemStatusChange} // Ajustado para bater com a propriedade interna do componente
+              onStatusChange={handleItemStatusChange}
             />
           </ScrollView>
         </KeyboardAvoidingView>

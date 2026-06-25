@@ -53,13 +53,11 @@ export default function CustomerPicker({
         }}
         contentContainerStyle={styles.container}
       >
-        {/* SEARCH */}
         <SearchInput
           value={searchText}
           onChangeText={setSearchText}
         />
 
-        {/* TOOLBAR */}
         <View style={styles.toolbar}>
           <Chip compact icon="account">
             {loading ? 'Carregando...' : `${filteredCustomers.length} clientes`}
@@ -76,14 +74,11 @@ export default function CustomerPicker({
 
         <Divider />
 
-        {/* LIST / SKELETON */}
         {loading ? (
-          // Exibe os skeletons em loop se estiver carregando
           <View style={styles.skeletonContainer}>
             <CustomerSkeleton />
           </View>
         ) : (
-          // Exibe a lista real quando terminar de carregar
           <FlatList
             data={filteredCustomers}
             keyExtractor={(item) => item.id}
@@ -164,7 +159,6 @@ const styles = StyleSheet.create({
     paddingBottom: SPACING.lg,
   },
 
-  // Ajuste de padding interno para o skeleton alinhar perfeitamente com a margem do modal
   skeletonContainer: {
     paddingTop: SPACING.md,
     paddingHorizontal: 0, 

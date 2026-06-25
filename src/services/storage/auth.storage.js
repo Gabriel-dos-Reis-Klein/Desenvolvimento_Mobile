@@ -2,7 +2,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const AUTH_STORAGE_KEY = '@app/auth';
 
-const EXPIRATION_TIME = 6 * 60 * 60 * 1000; // 6 horas
+const EXPIRATION_TIME = 6 * 60 * 60 * 1000;
 
 export async function saveAuth({ token }) {
   const payload = {

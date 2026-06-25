@@ -7,7 +7,7 @@ import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view
 import PageHeader from '../../components/common/PageHeader';
 import Input from '../../components/common/Input';
 import Button from '../../components/common/Button';
-import Tabs from '../../components/common/Tabs'; // Importando o novo componente genérico
+import Tabs from '../../components/common/Tabs'; 
 
 import ServiceTypeSelector from '../../components/orders/ServiceTypeSelector'; 
 import ItemStatusSelector from '../../components/orders/ItemStatusSelector';
@@ -321,7 +321,6 @@ export default function ItemForm({ navigation, route }) {
         <PageHeader title={mode === 'create' ? 'Novo Item' : 'Editar Item'} onBack={() => navigation.goBack()} />
       </View>
 
-      {/* Aplicado o novo componente genérico de abas */}
       <Tabs 
         tabs={itemTabsConfig} 
         activeTab={activeTab} 

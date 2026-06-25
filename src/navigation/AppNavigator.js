@@ -36,19 +36,15 @@ export default function AppNavigator() {
         {signed ? (
           <>
             <Stack.Screen name="Main" component={MainTab} />
-            
             <Stack.Screen name="Welcome" component={Welcome} />
 
-            {/* Pedidos (Orders) */}
             <Stack.Screen name="CreateOrder" component={CreateOrder} />
             <Stack.Screen name="OrderDetails" component={OrderDetails} />
             <Stack.Screen name="ItemForm" component={ItemForm} />
 
-            {/* Clientes (Customers) */}
             <Stack.Screen name="CreateCustomer" component={CreateCustomer} />
             <Stack.Screen name="CustomerDetails" component={CustomerDetails} />
 
-            {/* Configurações (Settings) */}
             <Stack.Screen name="Settings" component={Settings} />
             <Stack.Screen name="EditProfile" component={EditProfile} />
             <Stack.Screen name="ChangePassword" component={ChangePassword} />

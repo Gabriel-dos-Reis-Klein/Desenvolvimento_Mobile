@@ -1,10 +1,8 @@
 import { z } from 'zod';
 
-// Necessário para a validação da novaSenha funcionar
 export const passwordRegex =
   /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z\d]).{8,}$/;
 
-// Validação de Dados Pessoais
 export const editProfileSchema = z.object({
   nome: z
     .string()
@@ -18,7 +16,6 @@ export const editProfileSchema = z.object({
     .email('E-mail inválido'),
 });
 
-// Validação para Alteração de Senha do Perfil
 export const changePasswordSchema = z.object({
   novaSenha: z
     .string()

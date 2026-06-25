@@ -304,7 +304,6 @@ export default function CustomerDetails({ navigation, route }) {
                 <Text style={styles.emptyText}>Nenhum pedido encontrado para este cliente.</Text>
               </View>
             ) : (
-              // Substituído o TouchableOpacity customizado pelo componente reaproveitável OrderCard
               pedidos.map((pedido) => (
                 <OrderCard 
                   key={pedido.id} 
@@ -415,7 +414,4 @@ const styles = StyleSheet.create({
     gap: SPACING.md, 
     backgroundColor: COLORS.background 
   },
-  btnDelete: { 
-    borderColor: COLORS.error || '#ff3b30' 
-  }
 });

@@ -102,7 +102,6 @@ export default function ImageGalleryModal({
           <View style={styles.appbar}>
             <ActionButton icon="arrow-left" onPress={handleClose} />
             
-            {/* O container central agora fica visível por cima do fundo cinza */}
             <View style={styles.centerContainer} pointerEvents="none">
               {currentZoom > 100 && (
                 <View style={styles.zoomBadge}>

@@ -22,7 +22,6 @@ import { AuthProvider }
 import * as ScreenOrientation 
   from 'expo-screen-orientation';
 
-// TODO: criar contramedidas para caso a API esteja indisponível
 export default function App() {
 
   useAppFonts();

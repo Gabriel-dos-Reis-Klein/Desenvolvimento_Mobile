@@ -17,8 +17,6 @@ import {
 
 import StitchLine from '../common/StitchLine';
 
-// TODO: trocar ícone de tesoura pela logo
-
 export default function AuthHeader({
   title,
 }) {

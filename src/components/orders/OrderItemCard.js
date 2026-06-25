@@ -51,7 +51,6 @@ export default function OrderItemCard({ item = {}, onEdit, onDelete, onDuplicate
   const openMenu = () => setMenuVisible(true);
   const closeMenu = () => setMenuVisible(false);
 
-  // Componente interno para garantir o alinhamento e centralização perfeita dos ícones do Menu
   const renderMenuIcon = (iconName, iconColor) => (
     <View style={styles.menuIconContainer}>
       <FontAwesome6 name={iconName} size={12} color={iconColor} />
@@ -61,13 +60,12 @@ export default function OrderItemCard({ item = {}, onEdit, onDelete, onDuplicate
   return (
     <Card 
       style={styles.card} 
-      mode="flat" // Volta ao modo flat da versão anterior
+      mode="flat"
       elevation={0}
       onPress={onEdit}
     >
       <Card.Content style={styles.cardContent}>
         
-        {/* HEADER */}
         <View style={styles.header}>
           <Text numberOfLines={1} style={styles.title}>
             {item?.titulo || 'Sem Título'}
@@ -81,7 +79,6 @@ export default function OrderItemCard({ item = {}, onEdit, onDelete, onDuplicate
           </View>
         </View>
 
-        {/* DATAS */}
         <View style={styles.datesGrid}>
           {!!item?.dataProva && (
             <View style={styles.dateBadge}>
@@ -103,16 +100,13 @@ export default function OrderItemCard({ item = {}, onEdit, onDelete, onDuplicate
           )}
         </View>
 
-        {/* FOOTER */}
         <View style={styles.footer}>
           <View style={styles.priceContainer}>
             <Text style={styles.priceLabel}>Valor do item</Text>
-            {/* COR DO PREÇO: Retornou para COLORS.text da versão antiga */}
             <Text style={styles.priceValue}>{formatCurrency(item?.valor)}</Text>
           </View>
 
           <View style={styles.actionsContainer}>
-            {/* CONTADOR DE IMAGENS */}
             {!!item?.imagem?.length && item.imagem[0] !== "string" && (
               <View style={styles.imageBadgeContainer}>
                 <FontAwesome6 name="image" size={14} color={COLORS.textSecondary || '#4B5563'} />
@@ -122,7 +116,6 @@ export default function OrderItemCard({ item = {}, onEdit, onDelete, onDuplicate
               </View>
             )}
 
-            {/* GATILHO DO MENU TRÊS PONTOS */}
             <Menu
               visible={menuVisible}
               onDismiss={closeMenu}
@@ -167,7 +160,6 @@ const styles = StyleSheet.create({
     backgroundColor: COLORS.surface,
     borderRadius: 16, 
     marginBottom: SPACING.md,
-    // ESTILO DA BORDA ANTIGA: Retornou para a linha contínua sutil sem sombras pesadas
     borderWidth: 1,
     borderColor: 'rgba(0, 0, 0, 0.08)', 
   },

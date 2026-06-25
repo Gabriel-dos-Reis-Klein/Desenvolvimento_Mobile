@@ -111,7 +111,6 @@ export default function AddItemModal({
             <Input label="Descrição" type="textarea" value={descricao} onChangeText={setDescricao} />
             <Input label="Valor (R$)" keyboardType="numeric" value={valor} onChangeText={setValor} />
 
-            {/* TYPE SELECT SIMPLES */}
             <View style={styles.typeRow}>
               <Button title="Confecção" variant={tipo === 'CONFECCAO' ? 'primary' : 'secondary'} onPress={() => setTipo('CONFECCAO')} />
               <Button title="Reparo" variant={tipo === 'REPARO' ? 'primary' : 'secondary'} onPress={() => setTipo('REPARO')} />
