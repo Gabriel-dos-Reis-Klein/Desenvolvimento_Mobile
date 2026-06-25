@@ -4,23 +4,19 @@
     "slug": "ponto-gestor",
     "version": "1.0.0",
     "orientation": "default",
-    "icon": "./assets/images/icon.png", 
+    "icon": "./src/assets/images/icon.png",
     "userInterfaceStyle": "light",
     "newArchEnabled": true,
+    "primaryColor": "#FF0054",
     "ios": {
       "supportsTablet": true,
-      "icon": "./assets/images/icon.png",
-      "supportedOrientations": [
-        "portrait",
-        "portraitUpsideDown"
-      ]
+      "icon": "./src/assets/images/icon.png"
     },
     "android": {
       "package": "com.anonymous.ponto_gestor",
       "edgeToEdgeEnabled": true,
-      "primaryColor": "#FF0054",
       "adaptiveIcon": {
-        "foregroundImage": "./assets/images/icon.png",
+        "foregroundImage": "./src/assets/images/icon.png",
         "backgroundColor": "#FF0054"
       },
       "permissions": [
@@ -45,9 +41,10 @@
       ],
       "expo-audio"
     ],
+    "owner": "lucasflores",
     "extra": {
       "eas": {
-        "projectId": "f0b87add-34a6-45b5-b351-08f3bd1ad979"
+        "projectId": "3d694ba8-2b01-4631-8120-df246c16a851"
       }
     }
   }
